@@ -140,3 +140,8 @@ export {
     STANDARD_COMPONENT_NAMES,
     getStandardComponentDefinitions,
 } from "@mailforge/components";
+
+export {
+    COMPOSITE_COMPONENT_NAMES,
+    getCompositeComponentDefinitions,
+} from "@mailforge/components";

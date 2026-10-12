@@ -23,6 +23,7 @@ import {
     ComponentCatalog,
     ComponentExpander,
     registerStandardComponents,
+    registerCompositeComponents,
     type ReusableComponentDefinition,
 } from "@mailforge/components";
 
@@ -131,6 +132,11 @@ export class MailForgeEmail {
         // Register six standard reusable components
         // in this engine's existing component catalog.
         registerStandardComponents(
+            this.componentCatalog,
+        );
+
+        // Task 7.7.4: Six composite/layout components.
+        registerCompositeComponents(
             this.componentCatalog,
         );
     }

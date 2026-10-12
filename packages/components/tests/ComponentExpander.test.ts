@@ -242,7 +242,7 @@ describe("MailForge ComponentExpander", () => {
             .toThrow("Unsafe attribute");
     });
 
-    it("10. rejects multiple output nodes", () => {
+    it("10. expands multiple output nodes", () => {
         const custom = definition();
 
         custom.render = (_props, context) => [
@@ -260,8 +260,11 @@ describe("MailForge ComponentExpander", () => {
 
         const { expander } = setup(custom);
 
-        expect(() => expander.expand(template()))
-            .toThrow("Multiple output nodes");
+        const expanded = expander.expand(template());
+
+        expect(expanded.body).toHaveLength(2);
+        expect(expanded.body.map((node) => node.props?.text))
+            .toEqual(["First", "Second"]);
     });
 
     it("11. rejects altered node IDs", () => {
@@ -279,7 +282,7 @@ describe("MailForge ComponentExpander", () => {
             .toThrow("preserve context.nodeId");
     });
 
-    it("12. rejects unsupported output types", () => {
+    it("12. expands layout output types", () => {
         const custom = definition();
 
         custom.render = (_props, context) => ({
@@ -289,8 +292,9 @@ describe("MailForge ComponentExpander", () => {
 
         const { expander } = setup(custom);
 
-        expect(() => expander.expand(template()))
-            .toThrow("Unsupported output type");
+        const expanded = expander.expand(template());
+
+        expect(expanded.body[0]?.type).toBe("section");
     });
 
     it("13. wraps handler exceptions", () => {
@@ -315,7 +319,7 @@ describe("MailForge ComponentExpander", () => {
         const { expander } = setup(custom);
 
         expect(() => expander.expand(template()))
-            .toThrow("plain EmailNode object");
+            .toThrow("Handler output must contain EmailNode objects");
     });
 
     it("15. limits total custom expansions", () => {
