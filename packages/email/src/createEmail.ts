@@ -786,6 +786,17 @@ export class MailForgeEmail {
         return this;
     }
 
+    /** Register a reusable component library on this engine. */
+    public registerComponents(
+        definitions: readonly ReusableComponentDefinition[],
+    ): this {
+        for (const definition of definitions) {
+            this.registerComponent(definition);
+        }
+
+        return this;
+    }
+
     /** Replace a registered reusable component for this engine. */
     public overrideComponent(
         definition: ReusableComponentDefinition,

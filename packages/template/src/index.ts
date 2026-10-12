@@ -124,3 +124,12 @@ export type {
   ExtendedTemplateInfo,
 } from "./extended/ExtendedTemplates.js";
 
+export {
+  buildFeatureShowcaseTemplate,
+  featureShowcaseSchema,
+} from "./extended/FeatureShowcaseTemplate.js";
+
+export type {
+  FeatureShowcaseData,
+} from "./extended/FeatureShowcaseTemplate.js";
+

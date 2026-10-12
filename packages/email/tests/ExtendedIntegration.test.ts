@@ -2,11 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import {
     createEmail,
-    registerExtendedComponents,
     registerExtendedTemplates,
     buildNewsletterTemplate,
     buildPromotionTemplate,
     buildShippingUpdateTemplate,
+    buildFeatureShowcaseTemplate,
+    getExtendedComponentDefinitions,
     type NewsletterData,
     type PromotionData,
     type ShippingUpdateData,
@@ -17,7 +18,9 @@ describe("MailForge Extended Components & Templates Integration", () => {
         const email = createEmail();
 
         // Register extended components into this email instance
-        registerExtendedComponents(email["componentCatalog"]);
+        email.registerComponents(
+            getExtendedComponentDefinitions(),
+        );
 
         email.registerTemplate({
             schemaVersion: "1.0",
@@ -166,5 +169,42 @@ describe("MailForge Extended Components & Templates Integration", () => {
         expect(result.html).toContain("Carrier: UPS Express");
         expect(result.html).toContain("Tracking #: 1Z9999999999999999");
         expect(result.html).toContain("Track Package Online");
+    });
+
+    it("5. renders the complete feature showcase template", async () => {
+        const email = createEmail();
+        email.registerComponents(getExtendedComponentDefinitions());
+
+        email.registerTemplate(buildFeatureShowcaseTemplate({
+            recipientName: "Elena",
+            title: "Everything in one email",
+            summary: "Your complete account and order update is ready.",
+            imageUrl: "https://example.com/product.png",
+            imageAlt: "Product overview",
+            primaryUrl: "https://example.com/orders/ORD-1001",
+            secondaryUrl: "https://example.com/support",
+            order: {
+                id: "ORD-1001",
+                currency: "USD",
+                items: [{
+                    name: "MailForge Pro",
+                    quantity: 1,
+                    unitPriceCents: 4900,
+                }],
+            },
+            socialLinks: [{
+                platform: "github",
+                url: "https://github.com/mailforge",
+            }],
+        }));
+
+        const result = await email.render("feature-showcase");
+
+        expect(result.html).toContain("Everything in one email");
+        expect(result.html).toContain("What you can do next");
+        expect(result.html).toContain("ORDER SUMMARY");
+        expect(result.html).toContain("MailForge Pro");
+        expect(result.html).toContain("Account details");
+        expect(result.html).toContain("GitHub");
     });
 });

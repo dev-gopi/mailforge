@@ -224,3 +224,12 @@ export type {
     ShippingUpdateData,
 } from "@mailforge/templates";
 
+export {
+    buildFeatureShowcaseTemplate,
+    featureShowcaseSchema,
+} from "@mailforge/templates";
+
+export type {
+    FeatureShowcaseData,
+} from "@mailforge/templates";
+
