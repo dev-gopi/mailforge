@@ -7,6 +7,11 @@ import type {
 /**
  * Brand options supplied by a developer.
  */
+import type {
+  EmailLayoutOptions,
+  ResolvedEmailLayout,
+} from "../layout/Layout.types.js";
+
 export interface EmailBrandOptions {
   name?: string;
   logo?: string;
@@ -15,10 +20,8 @@ export interface EmailBrandOptions {
   supportEmail?: string;
 }
 
-/**
- * Main createEmail() configuration.
- */
-export interface EmailConfigOptions {
+export interface EmailConfigOptions
+  extends EmailLayoutOptions {
   brand?: EmailBrandOptions;
   theme?: EmailThemeOptions;
 }
@@ -40,6 +43,7 @@ export interface ResolvedEmailBrand {
 export interface ResolvedEmailConfig {
   readonly brand: Readonly<ResolvedEmailBrand>;
   readonly theme: ResolvedEmailTheme;
+  readonly layout: ResolvedEmailLayout;
 }
 
 /**

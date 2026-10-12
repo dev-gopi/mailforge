@@ -82,7 +82,9 @@ export function mjmlStyles(
 ): string {
     const attributes: string[] = [];
     for (const [key, value] of Object.entries(styles)) {
-        const name = STYLE_ATTRIBUTES[key];
+        const name = target === "mj-divider" && key === "color"
+            ? "border-color"
+            : STYLE_ATTRIBUTES[key];
         if (!name || (target && !TARGET_STYLES[target]?.includes(key))) {
             throw new Error(`Unsupported style '${key}' for ${target ?? "MJML"}`);
         }

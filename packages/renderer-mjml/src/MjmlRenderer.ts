@@ -116,8 +116,24 @@ export class MjmlRenderer implements EmailRenderer {
             state.selectors.length ? `<mj-html-attributes>${state.selectors.join("\n")}</mj-html-attributes>` : "",
         ].join("\n");
 
-        const source = `<mjml><mj-head>${head}</mj-head><mj-body>${body}</mj-body></mjml>`;
-        // MJML 5 supports an async compiler; strict mode throws on validation errors.
+        const background = options.bodyBackgroundColor;
+
+        if (
+            background !== undefined &&
+            !/^#[0-9a-fA-F]{6}$/.test(background)
+        ) {
+            throw new Error(
+                "Invalid email body background color",
+            );
+        }
+
+        const bodyAttributes = background
+            ? ` background-color="${background}"`
+            : "";
+
+        const source =
+            `<mjml><mj-head>${head}</mj-head>` +
+            `<mj-body${bodyAttributes}>${body}</mj-body></mjml>`;        // MJML 5 supports an async compiler; strict mode throws on validation errors.
         const compiled = await mjml2html(source, {
             validationLevel: "strict",
             keepComments: false,
@@ -206,7 +222,7 @@ export class MjmlRenderer implements EmailRenderer {
                 const attrs = targetAttributes(node, "mj-text", state);
                 const number = Number(props.level ?? 2);
                 const level = Number.isInteger(number) && number >= 1 && number <= 6 ? number : 2;
-                return `<mj-text ${attrs}><h${level}>${escapeHtml(props.text)}</h${level}></mj-text>`;
+                return `<mj-text ${attrs}><h${level} style="margin:0;font-size:inherit;line-height:inherit;font-family:inherit;color:inherit;font-weight:inherit">${escapeHtml(props.text)}</h${level}></mj-text>`;
             }
             case "text":
             case "copyright": {

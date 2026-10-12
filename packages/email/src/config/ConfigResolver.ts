@@ -10,12 +10,19 @@ import {
     resolveEmailTheme,
 } from "../theme/ThemeResolver.js";
 
+import {
+    resolveEmailLayout,
+} from "../layout/LayoutResolver.js";
+
 const DEFAULT_NAME = "MailForge";
 const DEFAULT_COLOR = "#2563eb";
 
 const CONFIG_KEYS = new Set([
     "brand",
     "theme",
+    "header",
+    "footer",
+    "copyright",
 ]);
 
 const BRAND_KEYS = new Set([
@@ -26,7 +33,12 @@ const BRAND_KEYS = new Set([
     "supportEmail",
 ]);
 
-const CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/;
+const hasControlCharacter = (value: string): boolean =>
+    [...value].some((character) => {
+        const code = character.charCodeAt(0);
+
+        return code <= 0x1f || code === 0x7f;
+    });
 
 function asRecord(
     value: unknown,
@@ -107,7 +119,7 @@ function readString(
         );
     }
 
-    if (CONTROL_CHARACTERS.test(clean)) {
+    if (hasControlCharacter(clean)) {
         throw new EmailConfigError(
             `brand.${key}`,
             "must not contain control characters",
@@ -251,8 +263,23 @@ export function resolveEmailConfig(
         explicitBrandColor,
     );
 
+    const layout = resolveEmailLayout({
+        ...(Object.hasOwn(options, "header")
+            ? { header: input.header }
+            : {}),
+
+        ...(Object.hasOwn(options, "footer")
+            ? { footer: input.footer }
+            : {}),
+
+        ...(Object.hasOwn(options, "copyright")
+            ? { copyright: input.copyright }
+            : {}),
+    });
+
     return Object.freeze({
         brand: Object.freeze(brand),
         theme,
+        layout,
     });
 }

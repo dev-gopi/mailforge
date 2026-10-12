@@ -8,6 +8,7 @@ export type RenderTrust = "safe" | "trusted";
 export interface RenderOptions {
     trust?: RenderTrust;
     inlineCss?: boolean;
+    bodyBackgroundColor?: string;
 }
 
 export interface RenderWarning {
