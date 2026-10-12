@@ -26,6 +26,19 @@ importers:
       vitest:
         specifier: ^5.0.3
         version: 5.0.3(@types/node@26.6.5)(vite@8.3.4(@types/node@26.6.5))
+      zod:
+        specifier: ^4.6.6
+        version: 4.6.6
+
+  packages/components:
+    dependencies:
+      '@mailforge/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      zod:
+        specifier: ^4.6.6
+        version: 4.6.6
 
   packages/core:
     dependencies:
@@ -35,6 +48,9 @@ importers:
 
   packages/email:
     dependencies:
+      '@mailforge/components':
+        specifier: workspace:*
+        version: link:../components
       '@mailforge/core':
         specifier: workspace:*
         version: link:../core
@@ -51,6 +67,9 @@ importers:
       '@types/node':
         specifier: ^26.6.5
         version: 26.6.5
+      zod:
+        specifier: ^4.6.6
+        version: 4.6.6
 
   packages/renderer-html:
     dependencies:

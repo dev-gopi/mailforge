@@ -21,13 +21,15 @@
         "test": "vitest run"
     },
     "dependencies": {
+        "@mailforge/components": "workspace:*",
         "@mailforge/core": "workspace:*",
-        "@mailforge/renderer-mjml": "workspace:*",
         "@mailforge/renderer-html": "workspace:*",
+        "@mailforge/renderer-mjml": "workspace:*",
         "@mailforge/templates": "workspace:*"
     },
     "devDependencies": {
-        "@types/node": "^26.6.5"
+        "@types/node": "^26.6.5",
+        "zod": "^4.6.6"
     },
     "sideEffects": false,
     "license": "MIT"

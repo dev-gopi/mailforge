@@ -125,3 +125,13 @@ export type {
     BuiltinTemplateName,
     BuiltinTemplateDataMap,
 } from "@mailforge/templates";
+
+import {
+    ComponentCatalog,
+    ComponentExpander,
+    type ReusableComponentDefinition,
+} from "@mailforge/components";
+
+import type {
+    ComponentInfo,
+} from "@mailforge/core";

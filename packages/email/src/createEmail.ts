@@ -7,6 +7,7 @@ import {
     type DocumentPatch,
     type RenderOptions,
     type RenderResult,
+    type ComponentInfo,
 } from "@mailforge/core";
 
 import {
@@ -17,6 +18,12 @@ import {
     HtmlRenderer,
     type HtmlRenderInput,
 } from "@mailforge/renderer-html";
+
+import {
+    ComponentCatalog,
+    ComponentExpander,
+    type ReusableComponentDefinition,
+} from "@mailforge/components";
 
 import {
     getBuiltinTemplate,
@@ -91,6 +98,15 @@ export class MailForgeEmail {
 
     private readonly registry =
         new ComponentRegistry();
+
+    private readonly componentCatalog =
+        new ComponentCatalog(this.registry);
+
+    private readonly componentExpander =
+        new ComponentExpander(
+            this.registry,
+            this.componentCatalog,
+        );
 
     private readonly validator =
         new ComponentValidator(this.registry);
@@ -330,9 +346,13 @@ export class MailForgeEmail {
             patches,
         );
 
+        const expanded = this.componentExpander.expand(
+            customized,
+        );
+
         // 6. Apply colors, typography and spacing.
         const themed = applyEmailTheme(
-            customized,
+            expanded,
             theme,
         );
 
@@ -368,6 +388,24 @@ export class MailForgeEmail {
                 trust: options.trust ?? "safe",
             },
         );
+    }
+
+    /**
+     * Register a reusable custom email component.
+     */
+    public registerComponent(
+        definition: ReusableComponentDefinition,
+    ): this {
+        this.componentCatalog.register(definition);
+        return this;
+    }
+
+    /**
+     * List all available built-in primitives
+     * and registered custom components.
+     */
+    public listComponents(): ComponentInfo[] {
+        return this.registry.list();
     }
 }
 
