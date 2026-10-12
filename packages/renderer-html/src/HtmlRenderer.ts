@@ -1,6 +1,7 @@
 
 import sanitizeHtml from "sanitize-html";
 import { convert } from "html-to-text";
+import { Buffer } from "node:buffer";
 import { CssProcessor } from "./CssProcessor.js";
 
 import type {

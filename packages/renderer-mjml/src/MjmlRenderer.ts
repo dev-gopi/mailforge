@@ -1,5 +1,6 @@
 import mjml2html from "mjml";
 import { convert } from "html-to-text";
+import { Buffer } from "node:buffer";
 import {
     ComponentRegistry,
     ComponentValidator,

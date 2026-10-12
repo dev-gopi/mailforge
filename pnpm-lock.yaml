@@ -33,6 +33,22 @@ importers:
         specifier: ^4.6.6
         version: 4.6.6
 
+  packages/email:
+    dependencies:
+      '@mailforge/core':
+        specifier: workspace:*
+        version: link:../core
+      '@mailforge/renderer-html':
+        specifier: workspace:*
+        version: link:../renderer-html
+      '@mailforge/renderer-mjml':
+        specifier: workspace:*
+        version: link:../renderer-mjml
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.5
+        version: 26.6.5
+
   packages/renderer-html:
     dependencies:
       '@mailforge/core':
@@ -82,6 +98,9 @@ importers:
       '@types/mjml':
         specifier: ^5.0.0
         version: 5.0.0
+      '@types/node':
+        specifier: ^26.6.5
+        version: 26.6.5
       '@types/sanitize-html':
         specifier: ^2.16.2
         version: 2.16.2

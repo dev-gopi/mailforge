@@ -1,0 +1,33 @@
+{
+    "name": "@mailforge/email",
+    "version": "0.1.0",
+    "description": "Plug-and-play email template generation for Node.js",
+    "private": true,
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc -p tsconfig.json",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@mailforge/core": "workspace:*",
+        "@mailforge/renderer-mjml": "workspace:*",
+        "@mailforge/renderer-html": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "^26.6.5"
+    },
+    "sideEffects": false,
+    "license": "MIT"
+}
