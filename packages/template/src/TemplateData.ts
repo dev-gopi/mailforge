@@ -1,14 +1,24 @@
+import {
+  DOMAIN_TEMPLATE_NAMES,
+  DOMAIN_TEMPLATE_SCHEMAS,
+  assertPlainTemplateData,
+  type DomainTemplateDataMap,
+  type DomainTemplateName,
+  type ParsedDomainTemplateDataMap,
+} from "./DomainTemplateData.js";
+
 export const BUILTIN_TEMPLATE_NAMES = [
   "welcome",
   "otp",
   "password-reset",
   "invitation",
   "notification",
+  ...DOMAIN_TEMPLATE_NAMES,
 ] as const;
 
 export type BuiltinTemplateName = (typeof BUILTIN_TEMPLATE_NAMES)[number];
 
-export interface BuiltinTemplateDataMap {
+export interface BuiltinTemplateDataMap extends DomainTemplateDataMap {
   welcome: {
     user: {
       firstName: string;
@@ -55,6 +65,52 @@ export class BuiltinTemplateDataError extends Error {
     super(`Invalid built-in email data at "${field}": ${reason}`);
     this.name = "BuiltinTemplateDataError";
   }
+}
+
+
+/**
+ * Parse and validate one new domain template.
+ * Converts schema errors to the existing
+ * MailForge built-in data error format.
+ */
+export function parseDomainTemplateData<
+  Name extends DomainTemplateName
+>(
+  name: Name,
+  input: unknown,
+): ParsedDomainTemplateDataMap[Name] {
+  try {
+    assertPlainTemplateData(input);
+  } catch (error) {
+    throw new BuiltinTemplateDataError(
+      "data",
+      error instanceof Error
+        ? error.message
+        : "Invalid template data",
+    );
+  }
+
+  const result =
+    DOMAIN_TEMPLATE_SCHEMAS[name].safeParse(input);
+
+  if (!result.success) {
+    const issue = result.error.issues[0];
+
+    const location = issue?.path.reduce<string>(
+      (path, part) =>
+        typeof part === "number"
+          ? `${path}[${part}]`
+          : `${path}.${String(part)}`,
+      "data",
+    ) ?? "data";
+
+    throw new BuiltinTemplateDataError(
+      location,
+      issue?.message ?? "Invalid template data",
+    );
+  }
+
+  return result.data as ParsedDomainTemplateDataMap[Name];
 }
 
 export function isBuiltinTemplateName(
@@ -220,6 +276,14 @@ export function assertBuiltinTemplateData(
 
       requiredHttps(field(data, "actionUrl"), "data.actionUrl");
 
+      return;
+    }
+
+    case "invoice":
+    case "payment-receipt":
+    case "order-confirmation":
+    case "security-alert": {
+      parseDomainTemplateData(name, input);
       return;
     }
   }

@@ -34,8 +34,11 @@ import {
     getBuiltinTemplateInfo,
     isBuiltinTemplateName,
     assertBuiltinTemplateData,
+    DOMAIN_TEMPLATE_NAMES,
+    buildDomainTemplate,
     type BuiltinTemplateName,
     type BuiltinTemplateDataMap,
+    type DomainTemplateName,
     type TemplateCategory,
     type TemplateCatalogEntry,
 } from "@mailforge/templates";
@@ -101,6 +104,14 @@ export interface TemplateRenderOptions
     patches?: readonly DocumentPatch[];
     layout?: EmailLayoutOptions;
     theme?: ThemeOverrides;
+}
+
+function isDomainTemplateName(
+    name: string,
+): name is DomainTemplateName {
+    return (
+        DOMAIN_TEMPLATE_NAMES as readonly string[]
+    ).includes(name);
 }
 
 export class MailForgeEmail {
@@ -288,40 +299,61 @@ export class MailForgeEmail {
     // EMAIL RENDERING
     // ---------------------------------------
 
+
     public async render(
         templateId: string,
         options: TemplateRenderOptions = {},
     ): Promise<RenderResult> {
-        /**
-         * When using a built-in directly,
-         * validate its required data.
-         *
-         * Custom templates with the same ID are
-         * unaffected by built-in requirements.
-         */
-        if (
-            !this.templates.has(templateId) &&
-            isBuiltinTemplateName(templateId)
-        ) {
-            assertBuiltinTemplateData(
-                templateId,
-                options.data,
+        // Developer-defined templates always take priority.
+        if (this.templates.has(templateId)) {
+            return this.renderDocument(
+                this.getTemplate(templateId),
+                options,
             );
         }
 
-        const document = this.getTemplate(templateId);
+        if (!isBuiltinTemplateName(templateId)) {
+            throw new Error(
+                `Template not found: ${templateId}`,
+            );
+        }
 
+        // Validate the data before rendering.
+        assertBuiltinTemplateData(
+            templateId,
+            options.data,
+        );
+
+        // New domain templates need typed, materialized
+        // components for line-item arrays and money.
+        if (isDomainTemplateName(templateId)) {
+            const document = buildDomainTemplate(
+                templateId,
+                options.data,
+            );
+
+            return this.renderPipeline(
+                document,
+                options,
+                true,
+            );
+        }
+
+        // Existing five templates use the normal
+        // dynamic-variable interpolation pipeline.
         return this.renderDocument(
-            document,
+            getBuiltinTemplate(templateId),
             options,
         );
     }
+
 
     /**
      * Type-safe helper that always renders the
      * packaged template, even if a custom
      * template has the same name.
      */
+
     public async renderBuiltin<
         Name extends BuiltinTemplateName
     >(
@@ -330,6 +362,19 @@ export class MailForgeEmail {
         options: Omit<TemplateRenderOptions, "data"> = {},
     ): Promise<RenderResult> {
         assertBuiltinTemplateData(name, data);
+
+        // This always renders the packaged template,
+        // ignoring any custom template with the same ID.
+        if (isDomainTemplateName(name)) {
+            return this.renderPipeline(
+                buildDomainTemplate(name, data),
+                {
+                    ...options,
+                    data,
+                },
+                true,
+            );
+        }
 
         return this.renderDocument(
             getBuiltinTemplate(name),
@@ -340,6 +385,7 @@ export class MailForgeEmail {
         );
     }
 
+
     /**
      * Existing structured-document pipeline
      * from Task 7.5.
@@ -348,7 +394,28 @@ export class MailForgeEmail {
         document: EmailDocument,
         options: TemplateRenderOptions = {},
     ): Promise<RenderResult> {
-        // 1. Resolve layout and theme.
+        return this.renderPipeline(
+            document,
+            options,
+            false,
+        );
+    }
+
+
+    /**
+     * Shared rendering pipeline for:
+     *
+     * - Ordinary templates with {{variables}}
+     * - Already-materialized domain templates
+     *
+     * prepared=true skips document interpolation but
+     * still interpolates any developer patch values.
+     */
+    private async renderPipeline(
+        document: EmailDocument,
+        options: TemplateRenderOptions,
+        prepared: boolean,
+    ): Promise<RenderResult> {
         const layout = this.resolveLayout(
             options.layout ?? {},
         );
@@ -361,62 +428,60 @@ export class MailForgeEmail {
             ? {}
             : options.data;
 
-        // 2. Create missing header, footer,
-        // and copyright.
+        // 1. Add company header/footer/copyright.
         const withDefaults = applyDefaultLayout(
             document,
             this.config.brand,
             layout,
         );
 
-        // 3. Resolve variables inside the document.
-        const interpolated = interpolateEmailDocument(
-            withDefaults,
-            data,
-        );
+        // 2. Only ordinary templates require another
+        // interpolation pass. Domain data is complete.
+        const interpolated = prepared
+            ? withDefaults
+            : interpolateEmailDocument(
+                withDefaults,
+                data,
+            );
 
-        // 4. Resolve variables in custom patches.
+        // 3. Patch placeholders still use the supplied data.
         const patches = interpolateDocumentPatches(
             options.patches ?? [],
             data,
         );
 
-        // 5. Apply patches atomically and validate.
+        // 4. Apply developer patches atomically.
         const customized = this.customizer.apply(
             interpolated,
             patches,
         );
 
+        // 5. Expand reusable leaf and composite components.
         const expanded = this.componentExpander.expand(
             customized,
         );
 
-        // 6. Apply colors, typography and spacing.
+        // 6. Apply brand/theme design tokens.
         const themed = applyEmailTheme(
             expanded,
             theme,
         );
 
-        // Revalidate the final styled document.
-        // This catches problems introduced after
-        // component expansion or theme application.
+        // 7. Validate once more after theme application.
         this.validator.validateOrThrow(themed);
 
-        // Enforce final rendering resource budgets.
+        // 8. Preserve the Task 7.7.5 resource budget.
         assertRenderBudget(themed);
 
-        // 7. Generate HTML and plain text.
+        // 9. Produce responsive HTML and plain text.
         return this.mjmlRenderer.render(
             themed,
             {
                 trust: options.trust ?? "safe",
-                bodyBackgroundColor:
-                    theme.colors.background,
+                bodyBackgroundColor: theme.colors.background,
 
                 ...(options.inlineCss !== undefined
-                    ? {
-                        inlineCss: options.inlineCss,
-                    }
+                    ? { inlineCss: options.inlineCss }
                     : {}),
             },
         );

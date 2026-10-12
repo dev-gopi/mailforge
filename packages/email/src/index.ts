@@ -147,13 +147,15 @@ export {
 } from "@mailforge/components";
 
 export {
-    listTemplateCatalog,
-    getBuiltinTemplateInfo,
+  DOMAIN_TEMPLATE_NAMES,
+  buildDomainTemplate,
+  parseDomainTemplateData,
 } from "@mailforge/templates";
 
 export type {
-    TemplateCategory,
-    TemplateCatalogEntry,
+  DomainTemplateName,
+  DomainTemplateDataMap,
+  ParsedDomainTemplateDataMap,
 } from "@mailforge/templates";
 
 export {

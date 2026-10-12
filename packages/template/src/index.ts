@@ -27,3 +27,23 @@ export type {
   TemplateCategory,
   TemplateCatalogEntry,
 } from "./registry/TemplateCatalog.js";
+
+export {
+  DOMAIN_TEMPLATE_NAMES,
+  DOMAIN_TEMPLATE_SCHEMAS,
+  assertPlainTemplateData,
+} from "./DomainTemplateData.js";
+
+export type {
+  DomainTemplateName,
+  DomainTemplateDataMap,
+  ParsedDomainTemplateDataMap,
+} from "./DomainTemplateData.js";
+
+export {
+  parseDomainTemplateData,
+} from "./TemplateData.js";
+
+export {
+  buildDomainTemplate,
+} from "./registry/DomainTemplateBuilder.js";
