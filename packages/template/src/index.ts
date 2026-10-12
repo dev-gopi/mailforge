@@ -3,6 +3,14 @@
 export {
   getBuiltinTemplate,
   listBuiltinTemplates,
+  BUILTIN_CATALOG_TEMPLATE_NAMES,
+  listBuiltinTemplateCatalog,
+  getBuiltinCatalogTemplate,
+} from "./BuiltinTemplates.js";
+
+export type {
+  BuiltinCatalogTemplateName,
+  BuiltinCatalogTemplateInfo,
 } from "./BuiltinTemplates.js";
 
 export {
@@ -31,6 +39,7 @@ export type {
 export {
   DOMAIN_TEMPLATE_NAMES,
   DOMAIN_TEMPLATE_SCHEMAS,
+  BUILTIN_ADDITIONAL_TEMPLATE_SCHEMAS,
   assertPlainTemplateData,
 } from "./DomainTemplateData.js";
 
@@ -38,6 +47,7 @@ export type {
   DomainTemplateName,
   DomainTemplateDataMap,
   ParsedDomainTemplateDataMap,
+  BuiltinAdditionalTemplateDataMap,
 } from "./DomainTemplateData.js";
 
 export {
@@ -81,7 +91,7 @@ export type {
   TemplateVersionStatus,
 } from "./registry/TemplateVersionRegistry.js";
 
-// Extended domain templates
+// Individually configurable built-in templates
 export {
   buildNewsletterTemplate,
   newsletterSchema,
@@ -110,26 +120,11 @@ export type {
 } from "./ecommerce/ShippingUpdateTemplate.js";
 
 export {
-  EXTENDED_TEMPLATE_NAMES,
-  EXTENDED_TEMPLATE_SCHEMAS,
-  listExtendedTemplates,
-  getExtendedTemplateInfo,
-  getExtendedTemplate,
-  registerExtendedTemplates,
-} from "./extended/ExtendedTemplates.js";
-
-export type {
-  ExtendedTemplateName,
-  ExtendedTemplateDataMap,
-  ExtendedTemplateInfo,
-} from "./extended/ExtendedTemplates.js";
-
-export {
   buildFeatureShowcaseTemplate,
   featureShowcaseSchema,
-} from "./extended/FeatureShowcaseTemplate.js";
+} from "./specialized/FeatureShowcaseTemplate.js";
 
 export type {
   FeatureShowcaseData,
-} from "./extended/FeatureShowcaseTemplate.js";
+} from "./specialized/FeatureShowcaseTemplate.js";
 

@@ -1,4 +1,8 @@
 import { z } from "zod";
+import { newsletterSchema, type NewsletterData } from "./marketing/NewsletterTemplate.js";
+import { promotionSchema, type PromotionData } from "./marketing/PromotionTemplate.js";
+import { shippingUpdateSchema, type ShippingUpdateData } from "./ecommerce/ShippingUpdateTemplate.js";
+import { catalogTemplateDataSchema, type CatalogTemplateData } from "./catalog/CatalogTemplates.js";
 
 export const DOMAIN_TEMPLATE_NAMES = [
   "invoice",
@@ -224,6 +228,21 @@ export const DOMAIN_TEMPLATE_SCHEMAS = {
   "order-confirmation": orderSchema,
   "security-alert": securitySchema,
 } as const;
+
+/** Data contracts for every configurable template outside the core domain set. */
+export const BUILTIN_ADDITIONAL_TEMPLATE_SCHEMAS = {
+  newsletter: newsletterSchema,
+  promotion: promotionSchema,
+  "shipping-update": shippingUpdateSchema,
+  catalog: catalogTemplateDataSchema,
+} as const;
+
+export interface BuiltinAdditionalTemplateDataMap {
+  newsletter: NewsletterData;
+  promotion: PromotionData;
+  "shipping-update": ShippingUpdateData;
+  catalog: CatalogTemplateData;
+}
 
 /**
  * Public input types: optional shipping and discount

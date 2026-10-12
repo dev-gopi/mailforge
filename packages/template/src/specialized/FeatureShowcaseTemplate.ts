@@ -82,8 +82,8 @@ export type FeatureShowcaseData = z.input<typeof featureShowcaseSchema>;
  * media, status, callouts, cards, two-column content, commerce, actions,
  * metadata, dividers, and social links.
  *
- * Register `getExtendedComponentDefinitions()` on the email engine before
- * rendering because this document uses the extended component library.
+ * Register the component definitions on the email engine before rendering
+ * because this document uses the component library.
  */
 export function buildFeatureShowcaseTemplate(
     input: FeatureShowcaseData,

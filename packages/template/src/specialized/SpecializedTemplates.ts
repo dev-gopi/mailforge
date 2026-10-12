@@ -20,35 +20,35 @@ import {
     type ShippingUpdateData,
 } from "../ecommerce/ShippingUpdateTemplate.js";
 
-export const EXTENDED_TEMPLATE_NAMES = [
+export const SPECIALIZED_TEMPLATE_NAMES = [
     "newsletter",
     "promotion",
     "shipping-update",
 ] as const;
 
-export type ExtendedTemplateName = (typeof EXTENDED_TEMPLATE_NAMES)[number];
+export type SpecializedTemplateName = (typeof SPECIALIZED_TEMPLATE_NAMES)[number];
 
-export interface ExtendedTemplateDataMap {
+export interface SpecializedTemplateDataMap {
     newsletter: NewsletterData;
     promotion: PromotionData;
     "shipping-update": ShippingUpdateData;
 }
 
-export const EXTENDED_TEMPLATE_SCHEMAS = {
+export const SPECIALIZED_TEMPLATE_SCHEMAS = {
     newsletter: newsletterSchema,
     promotion: promotionSchema,
     "shipping-update": shippingUpdateSchema,
 } as const;
 
-export interface ExtendedTemplateInfo {
-    readonly id: ExtendedTemplateName;
+export interface SpecializedTemplateInfo {
+    readonly id: SpecializedTemplateName;
     readonly category: "marketing" | "ecommerce";
     readonly title: string;
     readonly description: string;
     readonly version: string;
 }
 
-const EXTENDED_CATALOG: Record<ExtendedTemplateName, ExtendedTemplateInfo> = {
+const SPECIALIZED_CATALOG: Record<SpecializedTemplateName, SpecializedTemplateInfo> = {
     newsletter: {
         id: "newsletter",
         category: "marketing",
@@ -72,17 +72,17 @@ const EXTENDED_CATALOG: Record<ExtendedTemplateName, ExtendedTemplateInfo> = {
     },
 };
 
-export function listExtendedTemplates(): ExtendedTemplateInfo[] {
-    return EXTENDED_TEMPLATE_NAMES.map(name => ({ ...EXTENDED_CATALOG[name] }));
+export function listSpecializedTemplates(): SpecializedTemplateInfo[] {
+    return SPECIALIZED_TEMPLATE_NAMES.map(name => ({ ...SPECIALIZED_CATALOG[name] }));
 }
 
-export function getExtendedTemplateInfo(name: ExtendedTemplateName): ExtendedTemplateInfo {
-    return { ...EXTENDED_CATALOG[name] };
+export function getSpecializedTemplateInfo(name: SpecializedTemplateName): SpecializedTemplateInfo {
+    return { ...SPECIALIZED_CATALOG[name] };
 }
 
-export function getExtendedTemplate<Name extends ExtendedTemplateName>(
+export function getSpecializedTemplate<Name extends SpecializedTemplateName>(
     name: Name,
-    data?: ExtendedTemplateDataMap[Name],
+    data?: SpecializedTemplateDataMap[Name],
 ): EmailDocument {
     switch (name) {
         case "newsletter":
@@ -92,19 +92,19 @@ export function getExtendedTemplate<Name extends ExtendedTemplateName>(
         case "shipping-update":
             return buildShippingUpdateTemplate(data as ShippingUpdateData);
         default:
-            throw new Error(`Unknown extended template: ${name}`);
+            throw new Error(`Unknown specialized template: ${name}`);
     }
 }
 
 /**
- * Register all extended templates into a MailForgeEmail engine instance
+ * Register all specialized templates into a MailForgeEmail engine instance
  * using its public registerTemplate method.
  */
-export function registerExtendedTemplates(
+export function registerSpecializedTemplates(
     engine: { registerTemplate: (doc: EmailDocument) => unknown },
 ): void {
-    for (const name of EXTENDED_TEMPLATE_NAMES) {
-        engine.registerTemplate(getExtendedTemplate(name));
+    for (const name of SPECIALIZED_TEMPLATE_NAMES) {
+        engine.registerTemplate(getSpecializedTemplate(name));
     }
 }
 

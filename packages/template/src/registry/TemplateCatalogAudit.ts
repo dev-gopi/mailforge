@@ -1,7 +1,5 @@
 import { DocumentValidator, type EmailDocument } from "@mailforge/core";
-import { getBuiltinTemplate, listBuiltinTemplates } from "../BuiltinTemplates.js";
-import { buildExpandedTemplate, listExpandedTemplates } from "../expanded/ExpandedTemplateCatalog.js";
-import { getExtendedTemplate, listExtendedTemplates } from "../extended/ExtendedTemplates.js";
+import { getBuiltinCatalogTemplate, listBuiltinTemplateCatalog } from "../BuiltinTemplates.js";
 
 export interface CatalogIssue {
     readonly id: string;
@@ -27,16 +25,9 @@ export function auditTemplateCatalog(): CatalogAudit {
         const result = validator.validate(doc);
         issues.push(...result.errors.map(item => ({ id: expectedId, message: `${item.path}: ${item.message}` })));
     };
-    for (const id of listBuiltinTemplates()) {
-        check(getBuiltinTemplate(id), id, "1.0.0");
-    }
-    for (const item of listExtendedTemplates()) {
+    for (const item of listBuiltinTemplateCatalog()) {
         if (!item.title || !item.description) issues.push({ id: item.id, message: "Missing metadata" });
-        check(getExtendedTemplate(item.id), item.id, item.version);
-    }
-    for (const item of listExpandedTemplates()) {
-        if (!item.title || !item.description) issues.push({ id: item.id, message: "Missing metadata" });
-        check(buildExpandedTemplate(item.id), item.id, item.version);
+        check(getBuiltinCatalogTemplate(item.id), item.id, item.version);
     }
     return { valid: issues.length === 0, checked: seen.size, issues };
 }

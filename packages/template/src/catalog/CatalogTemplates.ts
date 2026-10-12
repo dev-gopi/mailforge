@@ -1,7 +1,15 @@
 import { z } from "zod";
 import { DocumentValidator, type EmailDocument, type EmailNode } from "@mailforge/core";
 
-export const EXPANDED_TEMPLATE_CATALOG = [
+import {
+    actionButton,
+    contentHeading,
+    contentParagraph,
+    mutedParagraph,
+    panel,
+} from "../shared/TemplateNodes.js";
+
+export const CATALOG_TEMPLATE_DEFINITIONS = [
     // Account and authentication
     ["account-activated", "account", "Account activated", "Your account is now active", "Open account"],
     ["email-verified", "account", "Email verified", "Your email address was verified", "Open account"],
@@ -33,20 +41,22 @@ export const EXPANDED_TEMPLATE_CATALOG = [
     ["event-invitation", "events", "Event invitation", "You're invited to an event", "RSVP"],
     ["event-registration", "events", "Registration confirmed", "Your event registration is confirmed", "View ticket"],
     ["event-reminder", "events", "Event reminder", "Your event is almost here", "Event details"],
+    ["event-cancelled", "events", "Event cancelled", "An event you registered for was cancelled", "View event"],
     ["workspace-invitation", "saas", "Workspace invitation", "You've been invited to a workspace", "Join workspace"],
     ["usage-warning", "saas", "Usage approaching limit", "Your usage is approaching its limit", "Review usage"],
     ["plan-upgrade", "saas", "Plan upgraded", "Your subscription plan was updated", "View plan"],
+    ["workspace-member-joined", "saas", "New teammate joined", "A teammate has joined your workspace", "View workspace"],
     ["support-ticket-opened", "support", "Support ticket received", "We've received your support request", "View ticket"],
     ["support-ticket-updated", "support", "Support ticket updated", "Your support request has an update", "View ticket"],
     ["support-ticket-resolved", "support", "Support ticket resolved", "Your support request has been resolved", "View resolution"],
     ["feedback-request", "support", "Share your feedback", "Tell us how we did", "Give feedback"],
 ] as const;
 
-export type ExpandedTemplateName = typeof EXPANDED_TEMPLATE_CATALOG[number][0];
-export type ExpandedTemplateCategory = typeof EXPANDED_TEMPLATE_CATALOG[number][1];
-export interface ExpandedTemplateInfo {
-    readonly id: ExpandedTemplateName;
-    readonly category: ExpandedTemplateCategory;
+export type CatalogTemplateName = typeof CATALOG_TEMPLATE_DEFINITIONS[number][0];
+export type CatalogTemplateCategory = typeof CATALOG_TEMPLATE_DEFINITIONS[number][1];
+export interface CatalogTemplateInfo {
+    readonly id: CatalogTemplateName;
+    readonly category: CatalogTemplateCategory;
     readonly title: string;
     readonly description: string;
     readonly version: "1.0.0";
@@ -59,60 +69,67 @@ const httpLink = z.url().refine((value: string) => {
 
 const textValue = z.string().trim().min(1).max(500).refine((value: string) => !/[\r\n\u0000-\u001f]/.test(value), "Control characters are not allowed");
 
-export const expandedTemplateDataSchema = z.object({
+export const catalogTemplateDataSchema = z.object({
     recipientName: textValue,
     actionUrl: httpLink,
     /** Optional secondary details, e.g. an order number, date or ticket ID. */
     detail: z.string().trim().max(1000).optional(),
     unsubscribeUrl: httpLink.optional(),
 }).strict();
-export type ExpandedTemplateData = z.input<typeof expandedTemplateDataSchema>;
+export type CatalogTemplateData = z.input<typeof catalogTemplateDataSchema>;
 
-const definitions = new Map<string, typeof EXPANDED_TEMPLATE_CATALOG[number]>(
-    EXPANDED_TEMPLATE_CATALOG.map(row => [row[0], row] as const),
+const definitions = new Map<string, typeof CATALOG_TEMPLATE_DEFINITIONS[number]>(
+    CATALOG_TEMPLATE_DEFINITIONS.map(row => [row[0], row] as const),
 );
 
-export function isExpandedTemplateName(id: string): id is ExpandedTemplateName {
+export function isCatalogTemplateName(id: string): id is CatalogTemplateName {
     return definitions.has(id);
 }
 
-export function listExpandedTemplates(category?: ExpandedTemplateCategory): ExpandedTemplateInfo[] {
-    return EXPANDED_TEMPLATE_CATALOG
+export function listCatalogTemplates(category?: CatalogTemplateCategory): CatalogTemplateInfo[] {
+    return CATALOG_TEMPLATE_DEFINITIONS
         .filter(row => category === undefined || row[1] === category)
         .map(([id, group, title, description]) => ({ id, category: group, title, description, version: "1.0.0" }));
 }
 
-export function buildExpandedTemplate(id: ExpandedTemplateName, input?: unknown): EmailDocument {
+export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
     const entry = definitions.get(id);
-    if (!entry) throw new Error(`Unknown expanded template: ${id}`);
+    if (!entry) throw new Error(`Unknown catalog template: ${id}`);
     const [, category, title, description, actionLabel] = entry;
-    const data = input === undefined ? undefined : expandedTemplateDataSchema.parse(input);
+    const data = input === undefined ? undefined : catalogTemplateDataSchema.parse(input);
     if (data !== undefined && category === "marketing" && data.unsubscribeUrl === undefined) {
         throw new Error(`Marketing template ${id} requires unsubscribeUrl`);
     }
     const recipient = data?.recipientName ?? "{{recipientName}}";
     const actionUrl = data?.actionUrl ?? "{{actionUrl}}";
     const body: EmailNode[] = [
-        { id: `${id}-title`, type: "heading", props: { text: title } },
-        { id: `${id}-greeting`, type: "text", props: { text: `Hello ${recipient},` } },
-        { id: `${id}-message`, type: "text", props: { text: description + "." } },
+        contentHeading(`${id}-title`, title),
+        contentParagraph(`${id}-greeting`, `Hello ${recipient},`),
+        contentParagraph(`${id}-message`, `${description}.`),
     ];
     if (data?.detail) {
-        body.push({ id: `${id}-detail`, type: "text", props: { text: data.detail } });
+        body.push(panel(`${id}-detail`, [
+            mutedParagraph(`${id}-detail-text`, data.detail),
+        ]));
     }
-    body.push({ id: `${id}-action`, type: "button", props: { text: actionLabel, href: actionUrl } });
+    body.push(actionButton(`${id}-action`, actionLabel, actionUrl));
     if (category === "authentication") {
-        body.push({ id: `${id}-security`, type: "text", props: { text: "If you did not request this, review your account security settings." } });
+        body.push(mutedParagraph(
+            `${id}-security`,
+            "If you did not request this, review your account security settings.",
+        ));
     }
     if (category === "marketing") {
-        body.push({ id: `${id}-unsubscribe`, type: "button", props: {
-            text: "Unsubscribe", href: data?.unsubscribeUrl ?? "{{unsubscribeUrl}}",
-        } });
+        body.push(actionButton(
+            `${id}-unsubscribe`,
+            "Unsubscribe",
+            data?.unsubscribeUrl ?? "{{unsubscribeUrl}}",
+        ));
     }
     const document: EmailDocument = {
         schemaVersion: "1.0", id, version: "1.0.0", subject: title,
         preheader: description, body,
-        metadata: { category, catalog: "expanded" },
+        metadata: { category, catalog: "builtin" },
     };
     new DocumentValidator().validateOrThrow(document);
     return document;

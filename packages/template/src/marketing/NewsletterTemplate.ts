@@ -7,8 +7,9 @@ import type {
 
 import {
     createTemplateDocument,
-    heading,
-    paragraph,
+    contentHeading,
+    contentParagraph,
+    mutedParagraph,
     actionButton,
 } from "../shared/TemplateNodes.js";
 
@@ -68,9 +69,9 @@ export function buildNewsletterTemplate(
     const summary = data?.summary ?? "{{newsletter.summary}}";
 
     const body: EmailNode[] = [
-        heading("newsletter-title", title),
-        paragraph("newsletter-issue", `Issue: ${issue}`),
-        paragraph("newsletter-summary", summary),
+        contentHeading("newsletter-title", title),
+        mutedParagraph("newsletter-issue", `Issue: ${issue}`),
+        contentParagraph("newsletter-summary", summary),
     ];
 
     if (data) {
@@ -86,14 +87,14 @@ export function buildNewsletterTemplate(
         });
 
         if (data.stories && data.stories.length > 0) {
-            body.push(heading("stories-heading", "More In This Issue"));
+            body.push(contentHeading("stories-heading", "More In This Issue"));
 
             data.stories.forEach((story, idx) => {
                 body.push(
-                    heading(`story-${idx}-title`, story.title),
+                    contentHeading(`story-${idx}-title`, story.title),
                 );
                 if (story.description) {
-                    body.push(paragraph(`story-${idx}-desc`, story.description));
+                    body.push(contentParagraph(`story-${idx}-desc`, story.description));
                 }
                 body.push(
                     actionButton(`story-${idx}-link`, "Read Story", story.articleUrl),
@@ -102,13 +103,13 @@ export function buildNewsletterTemplate(
         }
     } else {
         body.push(
-            paragraph("featured-preview", "Featured story and digest items."),
+            contentParagraph("featured-preview", "Featured story and digest items."),
             actionButton("featured-action", "Read Full Story", "{{newsletter.featured.articleUrl}}"),
         );
     }
 
     body.push(
-        paragraph("unsubscribe-text", "You received this email because you subscribed to our newsletter."),
+        mutedParagraph("unsubscribe-text", "You received this email because you subscribed to our newsletter."),
         actionButton("unsubscribe-action", "Unsubscribe", data?.unsubscribeUrl ?? "{{newsletter.unsubscribeUrl}}"),
     );
 

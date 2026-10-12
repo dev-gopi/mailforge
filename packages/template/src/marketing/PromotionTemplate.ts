@@ -7,8 +7,9 @@ import type {
 
 import {
     createTemplateDocument,
-    heading,
-    paragraph,
+    contentHeading,
+    contentParagraph,
+    mutedParagraph,
     actionButton,
 } from "../shared/TemplateNodes.js";
 
@@ -65,9 +66,9 @@ export function buildPromotionTemplate(
     const expiresOn = data?.expiresOn ?? "{{promotion.expiresOn}}";
 
     const body: EmailNode[] = [
-        heading("promo-title", title),
-        paragraph("promo-badge", `SPECIAL OFFER: ${discountPercent}`),
-        paragraph(
+        contentHeading("promo-title", title),
+        mutedParagraph("promo-badge", `SPECIAL OFFER: ${discountPercent}`),
+        contentParagraph(
             "promo-description",
             data?.description ?? "{{promotion.description}}",
         ),
@@ -91,11 +92,11 @@ export function buildPromotionTemplate(
             "Claim Your Discount",
             data?.actionUrl ?? "{{promotion.actionUrl}}",
         ),
-        paragraph("promo-expires", `Offer expires on ${expiresOn}.`),
+        mutedParagraph("promo-expires", `Offer expires on ${expiresOn}.`),
     ];
 
     if (data?.terms) {
-        body.push(paragraph("promo-terms", `Terms & Conditions: ${data.terms}`));
+        body.push(mutedParagraph("promo-terms", `Terms & Conditions: ${data.terms}`));
     }
 
     return createTemplateDocument(

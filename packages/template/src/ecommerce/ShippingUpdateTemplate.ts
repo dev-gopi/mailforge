@@ -7,8 +7,9 @@ import type {
 
 import {
     createTemplateDocument,
-    heading,
-    paragraph,
+    contentHeading,
+    contentParagraph,
+    mutedParagraph,
     actionButton,
 } from "../shared/TemplateNodes.js";
 
@@ -81,7 +82,7 @@ export function buildShippingUpdateTemplate(
     const statusLabel = STATUS_LABELS[status];
 
     const body: EmailNode[] = [
-        heading("shipping-title", "Your Order is on the Way!"),
+        contentHeading("shipping-title", "Your Order is on the Way!"),
         {
             id: "shipping-status-badge",
             type: "mf-status-badge",
@@ -90,11 +91,11 @@ export function buildShippingUpdateTemplate(
                 status: status === "delivered" ? "success" : "warning",
             },
         },
-        paragraph(
+        contentParagraph(
             "shipping-greeting",
             `Hello ${firstName}, your package for order #${orderId} is moving.`,
         ),
-        paragraph(
+        mutedParagraph(
             "shipping-eta",
             `Estimated delivery date: ${estimatedDelivery}`,
         ),
@@ -113,13 +114,13 @@ export function buildShippingUpdateTemplate(
         });
     } else {
         body.push(
-            paragraph("shipping-preview", `Carrier: ${carrier} — Tracking: ${trackingNumber}`),
+            mutedParagraph("shipping-preview", `Carrier: ${carrier} — Tracking: ${trackingNumber}`),
             actionButton("shipping-action", "Track Package", "{{shipment.trackingUrl}}"),
         );
     }
 
     body.push(
-        paragraph("shipping-help", "If you have questions about your delivery, our support team is available 24/7."),
+        mutedParagraph("shipping-help", "If you have questions about your delivery, our support team is available 24/7."),
     );
 
     return createTemplateDocument(

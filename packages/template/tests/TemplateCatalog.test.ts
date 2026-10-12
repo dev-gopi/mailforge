@@ -38,7 +38,7 @@ describe("MailForge Template Catalog", () => {
     ]);
   });
 
-  it("4. discovers the expanded billing and ecommerce categories", () => {
+  it("4. discovers billing and ecommerce categories", () => {
     expect(listTemplateCatalog("billing").map(item => item.id)).toEqual([
       "invoice", "payment-receipt",
     ]);
