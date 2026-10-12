@@ -170,3 +170,23 @@ export {
     EmailRenderBudgetError,
     assertRenderBudget,
 } from "./security/RenderGuard.js";
+
+// Task 7.8.2.2: template presets and reusable theme profiles
+export {
+    TemplatePresetRegistry,
+    ThemeProfileRegistry,
+} from "./presets/PresetRegistry.js";
+
+export {
+    TemplatePresetError,
+} from "./presets/Preset.types.js";
+
+export type {
+    TemplatePresetDefinition,
+    TemplatePresetInfo,
+    TemplateCustomizer,
+} from "./presets/Preset.types.js";
+
+export type {
+    ValidatedBuiltinTemplateDataMap,
+} from "@mailforge/templates";

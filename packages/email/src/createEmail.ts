@@ -45,8 +45,6 @@ import {
     type DomainTemplateName,
     type TemplateCategory,
     type TemplateCatalogEntry,
-    buildDomainTemplate,
-    assertBuiltinTemplateData,
 } from "@mailforge/templates";
 
 import {
@@ -282,16 +280,11 @@ export class MailForgeEmail {
      * Applies supported defaults and returns
      * the validated data.
      */
-    public validateTemplateData<
-        Name extends BuiltinTemplateName
-    >(
+    public validateTemplateData<Name extends BuiltinTemplateName>(
         name: Name,
         data: unknown,
-    ): BuiltinTemplateDataMap[Name] {
-        return this.templateContracts.validate(
-            name,
-            data,
-        );
+    ): ValidatedBuiltinTemplateDataMap[Name] {
+        return this.templateContracts.validate(name, data);
     }
 
     /**
@@ -305,63 +298,23 @@ export class MailForgeEmail {
      * Domain templates are materialized first so
      * invoice/order arrays remain real structures.
      */
-    public async renderCustomizedBuiltin<
-        Name extends BuiltinTemplateName
-    >(
+    public async renderCustomizedBuiltin<Name extends BuiltinTemplateName>(
         name: Name,
         data: BuiltinTemplateDataMap[Name],
-        customize: (
-            draft: EmailDocument,
-        ) => EmailDocument | void,
+        customize: TemplateCustomizer,
         options: Omit<TemplateRenderOptions, "data"> = {},
     ): Promise<RenderResult> {
-        const validated = this.validateTemplateData(
-            name,
-            data,
-        );
-
-        const domain = isDomainTemplateName(name);
-
-        // Build from the official catalog, even if the
-        // developer registered a template with this ID.
-        const source = domain
-            ? buildDomainTemplate(name, validated)
-            : getBuiltinTemplate(name);
-
-        // Each render receives an independent document.
-        const draft = structuredClone(source);
-
-        // Developer may mutate the draft or return
-        // a completely new EmailDocument.
-        const replacement = customize(draft);
-        const customized = replacement ?? draft;
-
-        if (
-            !customized ||
-            customized.id !== name ||
-            !Array.isArray(customized.body)
-        ) {
-            throw new Error(
-                `Invalid customized built-in template: ${name}`,
-            );
+        if (typeof customize !== "function") {
+            throw new TypeError("Template customize must be a function");
         }
 
-        // Existing validation allows placeholders
-        // during the template preparation phase.
-        this.validator.validateOrThrow(
-            prepareTemplateForValidation(customized),
-        );
+        const validated = this.validateTemplateData(name, data);
 
-        // For domain templates, original business data
-        // has already been materialized. Never run
-        // document interpolation over it again.
-        return this.renderPipeline(
-            structuredClone(customized),
-            {
-                ...options,
-                data: validated as unknown as TemplateData,
-            },
-            domain,
+        return this.renderValidatedBuiltin(
+            name,
+            validated,
+            options,
+            customize,
         );
     }
 
@@ -441,7 +394,6 @@ export class MailForgeEmail {
         templateId: string,
         options: TemplateRenderOptions = {},
     ): Promise<RenderResult> {
-        // Developer-defined templates always take priority.
         if (this.templates.has(templateId)) {
             return this.renderDocument(
                 this.getTemplate(templateId),
@@ -450,38 +402,20 @@ export class MailForgeEmail {
         }
 
         if (!isBuiltinTemplateName(templateId)) {
-            throw new Error(
-                `Template not found: ${templateId}`,
-            );
+            throw new Error(`Template not found: ${templateId}`);
         }
 
-        // New domain templates validate and materialize in one pass.
-        // New domain templates need typed, materialized
-        // components for line-item arrays and money.
-        if (isDomainTemplateName(templateId)) {
-            const document = buildDomainTemplate(
-                templateId,
-                options.data,
-            );
+        const validated = this.validateTemplateData(
+            templateId,
+            options.data,
+        );
 
-            return this.renderPipeline(
-                document,
-                options,
-                true,
-            );
-        }
-
-        // The original templates retain their schema validation.
-        assertBuiltinTemplateData(templateId, options.data);
-
-        // Existing five templates use the normal
-        // dynamic-variable interpolation pipeline.
-        return this.renderDocument(
-            getBuiltinTemplate(templateId),
+        return this.renderValidatedBuiltin(
+            templateId,
+            validated,
             options,
         );
     }
-
 
     /**
      * Type-safe helper that always renders the
@@ -489,37 +423,19 @@ export class MailForgeEmail {
      * template has the same name.
      */
 
-    public async renderBuiltin<
-        Name extends BuiltinTemplateName
-    >(
+    public async renderBuiltin<Name extends BuiltinTemplateName>(
         name: Name,
         data: BuiltinTemplateDataMap[Name],
         options: Omit<TemplateRenderOptions, "data"> = {},
     ): Promise<RenderResult> {
-        // This always renders the packaged template,
-        // ignoring any custom template with the same ID.
-        if (isDomainTemplateName(name)) {
-            return this.renderPipeline(
-                buildDomainTemplate(name, data),
-                {
-                    ...options,
-                    data,
-                },
-                true,
-            );
-        }
+        const validated = this.validateTemplateData(name, data);
 
-        assertBuiltinTemplateData(name, data);
-
-        return this.renderDocument(
-            getBuiltinTemplate(name),
-            {
-                ...options,
-                data,
-            },
+        return this.renderValidatedBuiltin(
+            name,
+            validated,
+            options,
         );
     }
-
 
     /**
      * Existing structured-document pipeline
@@ -536,6 +452,53 @@ export class MailForgeEmail {
         );
     }
 
+
+    /**
+     * All nine official templates use this path.
+     * Domain data is materialized only once.
+     */
+    private async renderValidatedBuiltin(
+        name: BuiltinTemplateName,
+        data: ValidatedBuiltinTemplateDataMap[BuiltinTemplateName],
+        options: Omit<TemplateRenderOptions, "data">,
+        customize?: TemplateCustomizer,
+    ): Promise<RenderResult> {
+        const domain = isDomainTemplateName(name);
+
+        const source = domain
+            ? buildParsedDomainTemplate(
+                name,
+                data as ParsedDomainTemplateDataMap[DomainTemplateName],
+            )
+            : getBuiltinTemplate(name);
+
+        const draft = structuredClone(source);
+        const modified = customize?.(draft) ?? draft;
+
+        if (
+            modified === null ||
+            typeof modified !== "object" ||
+            modified.id !== name ||
+            !Array.isArray(modified.body)
+        ) {
+            throw new Error(
+                `Invalid customized built-in template: ${name}`,
+            );
+        }
+
+        this.validator.validateOrThrow(
+            prepareTemplateForValidation(modified),
+        );
+
+        return this.renderPipeline(
+            structuredClone(modified),
+            {
+                ...options,
+                data: data as TemplateData,
+            },
+            domain,
+        );
+    }
 
     /**
      * Shared rendering pipeline for:
@@ -555,8 +518,22 @@ export class MailForgeEmail {
             options.layout ?? {},
         );
 
+        const profile = options.themeProfile === undefined
+            ? undefined
+            : this.themeProfiles.get(options.themeProfile);
+
+        if (
+            options.themeProfile !== undefined &&
+            profile === undefined
+        ) {
+            throw new TemplatePresetError(
+                "themeProfile",
+                `Unknown theme profile: ${options.themeProfile}`,
+            );
+        }
+
         const theme = this.resolveTheme(
-            options.theme ?? {},
+            mergeThemeOverrides(profile, options.theme),
         );
 
         const data = options.data === undefined
@@ -636,6 +613,111 @@ export class MailForgeEmail {
                 ...options,
                 trust: options.trust ?? "safe",
             },
+        );
+    }
+
+    /** Register a reusable theme for this engine. */
+    public registerThemeProfile(
+        name: string,
+        theme: ThemeOverrides,
+    ): this {
+        this.resolveTheme(theme);
+        this.themeProfiles.register(name, theme);
+        return this;
+    }
+
+    public getThemeProfile(
+        name: string,
+    ): ThemeOverrides | undefined {
+        return this.themeProfiles.get(name);
+    }
+
+    public listThemeProfiles(): string[] {
+        return this.themeProfiles.list();
+    }
+
+    /** Register one reusable built-in template preset. */
+    public registerTemplatePreset<Name extends BuiltinTemplateName>(
+        definition: TemplatePresetDefinition<Name>,
+    ): this {
+        if (
+            definition.themeProfile !== undefined &&
+            this.themeProfiles.get(definition.themeProfile) === undefined
+        ) {
+            throw new TemplatePresetError(
+                "themeProfile",
+                `Unknown theme profile: ${definition.themeProfile}`,
+            );
+        }
+
+        if (definition.theme !== undefined) {
+            this.resolveTheme(definition.theme);
+        }
+
+        if (definition.layout !== undefined) {
+            this.resolveLayout(definition.layout);
+        }
+
+        this.templatePresets.register(definition);
+        return this;
+    }
+
+    public listTemplatePresets(): TemplatePresetInfo[] {
+        return this.templatePresets.list();
+    }
+
+    public getTemplatePreset(
+        name: string,
+    ): TemplatePresetDefinition | undefined {
+        return this.templatePresets.get(name);
+    }
+
+    /** Render saved customization with fresh validated data. */
+    public async renderPreset(
+        presetId: string,
+        data: unknown,
+        options: Omit<TemplateRenderOptions, "data"> = {},
+    ): Promise<RenderResult> {
+        const preset = this.templatePresets.get(presetId);
+
+        if (!preset) {
+            throw new TemplatePresetError(
+                "id",
+                `Preset not found: ${presetId}`,
+            );
+        }
+
+        const themeProfile =
+            options.themeProfile ?? preset.themeProfile;
+
+        const merged: Omit<TemplateRenderOptions, "data"> = {
+            ...options,
+
+            ...(themeProfile !== undefined
+                ? { themeProfile }
+                : {}),
+
+            theme: mergeThemeOverrides(
+                preset.theme,
+                options.theme,
+            ),
+
+            layout: mergeLayoutOverrides(
+                preset.layout,
+                options.layout,
+            ),
+
+            patches: [
+                ...(preset.patches ?? []),
+                ...(options.patches ?? []),
+            ],
+        };
+
+        return this.renderCustomizedBuiltin(
+            preset.template,
+            data as BuiltinTemplateDataMap[BuiltinTemplateName],
+            draft => preset.customize?.(draft),
+            merged,
         );
     }
 
