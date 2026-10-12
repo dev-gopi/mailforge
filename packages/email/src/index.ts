@@ -151,15 +151,19 @@ export {
 } from "@mailforge/components";
 
 export {
-  DOMAIN_TEMPLATE_NAMES,
-  buildDomainTemplate,
-  parseDomainTemplateData,
+    DOMAIN_TEMPLATE_NAMES,
+    buildDomainTemplate,
+    parseDomainTemplateData,
+    TemplateContractRegistry,
 } from "@mailforge/templates";
 
 export type {
-  DomainTemplateName,
-  DomainTemplateDataMap,
-  ParsedDomainTemplateDataMap,
+    DomainTemplateName,
+    DomainTemplateDataMap,
+    ParsedDomainTemplateDataMap,
+    TemplateContractDefinition,
+    TemplateContractField,
+    TemplateFieldType,
 } from "@mailforge/templates";
 
 export {

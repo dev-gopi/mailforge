@@ -63,8 +63,11 @@ const timestamp = z
   )
   .refine((value) => {
     const milliseconds = Date.parse(value);
+
     return Number.isFinite(milliseconds) &&
-      new Date(milliseconds).toISOString().replace(".000Z", "Z") === value;
+      new Date(milliseconds)
+        .toISOString()
+        .replace(".000Z", "Z") === value;
   }, "Invalid UTC timestamp");
 
 const money = z.number().int().min(0).max(100_000_000_000);

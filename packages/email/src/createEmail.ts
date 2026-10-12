@@ -35,6 +35,8 @@ import {
     assertBuiltinTemplateData,
     DOMAIN_TEMPLATE_NAMES,
     buildDomainTemplate,
+    TemplateContractRegistry,
+    type TemplateContractDefinition,
     type BuiltinTemplateName,
     type BuiltinTemplateDataMap,
     type DomainTemplateName,
@@ -140,6 +142,9 @@ export class MailForgeEmail {
     private readonly htmlRenderer =
         new HtmlRenderer();
 
+    private readonly templateContracts =
+        new TemplateContractRegistry();
+
     // Only developer-registered templates live here.
     private readonly templates =
         new Map<string, EmailDocument>();
@@ -225,6 +230,106 @@ export class MailForgeEmail {
         category?: TemplateCategory,
     ): TemplateCatalogEntry[] {
         return listTemplateCatalog(category);
+    }
+
+    /**
+     * Inspect the required and optional fields
+     * for a built-in template.
+     */
+    public getTemplateContract<
+        Name extends BuiltinTemplateName
+    >(
+        name: Name,
+    ): TemplateContractDefinition<Name> {
+        return this.templateContracts.get(name);
+    }
+
+    /**
+     * Validate data using the unified Zod contracts.
+     * Applies supported defaults and returns
+     * the validated data.
+     */
+    public validateTemplateData<
+        Name extends BuiltinTemplateName
+    >(
+        name: Name,
+        data: unknown,
+    ): BuiltinTemplateDataMap[Name] {
+        return this.templateContracts.validate(
+            name,
+            data,
+        );
+    }
+
+    /**
+     * Render a built-in template after allowing
+     * trusted application code to customize its
+     * structured document.
+     *
+     * This does not modify the published template
+     * or store changes on the engine.
+     *
+     * Domain templates are materialized first so
+     * invoice/order arrays remain real structures.
+     */
+    public async renderCustomizedBuiltin<
+        Name extends BuiltinTemplateName
+    >(
+        name: Name,
+        data: BuiltinTemplateDataMap[Name],
+        customize: (
+            draft: EmailDocument,
+        ) => EmailDocument | void,
+        options: Omit<TemplateRenderOptions, "data"> = {},
+    ): Promise<RenderResult> {
+        const validated = this.validateTemplateData(
+            name,
+            data,
+        );
+
+        const domain = isDomainTemplateName(name);
+
+        // Build from the official catalog, even if the
+        // developer registered a template with this ID.
+        const source = domain
+            ? buildDomainTemplate(name, validated)
+            : getBuiltinTemplate(name);
+
+        // Each render receives an independent document.
+        const draft = structuredClone(source);
+
+        // Developer may mutate the draft or return
+        // a completely new EmailDocument.
+        const replacement = customize(draft);
+        const customized = replacement ?? draft;
+
+        if (
+            !customized ||
+            customized.id !== name ||
+            !Array.isArray(customized.body)
+        ) {
+            throw new Error(
+                `Invalid customized built-in template: ${name}`,
+            );
+        }
+
+        // Existing validation allows placeholders
+        // during the template preparation phase.
+        this.validator.validateOrThrow(
+            prepareTemplateForValidation(customized),
+        );
+
+        // For domain templates, original business data
+        // has already been materialized. Never run
+        // document interpolation over it again.
+        return this.renderPipeline(
+            structuredClone(customized),
+            {
+                ...options,
+                data: validated as unknown as TemplateData,
+            },
+            domain,
+        );
     }
 
     /**
@@ -333,7 +438,7 @@ export class MailForgeEmail {
             );
         }
 
-        // Existing five templates retain their original validation.
+        // The original templates retain their schema validation.
         assertBuiltinTemplateData(templateId, options.data);
 
         // Existing five templates use the normal

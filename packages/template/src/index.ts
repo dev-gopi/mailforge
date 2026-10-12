@@ -47,3 +47,17 @@ export {
 export {
   buildDomainTemplate,
 } from "./registry/DomainTemplateBuilder.js";
+
+export {
+  LEGACY_TEMPLATE_SCHEMAS,
+} from "./contracts/LegacyTemplateSchemas.js";
+
+export {
+  TemplateContractRegistry,
+} from "./registry/TemplateContractRegistry.js";
+
+export type {
+  TemplateFieldType,
+  TemplateContractField,
+  TemplateContractDefinition,
+} from "./contracts/TemplateContract.types.js";
