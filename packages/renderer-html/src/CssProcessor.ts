@@ -6,7 +6,7 @@ import juice from "juice";
  */
 export class CssProcessor {
     public process(html: string, css = "", inline = true): string {
-        if (css.length && /<|\u0000/.test(css)) {
+        if (css.includes("<") || css.includes("\0")) {
             throw new Error("CSS must not contain HTML markup");
         }
         if (inline) {

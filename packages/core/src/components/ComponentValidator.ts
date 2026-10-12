@@ -14,7 +14,7 @@ import type {
     ComponentValidationIssue,
 } from "./ComponentDefinition.js";
 
-import {
+import type {
     ComponentRegistry,
 } from "./ComponentRegistry.js";
 

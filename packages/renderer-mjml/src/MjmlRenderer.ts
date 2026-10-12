@@ -89,7 +89,11 @@ export class MjmlRenderer implements EmailRenderer {
         if (css && trust !== "trusted") {
             throw new Error("Custom CSS requires trusted rendering mode");
         }
-        if (Buffer.byteLength(css) > CSS_LIMIT || /<|<\/|\u0000/.test(css)) {
+        if (
+            Buffer.byteLength(css) > CSS_LIMIT ||
+            css.includes("<") ||
+            css.includes("\0")
+        ) {
             throw new Error("Custom CSS is oversized or contains markup");
         }
         // Prevent accidental unbounded output / DoS from a large document.

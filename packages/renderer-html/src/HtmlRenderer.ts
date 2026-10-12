@@ -20,19 +20,6 @@ export interface HtmlRenderInput {
 const MAX_HTML_LENGTH = 512_000;
 const MAX_CSS_LENGTH = 128_000;
 
-const escapeHtml = (value: string): string =>
-    value.replace(/[&<>"']/g, (character) => {
-        const entities: Record<string, string> = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;",
-        };
-
-        return entities[character] ?? character;
-    });
-
 export class HtmlRenderer implements EmailRenderer<HtmlRenderInput> {
     public readonly name = "html";
     private readonly cssProcessor = new CssProcessor();

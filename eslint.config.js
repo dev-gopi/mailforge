@@ -12,6 +12,14 @@ export default tseslint.config(
     js.configs.recommended,
     ...tseslint.configs.recommended,
     {
+        files: ["examples/**/*.mjs"],
+        languageOptions: {
+            globals: {
+                console: "readonly",
+            },
+        },
+    },
+    {
         files: ["**/*.ts"],
         rules: {
             "@typescript-eslint/consistent-type-imports": [

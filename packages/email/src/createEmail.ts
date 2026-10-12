@@ -18,8 +18,18 @@ import {
     type HtmlRenderInput,
 } from "@mailforge/renderer-html";
 
+import {
+    resolveEmailConfig,
+} from "./config/ConfigResolver.js";
+
+import type {
+    EmailConfigOptions,
+    ResolvedEmailBrand,
+    ResolvedEmailConfig,
+} from "./config/EmailConfig.js";
+
 /**
- * Options for rendering a structured email.
+ * Options for rendering a structured document.
  */
 export interface TemplateRenderOptions
     extends RenderOptions {
@@ -27,12 +37,11 @@ export interface TemplateRenderOptions
 }
 
 /**
- * Main MailForge email generation API.
- *
- * Connects the document engine,
- * customization system, and renderers.
+ * Main public MailForge email engine.
  */
 export class MailForgeEmail {
+    private readonly config: ResolvedEmailConfig;
+
     private readonly registry =
         new ComponentRegistry();
 
@@ -52,7 +61,32 @@ export class MailForgeEmail {
         new Map<string, EmailDocument>();
 
     /**
-     * Register a reusable email template.
+     * Validate and store brand configuration.
+     */
+    constructor(options: EmailConfigOptions = {}) {
+        this.config = resolveEmailConfig(options);
+    }
+
+    /**
+     * Get a copy of the current brand settings.
+     */
+    public getBrand(): ResolvedEmailBrand {
+        return {
+            ...this.config.brand,
+        };
+    }
+
+    /**
+     * Get a copy of the complete engine configuration.
+     */
+    public getConfig(): ResolvedEmailConfig {
+        return {
+            brand: this.getBrand(),
+        };
+    }
+
+    /**
+     * Register a reusable email document.
      */
     public registerTemplate(
         document: EmailDocument,
@@ -74,14 +108,14 @@ export class MailForgeEmail {
     }
 
     /**
-     * Returns the registered template names.
+     * Return the registered template IDs.
      */
     public listTemplates(): string[] {
         return [...this.templates.keys()].sort();
     }
 
     /**
-     * Returns an isolated copy of a template.
+     * Return an isolated copy of a template.
      */
     public getTemplate(
         templateId: string,
@@ -98,7 +132,7 @@ export class MailForgeEmail {
     }
 
     /**
-     * Render a previously registered template.
+     * Render a registered template.
      */
     public async render(
         templateId: string,
@@ -110,8 +144,7 @@ export class MailForgeEmail {
     }
 
     /**
-     * Render a document directly.
-     * Registering a template is optional.
+     * Render a structured document directly.
      */
     public async renderDocument(
         document: EmailDocument,
@@ -126,6 +159,7 @@ export class MailForgeEmail {
             customized,
             {
                 trust: options.trust ?? "safe",
+
                 ...(options.inlineCss !== undefined
                     ? { inlineCss: options.inlineCss }
                     : {}),
@@ -134,10 +168,7 @@ export class MailForgeEmail {
     }
 
     /**
-     * Render developer-supplied HTML.
-     *
-     * Safe mode is the default.
-     * Trusted mode must be explicitly requested.
+     * Render custom HTML through the HTML adapter.
      */
     public async renderHtml(
         input: HtmlRenderInput,
@@ -154,8 +185,12 @@ export class MailForgeEmail {
 }
 
 /**
- * Simple entry point for developers.
+ * Plug-and-play public factory.
+ *
+ * Existing createEmail() calls still work.
  */
-export function createEmail(): MailForgeEmail {
-    return new MailForgeEmail();
+export function createEmail(
+    config: EmailConfigOptions = {},
+): MailForgeEmail {
+    return new MailForgeEmail(config);
 }

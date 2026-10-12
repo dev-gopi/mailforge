@@ -71,6 +71,7 @@ export class DocumentCustomizer {
 
                 throw new Error(
                     `Patch ${index} (${patch.op}) failed: ${message}`,
+                    { cause: error },
                 );
             }
         }

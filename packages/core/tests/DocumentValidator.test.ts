@@ -97,7 +97,7 @@ describe("DocumentValidator", () => {
         expect(result.valid).toBe(false);
         expect(
             result.errors.some(
-                (error: any) =>
+                (error) =>
                     error.message.includes("Duplicate"),
             ),
         ).toBe(true);
