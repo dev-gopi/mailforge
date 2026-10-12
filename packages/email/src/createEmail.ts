@@ -1,4 +1,3 @@
-
 import {
     ComponentRegistry,
     ComponentValidator,
@@ -211,7 +210,7 @@ export class MailForgeEmail {
     // ---------------------------------------
 
     /**
-     * List the five templates bundled with MailForge.
+     * List all built-in templates bundled with MailForge.
      */
     public listBuiltinTemplates():
         BuiltinTemplateName[] {
@@ -318,12 +317,7 @@ export class MailForgeEmail {
             );
         }
 
-        // Validate the data before rendering.
-        assertBuiltinTemplateData(
-            templateId,
-            options.data,
-        );
-
+        // New domain templates validate and materialize in one pass.
         // New domain templates need typed, materialized
         // components for line-item arrays and money.
         if (isDomainTemplateName(templateId)) {
@@ -338,6 +332,9 @@ export class MailForgeEmail {
                 true,
             );
         }
+
+        // Existing five templates retain their original validation.
+        assertBuiltinTemplateData(templateId, options.data);
 
         // Existing five templates use the normal
         // dynamic-variable interpolation pipeline.
@@ -361,8 +358,6 @@ export class MailForgeEmail {
         data: BuiltinTemplateDataMap[Name],
         options: Omit<TemplateRenderOptions, "data"> = {},
     ): Promise<RenderResult> {
-        assertBuiltinTemplateData(name, data);
-
         // This always renders the packaged template,
         // ignoring any custom template with the same ID.
         if (isDomainTemplateName(name)) {
@@ -375,6 +370,8 @@ export class MailForgeEmail {
                 true,
             );
         }
+
+        assertBuiltinTemplateData(name, data);
 
         return this.renderDocument(
             getBuiltinTemplate(name),

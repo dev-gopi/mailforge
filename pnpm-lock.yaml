@@ -61,7 +61,7 @@ importers:
         version: link:../renderer-mjml
       '@mailforge/templates':
         specifier: workspace:*
-        version: link:../templates
+        version: link:../template
     devDependencies:
       '@types/node':
         specifier: ^26.6.5
@@ -126,7 +126,7 @@ importers:
         specifier: ^2.16.2
         version: 2.16.2
 
-  packages/templates:
+  packages/template:
     dependencies:
       '@mailforge/core':
         specifier: workspace:*

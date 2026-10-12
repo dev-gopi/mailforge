@@ -1,4 +1,3 @@
-
 import {
     describe,
     expect,
@@ -14,7 +13,7 @@ describe("MailForge Built-in Template Integration", () => {
     it("1. lists built-ins separately from custom templates", () => {
         const email = createEmail();
 
-        expect(email.listBuiltinTemplates()).toHaveLength(5);
+        expect(email.listBuiltinTemplates()).toHaveLength(9);
         expect(email.listTemplates()).toEqual([]);
     });
 

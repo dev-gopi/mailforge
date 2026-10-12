@@ -61,10 +61,11 @@ const timestamp = z
     /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/,
     "Use a UTC timestamp such as 2026-10-12T12:00:00Z",
   )
-  .refine(
-    (value) => Number.isFinite(Date.parse(value)),
-    "Invalid UTC timestamp",
-  );
+  .refine((value) => {
+    const milliseconds = Date.parse(value);
+    return Number.isFinite(milliseconds) &&
+      new Date(milliseconds).toISOString().replace(".000Z", "Z") === value;
+  }, "Invalid UTC timestamp");
 
 const money = z.number().int().min(0).max(100_000_000_000);
 

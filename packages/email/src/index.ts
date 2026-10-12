@@ -1,4 +1,3 @@
-
 export {
     createEmail,
     MailForgeEmail,
@@ -126,15 +125,20 @@ export type {
     BuiltinTemplateDataMap,
 } from "@mailforge/templates";
 
-import {
+// Public custom-component API (implementation lives in @mailforge/components).
+export {
     ComponentCatalog,
     ComponentExpander,
-    type ReusableComponentDefinition,
+    ComponentCatalogError,
+    ComponentRenderError,
 } from "@mailforge/components";
 
-import type {
-    ComponentInfo,
-} from "@mailforge/core";
+export type {
+    ReusableComponentDefinition,
+    ComponentRenderContext,
+    ComponentRenderOutput,
+    ComponentRenderHandler,
+} from "@mailforge/components";
 
 export {
     STANDARD_COMPONENT_NAMES,

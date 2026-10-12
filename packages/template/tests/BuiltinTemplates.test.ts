@@ -18,6 +18,10 @@ describe("MailForge Built-in Templates", () => {
       "password-reset",
       "invitation",
       "notification",
+      "invoice",
+      "payment-receipt",
+      "order-confirmation",
+      "security-alert",
     ]);
   });
 

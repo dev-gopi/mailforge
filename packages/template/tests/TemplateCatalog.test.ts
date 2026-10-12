@@ -17,6 +17,10 @@ describe("MailForge Template Catalog", () => {
       "password-reset",
       "invitation",
       "notification",
+      "invoice",
+      "payment-receipt",
+      "order-confirmation",
+      "security-alert",
     ]);
   });
 
@@ -33,9 +37,16 @@ describe("MailForge Template Catalog", () => {
     ]);
   });
 
-  it("4. keeps future categories empty", () => {
-    expect(listTemplateCatalog("billing")).toEqual([]);
-    expect(listTemplateCatalog("ecommerce")).toEqual([]);
+  it("4. discovers the expanded billing and ecommerce categories", () => {
+    expect(listTemplateCatalog("billing").map(item => item.id)).toEqual([
+      "invoice", "payment-receipt",
+    ]);
+    expect(listTemplateCatalog("ecommerce").map(item => item.id)).toEqual([
+      "order-confirmation",
+    ]);
+    expect(listTemplateCatalog("notifications").map(item => item.id)).toEqual([
+      "notification", "security-alert",
+    ]);
     expect(listTemplateCatalog("marketing")).toEqual([]);
   });
 
