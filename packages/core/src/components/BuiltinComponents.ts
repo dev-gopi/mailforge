@@ -18,8 +18,10 @@ const httpUrlSchema = z.url().refine(
             const url = new URL(value);
 
             return (
-                url.protocol === "https:" ||
-                url.protocol === "http:"
+                (url.protocol === "https:" ||
+                    url.protocol === "http:") &&
+                url.username.length === 0 &&
+                url.password.length === 0
             );
         } catch {
             return false;

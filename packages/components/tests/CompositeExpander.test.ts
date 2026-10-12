@@ -16,7 +16,6 @@ import {
 import {
     ComponentCatalog,
     ComponentExpander,
-    ComponentRenderError,
     type ComponentRenderHandler,
 } from "../src/index.js";
 

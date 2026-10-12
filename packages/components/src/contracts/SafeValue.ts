@@ -15,7 +15,7 @@ export function isSafeHttpsUrl(value: string): boolean {
             url.username.length === 0 &&
             url.password.length === 0 &&
             value.length <= 2048 &&
-            !/[\u0000-\u001f\u007f]/.test(value)
+            !/\p{Cc}/u.test(value)
         );
     } catch {
         return false;

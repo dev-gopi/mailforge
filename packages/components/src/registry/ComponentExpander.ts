@@ -1,17 +1,20 @@
 
 import {
-    ComponentRegistry,
     ComponentValidator,
     type EmailDocument,
     type EmailNode,
     type EmailNodeValue,
 } from "@mailforge/core";
 
+import type {
+    ComponentRegistry,
+} from "@mailforge/core";
+
 import {
     ComponentRenderError,
 } from "../contracts/ComponentRenderError.js";
 
-import {
+import type {
     ComponentCatalog,
 } from "./ComponentCatalog.js";
 

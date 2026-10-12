@@ -150,10 +150,18 @@ describe("MjmlRenderer", () => {
         } });
         await expect(renderer.render(doc)).rejects.toThrow("trusted rendering mode");
     });
-    it("rejects subjects containing line breaks", async () => {
+    it("rejects subjects containing control characters", async () => {
         const doc = sample();
         doc.subject = "Hello\r\nBcc: hidden@example.com";
-        await expect(renderer.render(doc)).rejects.toThrow("line breaks");
+        await expect(renderer.render(doc)).rejects.toThrow("control characters");
+    });
+    it("rejects credential-bearing URLs defensively", async () => {
+        const doc = sample();
+        doc.body[1]!.props = {
+            text: "Click",
+            href: "https://user:password@example.com",
+        };
+        await expect(renderer.render(doc)).rejects.toThrow();
     });
     it("reports MJML's unavoidable CSS behavior", async () => {
         const result = await renderer.render(sample(), { inlineCss: false });

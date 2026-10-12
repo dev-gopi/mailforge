@@ -100,6 +100,36 @@ describe("MailForge plug-and-play API", () => {
         }).toThrow("Template already registered");
     });
 
+    it("persists an override without mutating its source", () => {
+        const email = createEmail();
+        const replacement = createTestTemplate();
+        replacement.subject = "Replacement template";
+
+        email.overrideTemplate(replacement);
+        replacement.subject = "Caller mutation";
+
+        expect(email.getTemplate("welcome").subject)
+            .toBe("Replacement template");
+    });
+
+    it("extends a packaged template without modifying the package default", () => {
+        const email = createEmail();
+
+        email.extendTemplate("welcome", draft => {
+            draft.body.unshift({
+                id: "custom-introduction",
+                type: "text",
+                props: { text: "A custom introduction" },
+            });
+        });
+
+        expect(email.getTemplate("welcome").body[0]?.id)
+            .toBe("custom-introduction");
+        expect(email.unregisterTemplate("welcome")).toBe(true);
+        expect(email.getTemplate("welcome").body[0]?.id)
+            .toBe("welcome-heading");
+    });
+
     it("protects registered templates from mutation", () => {
         const email = createEmail();
         const original = createTestTemplate();

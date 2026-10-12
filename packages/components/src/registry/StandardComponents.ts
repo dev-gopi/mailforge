@@ -3,7 +3,7 @@ import type {
     ReusableComponentDefinition,
 } from "../contracts/ComponentRenderer.types.js";
 
-import {
+import type {
     ComponentCatalog,
 } from "./ComponentCatalog.js";
 

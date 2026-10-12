@@ -16,7 +16,7 @@ const text = (max: number) =>
     .max(max)
     .refine(
       (value) =>
-        value.trim().length > 0 && !/[\u0000-\u001f\u007f]/.test(value),
+        value.trim().length > 0 && !/\p{Cc}/u.test(value),
       "Must contain valid non-empty text",
     );
 
@@ -26,7 +26,7 @@ const httpsUrl = z
   .max(2048)
   .refine((value) => {
     try {
-      if (/[\u0000-\u001f\u007f]/.test(value)) {
+      if (/\p{Cc}/u.test(value)) {
         return false;
       }
 

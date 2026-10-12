@@ -17,6 +17,11 @@ const dangerousAttributeNames = new Set([
     "formaction",
 ]);
 
+const headerText = z.string().refine(
+    value => !/\p{Cc}/u.test(value),
+    "Email headers must not contain control characters",
+);
+
 const EmailNodeSchema: z.ZodType<EmailNode> =
     z.lazy(() =>
         z.object({
@@ -62,9 +67,9 @@ const EmailDocumentSchema = z.object({
         "Version must be in X.Y.Z format",
     ),
 
-    subject: z.string().trim().min(1),
+    subject: headerText.trim().min(1),
 
-    preheader: z.string().optional(),
+    preheader: headerText.optional(),
 
     locale: z.string().optional(),
 

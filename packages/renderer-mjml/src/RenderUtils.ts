@@ -23,6 +23,9 @@ export function safeUrl(value: unknown): string {
     if (url.protocol !== "https:" && url.protocol !== "http:") {
         throw new Error("Unsafe URL protocol");
     }
+    if (url.username || url.password) {
+        throw new Error("URLs must not contain credentials");
+    }
     return url.toString();
 }
 

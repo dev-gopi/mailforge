@@ -108,6 +108,17 @@ describe("ComponentValidator", () => {
         ).toBe(false);
     });
 
+    it("rejects button URLs containing credentials", () => {
+        const document = createDocument();
+
+        document.body[1]!.props = {
+            text: "Invalid button",
+            href: "https://user:password@example.com",
+        };
+
+        expect(validator.validate(document).valid).toBe(false);
+    });
+
     it("rejects children in leaf components", () => {
         const document = createDocument();
 

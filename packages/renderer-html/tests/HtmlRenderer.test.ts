@@ -89,6 +89,24 @@ describe("HtmlRenderer", () => {
         );
     });
 
+    it("rejects control characters in email headers", async () => {
+        await expect(
+            renderer.render({
+                subject: "Welcome\u0000",
+                preheader: "Your account is ready",
+                html: "<p>Hello</p>",
+            }),
+        ).rejects.toThrow("Email subject is required");
+
+        await expect(
+            renderer.render({
+                subject: "Welcome",
+                preheader: "Your account\nis ready",
+                html: "<p>Hello</p>",
+            }),
+        ).rejects.toThrow("Email preheader must not contain control characters");
+    });
+
     it("preserves safe custom data attributes", async () => {
         const result = await renderer.render({
             subject: "Tracking",

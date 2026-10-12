@@ -148,7 +148,7 @@ function requiredText(value: unknown, path: string, max = 160): void {
     typeof value !== "string" ||
     value.trim().length === 0 ||
     value.length > max ||
-    /[\u0000-\u001f\u007f]/.test(value)
+    /\p{Cc}/u.test(value)
   ) {
     throw new BuiltinTemplateDataError(
       path,

@@ -50,6 +50,104 @@ export class ComponentCatalog {
     public register(
         definition: ReusableComponentDefinition,
     ): this {
+        const { name, render, coreDefinition } =
+            this.validateDefinition(definition);
+
+        // Includes protection against overriding
+        // the 14 built-in core components.
+        if (this.registry.has(name)) {
+            throw new ComponentCatalogError(
+                "COMPONENT_CATALOG_DUPLICATE",
+                name,
+                "component is already registered",
+            );
+        }
+
+        try {
+            this.registry.register(coreDefinition);
+        } catch (error) {
+            const reason =
+                error instanceof Error
+                    ? error.message
+                    : "unknown registration error";
+
+            throw new ComponentCatalogError(
+                "COMPONENT_CATALOG_INVALID",
+                name,
+                reason,
+            );
+        }
+
+        this.entries.set(name, {
+            render,
+            version: definition.version,
+            schema: definition.schema,
+        });
+
+        return this;
+    }
+
+    /**
+     * Replace an existing reusable component without changing
+     * references held by registered templates.
+     */
+    public replace(
+        definition: ReusableComponentDefinition,
+    ): this {
+        const { name, render, coreDefinition } =
+            this.validateDefinition(definition);
+
+        if (!this.entries.has(name)) {
+            throw new ComponentCatalogError(
+                "COMPONENT_CATALOG_NOT_FOUND",
+                name,
+                "only reusable catalog components can be replaced",
+            );
+        }
+
+        try {
+            this.registry.replace(coreDefinition);
+        } catch (error) {
+            const reason =
+                error instanceof Error
+                    ? error.message
+                    : "unknown replacement error";
+
+            throw new ComponentCatalogError(
+                "COMPONENT_CATALOG_INVALID",
+                name,
+                reason,
+            );
+        }
+
+        this.entries.set(name, {
+            render,
+            version: definition.version,
+            schema: definition.schema,
+        });
+
+        return this;
+    }
+
+    /** Remove a reusable component and its core validation contract. */
+    public unregister(name: string): boolean {
+        if (!this.entries.has(name)) {
+            return false;
+        }
+
+        this.entries.delete(name);
+        this.registry.unregister(name);
+
+        return true;
+    }
+
+    private validateDefinition(
+        definition: ReusableComponentDefinition,
+    ): {
+        name: string;
+        render: ComponentRenderHandler;
+        coreDefinition: ComponentDefinition;
+    } {
         if (
             definition === null ||
             typeof definition !== "object" ||
@@ -86,16 +184,6 @@ export class ComponentCatalog {
             );
         }
 
-        // Includes protection against overriding
-        // the 14 built-in core components.
-        if (this.registry.has(name)) {
-            throw new ComponentCatalogError(
-                "COMPONENT_CATALOG_DUPLICATE",
-                name,
-                "component is already registered",
-            );
-        }
-
         /**
          * Separate the handler from core metadata.
          * The core registry should not store the
@@ -106,29 +194,7 @@ export class ComponentCatalog {
             ...coreDefinition
         } = definition;
 
-        try {
-            this.registry.register(coreDefinition);
-        } catch (error) {
-            const reason =
-                error instanceof Error
-                    ? error.message
-                    : "unknown registration error";
-
-            throw new ComponentCatalogError(
-                "COMPONENT_CATALOG_INVALID",
-                name,
-                reason,
-            );
-        }
-
-        // Store only after core registration succeeds.
-        this.entries.set(name, {
-            render,
-            version: definition.version,
-            schema: definition.schema,
-        });
-
-        return this;
+        return { name, render, coreDefinition };
     }
 
     /**

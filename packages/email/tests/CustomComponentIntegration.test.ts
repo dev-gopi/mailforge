@@ -291,4 +291,40 @@ describe("MailForge Custom Component Integration", () => {
             second.renderDocument(document()),
         ).rejects.toThrow("Unknown component");
     });
+
+    it("9. overrides a default reusable component per engine", async () => {
+        const email = createEmail();
+
+        email.overrideComponent({
+            name: "mf-status-badge",
+            version: "2.0.0",
+            allowChildren: false,
+            schema: z.object({
+                label: z.string().min(1),
+                status: z.enum(["success", "warning", "error"]),
+            }).strict(),
+            defaults: { status: "success" },
+            render: (props, context) => ({
+                id: context.nodeId,
+                type: "text",
+                props: {
+                    text: `Custom status: ${String(props.label)}`,
+                },
+            }),
+        });
+
+        const result = await email.renderDocument({
+            schemaVersion: "1.0",
+            id: "overridden-component",
+            version: "1.0.0",
+            subject: "Component override",
+            body: [{
+                id: "status",
+                type: "mf-status-badge",
+                props: { label: "Ready" },
+            }],
+        });
+
+        expect(result.text).toContain("Custom status: Ready");
+    });
 });

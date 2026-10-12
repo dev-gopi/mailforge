@@ -142,7 +142,39 @@ describe("MailForge ComponentCatalog", () => {
         }).toThrow(ComponentCatalogError);
     });
 
-    it("9. rejects invalid component names", () => {
+    it("9. replaces a reusable component atomically", () => {
+        const catalog = new ComponentCatalog();
+        catalog.register(definition());
+
+        catalog.replace({
+            ...definition(),
+            version: "2.0.0",
+            render: (props, context) => ({
+                id: context.nodeId,
+                type: "text",
+                props: { text: `Updated: ${String(props.label)}` },
+            }),
+        });
+
+        expect(catalog.get("status-badge")?.version).toBe("2.0.0");
+        expect(catalog.get("status-badge")?.render(
+            { label: "Paid", status: "success" },
+            { nodeId: "status", componentName: "status-badge" },
+        )).toMatchObject({
+            props: { text: "Updated: Paid" },
+        });
+    });
+
+    it("10. unregisters only reusable components", () => {
+        const catalog = new ComponentCatalog();
+        catalog.register(definition());
+
+        expect(catalog.unregister("status-badge")).toBe(true);
+        expect(catalog.has("status-badge")).toBe(false);
+        expect(catalog.unregister("text")).toBe(false);
+    });
+
+    it("11. rejects invalid component names", () => {
         const catalog = new ComponentCatalog();
 
         expect(() => {
@@ -154,7 +186,7 @@ describe("MailForge ComponentCatalog", () => {
         expect(catalog.list()).toHaveLength(0);
     });
 
-    it("10. rejects invalid version strings", () => {
+    it("12. rejects invalid version strings", () => {
         const catalog = new ComponentCatalog();
 
         const item = definition();
@@ -165,7 +197,7 @@ describe("MailForge ComponentCatalog", () => {
         }).toThrow("Invalid component version");
     });
 
-    it("11. rejects missing rendering handlers", () => {
+    it("13. rejects missing rendering handlers", () => {
         const catalog = new ComponentCatalog();
 
         const item = {

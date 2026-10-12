@@ -28,8 +28,15 @@ export class HtmlRenderer implements EmailRenderer<HtmlRenderInput> {
         input: HtmlRenderInput,
         options: RenderOptions = {},
     ): Promise<RenderResult> {
-        if (!input.subject.trim() || /[\r\n]/.test(input.subject)) {
+        if (!input.subject.trim() || /\p{Cc}/u.test(input.subject)) {
             throw new Error("Email subject is required");
+        }
+
+        if (
+            input.preheader !== undefined &&
+            /\p{Cc}/u.test(input.preheader)
+        ) {
+            throw new Error("Email preheader must not contain control characters");
         }
 
         if (Buffer.byteLength(input.html, "utf8") > MAX_HTML_LENGTH) {

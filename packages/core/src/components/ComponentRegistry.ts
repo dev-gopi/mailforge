@@ -29,6 +29,44 @@ export class ComponentRegistry {
     }
 
     public register(definition: ComponentDefinition): void {
+        this.assertValidDefinition(definition);
+
+        if (this.components.has(definition.name)) {
+            throw new Error(
+                `Component already registered: ${definition.name}`,
+            );
+        }
+
+        this.components.set(
+            definition.name,
+            this.cloneDefinition(definition),
+        );
+    }
+
+    /**
+     * Atomically replace an existing definition.
+     *
+     * This is intentionally separate from register so callers
+     * cannot accidentally replace a component by name.
+     */
+    public replace(definition: ComponentDefinition): void {
+        this.assertValidDefinition(definition);
+
+        if (!this.components.has(definition.name)) {
+            throw new Error(
+                `Component not found: ${definition.name}`,
+            );
+        }
+
+        this.components.set(
+            definition.name,
+            this.cloneDefinition(definition),
+        );
+    }
+
+    private assertValidDefinition(
+        definition: ComponentDefinition,
+    ): void {
         if (!componentNamePattern.test(definition.name)) {
             throw new Error(
                 `Invalid component name: ${definition.name}`,
@@ -43,30 +81,17 @@ export class ComponentRegistry {
             );
         }
 
-        if (this.components.has(definition.name)) {
-            throw new Error(
-                `Component already registered: ${definition.name}`,
-            );
-        }
+    }
 
-        if (
-            definition.defaults !== undefined &&
-            !definition.schema.safeParse(
-                definition.defaults,
-            ).success
-        ) {
-            // Partial defaults are allowed, so validation
-            // occurs against merged props at usage time.
-        }
-
-        const stored: ComponentDefinition = {
+    private cloneDefinition(
+        definition: ComponentDefinition,
+    ): ComponentDefinition {
+        return {
             ...definition,
             defaults: definition.defaults
                 ? structuredClone(definition.defaults)
                 : undefined,
         };
-
-        this.components.set(definition.name, stored);
     }
 
     public has(name: string): boolean {

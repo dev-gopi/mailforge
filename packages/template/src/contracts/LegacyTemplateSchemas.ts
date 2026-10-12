@@ -8,7 +8,7 @@ function text(max: number) {
         .refine(
             value =>
                 value.trim().length > 0 &&
-                !/[\u0000-\u001f\u007f]/.test(value),
+                !/\p{Cc}/u.test(value),
             "Must contain valid non-empty text",
         );
 }

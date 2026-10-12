@@ -335,12 +335,67 @@ export class MailForgeEmail {
     public registerTemplate(
         document: EmailDocument,
     ): this {
+        return this.storeTemplate(document, false);
+    }
+
+    /**
+     * Persistently replace a registered template or a packaged
+     * template with the same id. The supplied document is cloned,
+     * so later caller mutations cannot affect future renders.
+     */
+    public overrideTemplate(
+        document: EmailDocument,
+    ): this {
+        return this.storeTemplate(document, true);
+    }
+
+    /**
+     * Derive and persist a template without mutating its source.
+     *
+     * The source can be either a packaged template or a previously
+     * registered custom template. The callback may mutate the draft
+     * or return a replacement document.
+     */
+    public extendTemplate(
+        templateId: string,
+        customize: TemplateCustomizer,
+    ): this {
+        if (typeof customize !== "function") {
+            throw new TypeError("Template customize must be a function");
+        }
+
+        const draft = this.getTemplate(templateId);
+        const modified = customize(draft) ?? draft;
+
+        if (
+            modified === null ||
+            typeof modified !== "object" ||
+            modified.id !== templateId ||
+            !Array.isArray(modified.body)
+        ) {
+            throw new Error(
+                `Invalid extended template: ${templateId}`,
+            );
+        }
+
+        return this.overrideTemplate(modified);
+    }
+
+    /** Remove a custom template, revealing a packaged template if one exists. */
+    public unregisterTemplate(templateId: string): boolean {
+        return this.templates.delete(templateId);
+    }
+
+    private storeTemplate(
+        document: EmailDocument,
+        replace: boolean,
+    ): this {
         const validationCopy =
             prepareTemplateForValidation(document);
 
         this.validator.validateOrThrow(validationCopy);
 
-        if (this.templates.has(document.id)) {
+        if (!replace && this.templates.has(document.id)) {
             throw new Error(
                 `Template already registered: ${document.id}`,
             );
@@ -480,7 +535,7 @@ export class MailForgeEmail {
             typeof modified !== "object" ||
             modified.id !== name ||
             !Array.isArray(modified.body)
-        ) {
+           ) {
             throw new Error(
                 `Invalid customized built-in template: ${name}`,
             );
@@ -729,6 +784,19 @@ export class MailForgeEmail {
     ): this {
         this.componentCatalog.register(definition);
         return this;
+    }
+
+    /** Replace a registered reusable component for this engine. */
+    public overrideComponent(
+        definition: ReusableComponentDefinition,
+    ): this {
+        this.componentCatalog.replace(definition);
+        return this;
+    }
+
+    /** Remove a registered reusable component from this engine. */
+    public unregisterComponent(name: string): boolean {
+        return this.componentCatalog.unregister(name);
     }
 
     /**

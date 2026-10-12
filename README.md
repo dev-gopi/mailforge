@@ -72,6 +72,54 @@ console.log(result.text);
 
 `HtmlRenderer` sanitizes untrusted HTML. Supplying custom CSS requires `{ trust: "trusted" }`; use trusted rendering only for content you control.
 
+## Extending templates and components
+
+`createEmail()` provides isolated registries per engine. Built-in templates and
+components are never mutated: registration, overrides, and extensions are cloned
+before storage.
+
+```ts
+import { z } from "zod";
+import { createEmail } from "@mailforge/email";
+
+const email = createEmail();
+
+// Persistently derive a packaged template. The callback may add, remove,
+// replace, or reorder document nodes.
+email.extendTemplate("welcome", draft => {
+    draft.body.unshift({
+        id: "announcement",
+        type: "text",
+        props: { text: "A message from Acme" },
+    });
+});
+
+// Reuse the default template name with the derived version.
+await email.render("welcome", { data: {
+    user: { firstName: "Sam" },
+    actionUrl: "https://example.com/dashboard",
+} });
+
+// Register a new component, then use it in any registered template.
+email.registerComponent({
+    name: "notice",
+    version: "1.0.0",
+    allowChildren: false,
+    schema: z.object({ message: z.string().min(1) }),
+    render: (props, context) => ({
+        id: context.nodeId,
+        type: "text",
+        props: { text: String(props.message) },
+    }),
+});
+```
+
+Use `overrideTemplate()` to replace a registered or packaged template,
+`unregisterTemplate()` to remove a custom override, and `overrideComponent()` or
+`unregisterComponent()` for registered reusable components. One-off changes can
+also use `render(..., { patches })`, while `renderCustomizedBuiltin()` and
+template presets keep customizations non-persistent.
+
 ## Development commands
 
 | Command | Description |

@@ -84,6 +84,14 @@ describe("DocumentValidator", () => {
         ).toBe(false);
     });
 
+    it("rejects control characters in email headers", () => {
+        const document = createDocument();
+        document.subject = "Welcome\u0000";
+        document.preheader = "Preview\ntext";
+
+        expect(validator.validate(document).valid).toBe(false);
+    });
+
     it("rejects duplicate node IDs", () => {
         const document = createDocument();
 

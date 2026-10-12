@@ -77,13 +77,19 @@ export class MjmlRenderer implements EmailRenderer {
         document: EmailDocument,
         options: RenderOptions = {},
     ): Promise<RenderResult> {
+        if (/\p{Cc}/u.test(document.subject)) {
+            throw new Error("Email subject must not contain control characters");
+        }
+        if (
+            document.preheader !== undefined &&
+            /\p{Cc}/u.test(document.preheader)
+        ) {
+            throw new Error("Email preheader must not contain control characters");
+        }
         this.validator.validateOrThrow(document);
         const trust: Trust = options.trust ?? "safe";
         if (trust !== "trusted" && trust !== "safe") {
             throw new Error("Invalid render trust mode");
-        }
-        if (/[\r\n]/.test(document.subject)) {
-            throw new Error("Email subject must not contain line breaks");
         }
         const css = document.head?.customCss ?? "";
         if (css && trust !== "trusted") {
