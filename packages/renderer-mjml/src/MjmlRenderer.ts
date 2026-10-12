@@ -158,7 +158,39 @@ export class MjmlRenderer implements EmailRenderer {
             html,
             text: convert(html, {
                 wordwrap: 120,
-                selectors: [{ selector: "img", format: "skip" }],
+                selectors: [
+                    { selector: "img", format: "skip" },
+                    {
+                        selector: "h1",
+                        format: "heading",
+                        options: { uppercase: false },
+                    },
+                    {
+                        selector: "h2",
+                        format: "heading",
+                        options: { uppercase: false },
+                    },
+                    {
+                        selector: "h3",
+                        format: "heading",
+                        options: { uppercase: false },
+                    },
+                    {
+                        selector: "h4",
+                        format: "heading",
+                        options: { uppercase: false },
+                    },
+                    {
+                        selector: "h5",
+                        format: "heading",
+                        options: { uppercase: false },
+                    },
+                    {
+                        selector: "h6",
+                        format: "heading",
+                        options: { uppercase: false },
+                    },
+                ],
             }),
             ...(document.preheader !== undefined ? { preheader: document.preheader } : {}),
             warnings: options.inlineCss === false ? [{

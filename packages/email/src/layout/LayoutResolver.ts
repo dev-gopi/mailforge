@@ -73,6 +73,7 @@ function textValue(
         typeof input !== "string" ||
         !input.trim() ||
         input.length > maxLength ||
+        // eslint-disable-next-line no-control-regex
         /[\u0000-\u001f\u007f]/.test(input)
     ) {
         throw new EmailLayoutError(
@@ -200,6 +201,7 @@ function parseAttrs(
         if (
             String(value).length > 1024 ||
             (typeof value === "number" && !Number.isFinite(value)) ||
+            // eslint-disable-next-line no-control-regex
             /[\u0000-\u001f\u007f]/.test(String(value))
         ) {
             throw new EmailLayoutError(

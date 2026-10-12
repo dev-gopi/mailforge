@@ -51,6 +51,11 @@ describe("MjmlRenderer", () => {
         expect(result.text).toContain("Hello John!");
         expect(result.text).toContain("Get Started");
     });
+    it("preserves heading casing in the plain-text alternative", async () => {
+        const result = await renderer.render(sample());
+        expect(result.text).toContain("MailForge");
+        expect(result.text).not.toContain("MAILFORGE");
+    });
     it("preserves header, footer and copyright content", async () => {
         const result = await renderer.render(sample());
         expect(result.html).toContain("MailForge");

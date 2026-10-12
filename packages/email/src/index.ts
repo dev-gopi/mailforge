@@ -1,96 +1,113 @@
 
 export {
-  createEmail,
-  MailForgeEmail,
+    createEmail,
+    MailForgeEmail,
 } from "./createEmail.js";
 
 export type {
-  TemplateRenderOptions,
+    TemplateRenderOptions,
 } from "./createEmail.js";
 
-// Brand and configuration
+// Branding and global configuration
 export {
-  EmailConfigError,
+    EmailConfigError,
 } from "./config/EmailConfig.js";
 
 export {
-  resolveEmailConfig,
+    resolveEmailConfig,
 } from "./config/ConfigResolver.js";
 
 export type {
-  EmailBrandOptions,
-  EmailConfigOptions,
-  ResolvedEmailBrand,
-  ResolvedEmailConfig,
+    EmailBrandOptions,
+    EmailConfigOptions,
+    ResolvedEmailBrand,
+    ResolvedEmailConfig,
 } from "./config/EmailConfig.js";
 
 // Themes
 export {
-  EmailThemeError,
+    EmailThemeError,
 } from "./theme/Theme.types.js";
 
 export {
-  getThemePreset,
-  listThemePresets,
+    getThemePreset,
+    listThemePresets,
 } from "./theme/ThemePresets.js";
 
 export {
-  resolveEmailTheme,
-  mergeEmailTheme,
-  defineThemeOverrides,
+    resolveEmailTheme,
+    mergeEmailTheme,
+    defineThemeOverrides,
 } from "./theme/ThemeResolver.js";
 
 export type {
-  ThemePreset,
-  ThemeColors,
-  ThemeTypography,
-  ThemeSpacing,
-  ThemeOverrides,
-  ThemeConfiguration,
-  EmailThemeOptions,
-  ResolvedEmailTheme,
+    ThemePreset,
+    ThemeColors,
+    ThemeTypography,
+    ThemeSpacing,
+    ThemeOverrides,
+    ThemeConfiguration,
+    EmailThemeOptions,
+    ResolvedEmailTheme,
 } from "./theme/Theme.types.js";
 
-// Automatic layouts
+// Layouts
 export {
-  EmailLayoutError,
+    EmailLayoutError,
 } from "./layout/Layout.types.js";
 
 export {
-  resolveEmailLayout,
-  mergeEmailLayout,
+    resolveEmailLayout,
+    mergeEmailLayout,
 } from "./layout/LayoutResolver.js";
 
 export {
-  applyDefaultLayout,
+    applyDefaultLayout,
 } from "./layout/DefaultLayout.js";
 
 export {
-  applyEmailTheme,
+    applyEmailTheme,
 } from "./layout/ThemeApplicator.js";
 
 export type {
-  EmailLayoutOptions,
-  HeaderOptions,
-  FooterOptions,
-  CopyrightOptions,
-  LayoutAttributes,
-  ResolvedHeader,
-  ResolvedFooter,
-  ResolvedCopyright,
-  ResolvedEmailLayout,
+    EmailLayoutOptions,
+    HeaderOptions,
+    FooterOptions,
+    CopyrightOptions,
+    LayoutAttributes,
+    ResolvedHeader,
+    ResolvedFooter,
+    ResolvedCopyright,
+    ResolvedEmailLayout,
 } from "./layout/Layout.types.js";
 
-// Core public types
+// Dynamic variables
+export {
+    EmailVariableError,
+} from "./variables/Variable.types.js";
+
+export {
+    prepareTemplateForValidation,
+    interpolateEmailDocument,
+    interpolateDocumentPatches,
+} from "./variables/VariableResolver.js";
+
 export type {
-  EmailDocument,
-  EmailNode,
-  DocumentPatch,
-  RenderOptions,
-  RenderResult,
+    TemplateData,
+    VariableIssue,
+    VariableErrorCode,
+} from "./variables/Variable.types.js";
+
+// Existing core types
+export type {
+    EmailDocument,
+    EmailNode,
+    DocumentPatch,
+    RenderOptions,
+    RenderResult,
 } from "@mailforge/core";
 
-// HTML renderer
+// Standalone HTML renderer
 export type {
-  HtmlRenderInput,
+    HtmlRenderInput,
 } from "@mailforge/renderer-html";

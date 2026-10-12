@@ -1,253 +1,310 @@
 
 import {
-  ComponentRegistry,
-  ComponentValidator,
-  DocumentCustomizer,
-  type EmailDocument,
-  type DocumentPatch,
-  type RenderOptions,
-  type RenderResult,
+    ComponentRegistry,
+    ComponentValidator,
+    DocumentCustomizer,
+    type EmailDocument,
+    type DocumentPatch,
+    type RenderOptions,
+    type RenderResult,
 } from "@mailforge/core";
 
 import {
-  MjmlRenderer,
+    MjmlRenderer,
 } from "@mailforge/renderer-mjml";
 
 import {
-  HtmlRenderer,
-  type HtmlRenderInput,
+    HtmlRenderer,
+    type HtmlRenderInput,
 } from "@mailforge/renderer-html";
 
 import {
-  resolveEmailConfig,
+    resolveEmailConfig,
 } from "./config/ConfigResolver.js";
 
 import {
-  mergeEmailTheme,
+    mergeEmailTheme,
 } from "./theme/ThemeResolver.js";
 
 import {
-  listThemePresets,
+    listThemePresets,
 } from "./theme/ThemePresets.js";
 
 import {
-  applyDefaultLayout,
+    applyDefaultLayout,
 } from "./layout/DefaultLayout.js";
 
 import {
-  applyEmailTheme,
+    applyEmailTheme,
 } from "./layout/ThemeApplicator.js";
 
 import {
-  mergeEmailLayout,
+    mergeEmailLayout,
 } from "./layout/LayoutResolver.js";
 
+import {
+    prepareTemplateForValidation,
+    interpolateEmailDocument,
+    interpolateDocumentPatches,
+} from "./variables/VariableResolver.js";
+
 import type {
-  EmailConfigOptions,
-  ResolvedEmailBrand,
-  ResolvedEmailConfig,
+    TemplateData,
+} from "./variables/Variable.types.js";
+
+import type {
+    EmailConfigOptions,
+    ResolvedEmailBrand,
+    ResolvedEmailConfig,
 } from "./config/EmailConfig.js";
 
 import type {
-  ResolvedEmailTheme,
-  ThemeOverrides,
-  ThemePreset,
+    ResolvedEmailTheme,
+    ThemeOverrides,
+    ThemePreset,
 } from "./theme/Theme.types.js";
 
 import type {
-  EmailLayoutOptions,
-  ResolvedEmailLayout,
+    EmailLayoutOptions,
+    ResolvedEmailLayout,
 } from "./layout/Layout.types.js";
 
+/**
+ * Additional properties accepted by render().
+ */
 export interface TemplateRenderOptions
-  extends RenderOptions {
-  patches?: readonly DocumentPatch[];
-  layout?: EmailLayoutOptions;
-  theme?: ThemeOverrides;
+    extends RenderOptions {
+    data?: TemplateData;
+    patches?: readonly DocumentPatch[];
+    layout?: EmailLayoutOptions;
+    theme?: ThemeOverrides;
 }
 
 export class MailForgeEmail {
-  private readonly config: ResolvedEmailConfig;
+    private readonly config: ResolvedEmailConfig;
 
-  private readonly registry =
-    new ComponentRegistry();
+    private readonly registry =
+        new ComponentRegistry();
 
-  private readonly validator =
-    new ComponentValidator(this.registry);
+    private readonly validator =
+        new ComponentValidator(this.registry);
 
-  private readonly customizer =
-    new DocumentCustomizer(this.registry);
+    private readonly customizer =
+        new DocumentCustomizer(this.registry);
 
-  private readonly mjmlRenderer =
-    new MjmlRenderer(this.registry);
+    private readonly mjmlRenderer =
+        new MjmlRenderer(this.registry);
 
-  private readonly htmlRenderer =
-    new HtmlRenderer();
+    private readonly htmlRenderer =
+        new HtmlRenderer();
 
-  private readonly templates =
-    new Map<string, EmailDocument>();
+    private readonly templates =
+        new Map<string, EmailDocument>();
 
-  constructor(options: EmailConfigOptions = {}) {
-    this.config = resolveEmailConfig(options);
-  }
-
-  public getBrand(): ResolvedEmailBrand {
-    return structuredClone(this.config.brand);
-  }
-
-  public getTheme(): ResolvedEmailTheme {
-    return structuredClone(this.config.theme);
-  }
-
-  public getLayout(): ResolvedEmailLayout {
-    return structuredClone(this.config.layout);
-  }
-
-  public getConfig(): ResolvedEmailConfig {
-    return {
-      brand: this.getBrand(),
-      theme: this.getTheme(),
-      layout: this.getLayout(),
-    };
-  }
-
-  public listThemes(): ThemePreset[] {
-    return listThemePresets();
-  }
-
-  public resolveTheme(
-    overrides: ThemeOverrides = {},
-  ): ResolvedEmailTheme {
-    return mergeEmailTheme(
-      this.config.theme,
-      overrides,
-    );
-  }
-
-  public resolveLayout(
-    overrides: EmailLayoutOptions = {},
-  ): ResolvedEmailLayout {
-    return mergeEmailLayout(
-      this.config.layout,
-      overrides,
-    );
-  }
-
-  public registerTemplate(
-    document: EmailDocument,
-  ): this {
-    this.validator.validateOrThrow(document);
-
-    if (this.templates.has(document.id)) {
-      throw new Error(
-        `Template already registered: ${document.id}`,
-      );
+    constructor(options: EmailConfigOptions = {}) {
+        this.config = resolveEmailConfig(options);
     }
 
-    this.templates.set(
-      document.id,
-      structuredClone(document),
-    );
+    // -----------------------------
+    // BRAND AND THEME CONFIGURATION
+    // -----------------------------
 
-    return this;
-  }
-
-  public listTemplates(): string[] {
-    return [...this.templates.keys()].sort();
-  }
-
-  public getTemplate(
-    templateId: string,
-  ): EmailDocument {
-    const document = this.templates.get(templateId);
-
-    if (!document) {
-      throw new Error(
-        `Template not found: ${templateId}`,
-      );
+    public getBrand(): ResolvedEmailBrand {
+        return structuredClone(this.config.brand);
     }
 
-    return structuredClone(document);
-  }
+    public getTheme(): ResolvedEmailTheme {
+        return structuredClone(this.config.theme);
+    }
 
-  public async render(
-    templateId: string,
-    options: TemplateRenderOptions = {},
-  ): Promise<RenderResult> {
-    const document = this.getTemplate(templateId);
+    public getLayout(): ResolvedEmailLayout {
+        return structuredClone(this.config.layout);
+    }
 
-    return this.renderDocument(document, options);
-  }
+    public getConfig(): ResolvedEmailConfig {
+        return {
+            brand: this.getBrand(),
+            theme: this.getTheme(),
+            layout: this.getLayout(),
+        };
+    }
 
-  public async renderDocument(
-    document: EmailDocument,
-    options: TemplateRenderOptions = {},
-  ): Promise<RenderResult> {
-    // 1. Resolve this email's layout.
-    const layout = this.resolveLayout(
-      options.layout ?? {},
-    );
+    public listThemes(): ThemePreset[] {
+        return listThemePresets();
+    }
 
-    // 2. Resolve this email's visual theme.
-    const theme = this.resolveTheme(
-      options.theme ?? {},
-    );
+    public resolveTheme(
+        overrides: ThemeOverrides = {},
+    ): ResolvedEmailTheme {
+        return mergeEmailTheme(
+            this.config.theme,
+            overrides,
+        );
+    }
 
-    // 3. Generate missing branded sections.
-    const withDefaults = applyDefaultLayout(
-      document,
-      this.config.brand,
-      layout,
-    );
+    public resolveLayout(
+        overrides: EmailLayoutOptions = {},
+    ): ResolvedEmailLayout {
+        return mergeEmailLayout(
+            this.config.layout,
+            overrides,
+        );
+    }
 
-    // 4. Apply developer patches atomically.
-    const customized = this.customizer.apply(
-      withDefaults,
-      options.patches ?? [],
-    );
+    // -----------------------------
+    // TEMPLATE REGISTRATION
+    // -----------------------------
 
-    // 5. Apply theme defaults to all components.
-    const themed = applyEmailTheme(
-      customized,
-      theme,
-    );
+    public registerTemplate(
+        document: EmailDocument,
+    ): this {
+        /**
+         * Validate a temporary copy where variable
+         * URLs are replaced with safe example URLs.
+         *
+         * Store the original template unchanged.
+         */
+        const validationCopy =
+            prepareTemplateForValidation(document);
 
-    // 6. Render the completed document.
-    return this.mjmlRenderer.render(
-      themed,
-      {
-        trust: options.trust ?? "safe",
-        bodyBackgroundColor: theme.colors.background,
+        this.validator.validateOrThrow(validationCopy);
 
-        ...(options.inlineCss !== undefined
-          ? {
-              inlineCss: options.inlineCss,
-            }
-          : {}),
-      },
-    );
-  }
+        if (this.templates.has(document.id)) {
+            throw new Error(
+                `Template already registered: ${document.id}`,
+            );
+        }
 
-  /**
-   * Standalone HTML rendering retains its
-   * existing behavior and trust policy.
-   */
-  public async renderHtml(
-    input: HtmlRenderInput,
-    options: RenderOptions = {},
-  ): Promise<RenderResult> {
-    return this.htmlRenderer.render(
-      input,
-      {
-        ...options,
-        trust: options.trust ?? "safe",
-      },
-    );
-  }
+        this.templates.set(
+            document.id,
+            structuredClone(document),
+        );
+
+        return this;
+    }
+
+    public listTemplates(): string[] {
+        return [...this.templates.keys()].sort();
+    }
+
+    public getTemplate(
+        templateId: string,
+    ): EmailDocument {
+        const document = this.templates.get(templateId);
+
+        if (!document) {
+            throw new Error(
+                `Template not found: ${templateId}`,
+            );
+        }
+
+        return structuredClone(document);
+    }
+
+    // -----------------------------
+    // EMAIL RENDERING
+    // -----------------------------
+
+    public async render(
+        templateId: string,
+        options: TemplateRenderOptions = {},
+    ): Promise<RenderResult> {
+        const document = this.getTemplate(templateId);
+
+        return this.renderDocument(
+            document,
+            options,
+        );
+    }
+
+    public async renderDocument(
+        document: EmailDocument,
+        options: TemplateRenderOptions = {},
+    ): Promise<RenderResult> {
+        // Step 1: Resolve configuration for this email.
+        const layout = this.resolveLayout(
+            options.layout ?? {},
+        );
+
+        const theme = this.resolveTheme(
+            options.theme ?? {},
+        );
+
+        const data = options.data ?? {};
+
+        // Step 2: Add missing branded sections.
+        const withDefaults = applyDefaultLayout(
+            document,
+            this.config.brand,
+            layout,
+        );
+
+        // Step 3: Resolve variables before component
+        // validation, especially dynamic URLs.
+        const interpolated = interpolateEmailDocument(
+            withDefaults,
+            data,
+        );
+
+        // Step 4: Resolve variables inside patches.
+        const patches = interpolateDocumentPatches(
+            options.patches ?? [],
+            data,
+        );
+
+        // Step 5: Apply patches atomically.
+        // This validates the fully resolved document.
+        const customized = this.customizer.apply(
+            interpolated,
+            patches,
+        );
+
+        // Step 6: Apply theme styling.
+        const themed = applyEmailTheme(
+            customized,
+            theme,
+        );
+
+        // Step 7: Render the completed email.
+        return this.mjmlRenderer.render(
+            themed,
+            {
+                trust: options.trust ?? "safe",
+                bodyBackgroundColor: theme.colors.background,
+
+                ...(options.inlineCss !== undefined
+                    ? { inlineCss: options.inlineCss }
+                    : {}),
+            },
+        );
+    }
+
+    /**
+     * Existing standalone HTML API.
+     *
+     * This does not interpolate {{variables}}.
+     * HTML-template interpolation requires a
+     * separate, context-aware API in a later task.
+     */
+    public async renderHtml(
+        input: HtmlRenderInput,
+        options: RenderOptions = {},
+    ): Promise<RenderResult> {
+        return this.htmlRenderer.render(
+            input,
+            {
+                ...options,
+                trust: options.trust ?? "safe",
+            },
+        );
+    }
 }
 
+/**
+ * Main plug-and-play factory.
+ */
 export function createEmail(
-  config: EmailConfigOptions = {},
+    config: EmailConfigOptions = {},
 ): MailForgeEmail {
-  return new MailForgeEmail(config);
+    return new MailForgeEmail(config);
 }

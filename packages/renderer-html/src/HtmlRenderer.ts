@@ -168,6 +168,36 @@ export class HtmlRenderer implements EmailRenderer<HtmlRenderInput> {
                     selector: "img",
                     format: "skip",
                 },
+                {
+                    selector: "h1",
+                    format: "heading",
+                    options: { uppercase: false },
+                },
+                {
+                    selector: "h2",
+                    format: "heading",
+                    options: { uppercase: false },
+                },
+                {
+                    selector: "h3",
+                    format: "heading",
+                    options: { uppercase: false },
+                },
+                {
+                    selector: "h4",
+                    format: "heading",
+                    options: { uppercase: false },
+                },
+                {
+                    selector: "h5",
+                    format: "heading",
+                    options: { uppercase: false },
+                },
+                {
+                    selector: "h6",
+                    format: "heading",
+                    options: { uppercase: false },
+                },
             ],
         });
 
