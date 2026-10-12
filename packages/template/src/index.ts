@@ -69,3 +69,58 @@ export {
 export type {
   ValidatedBuiltinTemplateDataMap,
 } from "./registry/TemplateContractRegistry.js";
+// Task 7.8.3.1: Template version lifecycle
+export {
+  TemplateVersionRegistry,
+  TemplateVersionError,
+} from "./registry/TemplateVersionRegistry.js";
+
+export type {
+  TemplateVersionInfo,
+  TemplateVersionSelection,
+  TemplateVersionStatus,
+} from "./registry/TemplateVersionRegistry.js";
+
+// Extended domain templates
+export {
+  buildNewsletterTemplate,
+  newsletterSchema,
+} from "./marketing/NewsletterTemplate.js";
+
+export type {
+  NewsletterData,
+} from "./marketing/NewsletterTemplate.js";
+
+export {
+  buildPromotionTemplate,
+  promotionSchema,
+} from "./marketing/PromotionTemplate.js";
+
+export type {
+  PromotionData,
+} from "./marketing/PromotionTemplate.js";
+
+export {
+  buildShippingUpdateTemplate,
+  shippingUpdateSchema,
+} from "./ecommerce/ShippingUpdateTemplate.js";
+
+export type {
+  ShippingUpdateData,
+} from "./ecommerce/ShippingUpdateTemplate.js";
+
+export {
+  EXTENDED_TEMPLATE_NAMES,
+  EXTENDED_TEMPLATE_SCHEMAS,
+  listExtendedTemplates,
+  getExtendedTemplateInfo,
+  getExtendedTemplate,
+  registerExtendedTemplates,
+} from "./extended/ExtendedTemplates.js";
+
+export type {
+  ExtendedTemplateName,
+  ExtendedTemplateDataMap,
+  ExtendedTemplateInfo,
+} from "./extended/ExtendedTemplates.js";
+

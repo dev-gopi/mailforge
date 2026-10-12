@@ -95,3 +95,27 @@ export {
     getCompositeComponentDefinitions,
     registerCompositeComponents,
 } from "./registry/CompositeComponents.js";
+
+export {
+    createCalloutBoxDefinition,
+} from "./feedback/CalloutBox.js";
+
+export {
+    createKeyValueListDefinition,
+} from "./layout/KeyValueList.js";
+
+export {
+    createDividerWithTextDefinition,
+} from "./layout/DividerWithText.js";
+
+export {
+    createSocialLinksDefinition,
+} from "./actions/SocialLinks.js";
+
+export {
+    EXTENDED_COMPONENT_NAMES,
+    getExtendedComponentDefinitions,
+    registerExtendedComponents,
+    registerAllComponents,
+} from "./registry/ExtendedComponents.js";
+

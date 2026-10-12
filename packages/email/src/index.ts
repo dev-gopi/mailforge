@@ -190,3 +190,37 @@ export type {
 export type {
     ValidatedBuiltinTemplateDataMap,
 } from "@mailforge/templates";
+
+// Extended reusable components
+export {
+    EXTENDED_COMPONENT_NAMES,
+    getExtendedComponentDefinitions,
+    registerExtendedComponents,
+    registerAllComponents,
+    createCalloutBoxDefinition,
+    createKeyValueListDefinition,
+    createDividerWithTextDefinition,
+    createSocialLinksDefinition,
+} from "@mailforge/components";
+
+// Extended domain templates
+export {
+    EXTENDED_TEMPLATE_NAMES,
+    listExtendedTemplates,
+    getExtendedTemplateInfo,
+    getExtendedTemplate,
+    registerExtendedTemplates,
+    buildNewsletterTemplate,
+    buildPromotionTemplate,
+    buildShippingUpdateTemplate,
+} from "@mailforge/templates";
+
+export type {
+    ExtendedTemplateName,
+    ExtendedTemplateDataMap,
+    ExtendedTemplateInfo,
+    NewsletterData,
+    PromotionData,
+    ShippingUpdateData,
+} from "@mailforge/templates";
+

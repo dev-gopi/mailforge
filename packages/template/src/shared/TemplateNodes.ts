@@ -1,7 +1,5 @@
 import type { EmailDocument, EmailNode } from "@mailforge/core";
 
-import type { BuiltinTemplateName } from "../TemplateData.js";
-
 export function heading(id: string, text: string): EmailNode {
   return {
     id,
@@ -31,7 +29,7 @@ export function actionButton(
 }
 
 export function createTemplateDocument(
-  id: BuiltinTemplateName,
+  id: string,
   subject: string,
   preheader: string,
   body: EmailNode[],
