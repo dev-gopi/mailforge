@@ -6,10 +6,17 @@ import {
     type ResolvedEmailConfig,
 } from "./EmailConfig.js";
 
+import {
+    resolveEmailTheme,
+} from "../theme/ThemeResolver.js";
+
 const DEFAULT_NAME = "MailForge";
 const DEFAULT_COLOR = "#2563eb";
 
-const CONFIG_KEYS = new Set(["brand"]);
+const CONFIG_KEYS = new Set([
+    "brand",
+    "theme",
+]);
 
 const BRAND_KEYS = new Set([
     "name",
@@ -19,16 +26,8 @@ const BRAND_KEYS = new Set([
     "supportEmail",
 ]);
 
-const hasControlCharacter = (value: string): boolean =>
-    [...value].some((character) => {
-        const code = character.charCodeAt(0);
+const CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/;
 
-        return code <= 0x1f || code === 0x7f;
-    });
-
-/**
- * Accept ordinary objects, not arrays or class instances.
- */
 function asRecord(
     value: unknown,
     field: string,
@@ -44,11 +43,11 @@ function asRecord(
         );
     }
 
-    const proto = Object.getPrototypeOf(value);
+    const prototype = Object.getPrototypeOf(value);
 
     if (
-        proto !== Object.prototype &&
-        proto !== null
+        prototype !== Object.prototype &&
+        prototype !== null
     ) {
         throw new EmailConfigError(
             field,
@@ -59,9 +58,6 @@ function asRecord(
     return value as Record<string, unknown>;
 }
 
-/**
- * Reject unknown settings to catch spelling errors.
- */
 function allowOnly(
     value: Record<string, unknown>,
     allowed: Set<string>,
@@ -77,9 +73,6 @@ function allowOnly(
     }
 }
 
-/**
- * Read and validate an optional string.
- */
 function readString(
     data: Record<string, unknown>,
     key: string,
@@ -114,7 +107,7 @@ function readString(
         );
     }
 
-    if (hasControlCharacter(clean)) {
+    if (CONTROL_CHARACTERS.test(clean)) {
         throw new EmailConfigError(
             `brand.${key}`,
             "must not contain control characters",
@@ -124,11 +117,6 @@ function readString(
     return clean;
 }
 
-/**
- * Validate HTTPS brand asset/website URLs.
- *
- * This function does not fetch remote resources.
- */
 function checkHttps(
     value: string,
     field: string,
@@ -160,7 +148,7 @@ function checkHttps(
 }
 
 /**
- * Normalize and validate the complete configuration.
+ * Resolve brand and theme configuration.
  */
 export function resolveEmailConfig(
     input: EmailConfigOptions = {},
@@ -243,8 +231,28 @@ export function resolveEmailConfig(
             : {}),
     };
 
-    // The stored configuration cannot be mutated.
+    /**
+     * Only an explicitly provided company color
+     * overrides the selected preset.
+     *
+     * This is important: selecting "minimal"
+     * should not accidentally inherit the
+     * default modern blue color.
+     */
+    const explicitBrandColor = Object.hasOwn(
+        rawBrand,
+        "primaryColor",
+    )
+        ? primaryColor
+        : undefined;
+
+    const theme = resolveEmailTheme(
+        options.theme,
+        explicitBrandColor,
+    );
+
     return Object.freeze({
         brand: Object.freeze(brand),
+        theme,
     });
 }

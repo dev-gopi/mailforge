@@ -8,7 +8,7 @@ export type {
     TemplateRenderOptions,
 } from "./createEmail.js";
 
-// Global configuration
+// Branding configuration
 export {
     EmailConfigError,
 } from "./config/EmailConfig.js";
@@ -23,6 +23,33 @@ export type {
     ResolvedEmailBrand,
     ResolvedEmailConfig,
 } from "./config/EmailConfig.js";
+
+// Theme management
+export {
+    EmailThemeError,
+} from "./theme/Theme.types.js";
+
+export {
+    getThemePreset,
+    listThemePresets,
+} from "./theme/ThemePresets.js";
+
+export {
+    resolveEmailTheme,
+    mergeEmailTheme,
+    defineThemeOverrides,
+} from "./theme/ThemeResolver.js";
+
+export type {
+    ThemePreset,
+    ThemeColors,
+    ThemeTypography,
+    ThemeSpacing,
+    ThemeOverrides,
+    ThemeConfiguration,
+    EmailThemeOptions,
+    ResolvedEmailTheme,
+} from "./theme/Theme.types.js";
 
 // Existing core types
 export type {

@@ -1,63 +1,61 @@
 
+import type {
+  EmailThemeOptions,
+  ResolvedEmailTheme,
+} from "../theme/Theme.types.js";
+
 /**
- * Settings the developer can provide.
- *
- * Every field is optional because MailForge
- * provides default branding.
+ * Brand options supplied by a developer.
  */
 export interface EmailBrandOptions {
-    name?: string;
-    logo?: string;
-    website?: string;
-    primaryColor?: string;
-    supportEmail?: string;
+  name?: string;
+  logo?: string;
+  website?: string;
+  primaryColor?: string;
+  supportEmail?: string;
 }
 
 /**
- * Main configuration passed to createEmail().
- *
- * Themes, header, footer and copyright
- * options will be added in future tasks.
+ * Main createEmail() configuration.
  */
 export interface EmailConfigOptions {
-    brand?: EmailBrandOptions;
+  brand?: EmailBrandOptions;
+  theme?: EmailThemeOptions;
 }
 
 /**
- * Final validated brand settings.
- *
- * Name and primary color are always available.
+ * Final validated brand configuration.
  */
 export interface ResolvedEmailBrand {
-    readonly name: string;
-    readonly primaryColor: string;
-
-    readonly logo?: string;
-    readonly website?: string;
-    readonly supportEmail?: string;
+  readonly name: string;
+  readonly primaryColor: string;
+  readonly logo?: string;
+  readonly website?: string;
+  readonly supportEmail?: string;
 }
 
 /**
- * Internal normalized engine configuration.
+ * Final validated engine configuration.
  */
 export interface ResolvedEmailConfig {
-    readonly brand: Readonly<ResolvedEmailBrand>;
+  readonly brand: Readonly<ResolvedEmailBrand>;
+  readonly theme: ResolvedEmailTheme;
 }
 
 /**
- * Structured error for invalid configuration.
+ * Error for invalid global configuration.
  */
 export class EmailConfigError extends Error {
-    public readonly code = "EMAIL_CONFIG_INVALID";
+  public readonly code = "EMAIL_CONFIG_INVALID";
 
-    constructor(
-        public readonly field: string,
-        reason: string,
-    ) {
-        super(
-            `Invalid MailForge config at "${field}": ${reason}`,
-        );
+  constructor(
+    public readonly field: string,
+    reason: string,
+  ) {
+    super(
+      `Invalid MailForge config at "${field}": ${reason}`,
+    );
 
-        this.name = "EmailConfigError";
-    }
+    this.name = "EmailConfigError";
+  }
 }

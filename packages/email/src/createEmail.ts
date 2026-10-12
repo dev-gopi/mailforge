@@ -22,23 +22,31 @@ import {
     resolveEmailConfig,
 } from "./config/ConfigResolver.js";
 
+import {
+    mergeEmailTheme,
+} from "./theme/ThemeResolver.js";
+
+import {
+    listThemePresets,
+} from "./theme/ThemePresets.js";
+
 import type {
     EmailConfigOptions,
     ResolvedEmailBrand,
     ResolvedEmailConfig,
 } from "./config/EmailConfig.js";
 
-/**
- * Options for rendering a structured document.
- */
+import type {
+    ResolvedEmailTheme,
+    ThemeOverrides,
+    ThemePreset,
+} from "./theme/Theme.types.js";
+
 export interface TemplateRenderOptions
     extends RenderOptions {
     patches?: readonly DocumentPatch[];
 }
 
-/**
- * Main public MailForge email engine.
- */
 export class MailForgeEmail {
     private readonly config: ResolvedEmailConfig;
 
@@ -60,28 +68,52 @@ export class MailForgeEmail {
     private readonly templates =
         new Map<string, EmailDocument>();
 
-    /**
-     * Validate and store brand configuration.
-     */
     constructor(options: EmailConfigOptions = {}) {
         this.config = resolveEmailConfig(options);
     }
 
     /**
-     * Get a copy of the current brand settings.
+     * Return an isolated copy of brand settings.
      */
     public getBrand(): ResolvedEmailBrand {
-        return {
-            ...this.config.brand,
-        };
+        return structuredClone(this.config.brand);
     }
 
     /**
-     * Get a copy of the complete engine configuration.
+     * Return an isolated copy of the theme.
+     */
+    public getTheme(): ResolvedEmailTheme {
+        return structuredClone(this.config.theme);
+    }
+
+    /**
+     * List available built-in theme presets.
+     */
+    public listThemes(): ThemePreset[] {
+        return listThemePresets();
+    }
+
+    /**
+     * Calculate a temporary customized theme.
+     *
+     * Does NOT change the stored configuration.
+     */
+    public resolveTheme(
+        overrides: ThemeOverrides = {},
+    ): ResolvedEmailTheme {
+        return mergeEmailTheme(
+            this.config.theme,
+            overrides,
+        );
+    }
+
+    /**
+     * Return an isolated copy of full config.
      */
     public getConfig(): ResolvedEmailConfig {
         return {
             brand: this.getBrand(),
+            theme: this.getTheme(),
         };
     }
 
@@ -108,14 +140,14 @@ export class MailForgeEmail {
     }
 
     /**
-     * Return the registered template IDs.
+     * List all registered template IDs.
      */
     public listTemplates(): string[] {
         return [...this.templates.keys()].sort();
     }
 
     /**
-     * Return an isolated copy of a template.
+     * Return an isolated document copy.
      */
     public getTemplate(
         templateId: string,
@@ -132,7 +164,7 @@ export class MailForgeEmail {
     }
 
     /**
-     * Render a registered template.
+     * Render an existing template.
      */
     public async render(
         templateId: string,
@@ -168,7 +200,7 @@ export class MailForgeEmail {
     }
 
     /**
-     * Render custom HTML through the HTML adapter.
+     * Render custom HTML using the HTML adapter.
      */
     public async renderHtml(
         input: HtmlRenderInput,
@@ -185,9 +217,7 @@ export class MailForgeEmail {
 }
 
 /**
- * Plug-and-play public factory.
- *
- * Existing createEmail() calls still work.
+ * Main plug-and-play factory.
  */
 export function createEmail(
     config: EmailConfigOptions = {},
