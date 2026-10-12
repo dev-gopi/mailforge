@@ -264,7 +264,7 @@ describe("Composite Component Expansion", () => {
         expect(() => expander.expand(document({
             id: "huge",
             type: "mf-test-huge",
-        }))).toThrow("too many nodes");
+        }))).toThrow("Handler output exceeds array item budget");
     });
 
     it("12. rejects deeply nested output trees", () => {
@@ -291,7 +291,7 @@ describe("Composite Component Expansion", () => {
         expect(() => expander.expand(document({
             id: "deep",
             type: "mf-test-deep",
-        }))).toThrow("exceeds 20 levels");
+        }))).toThrow("Handler output exceeds nesting budget");
     });
 
     it("13. rejects invalid section nesting", () => {

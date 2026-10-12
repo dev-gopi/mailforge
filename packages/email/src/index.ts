@@ -145,3 +145,18 @@ export {
     COMPOSITE_COMPONENT_NAMES,
     getCompositeComponentDefinitions,
 } from "@mailforge/components";
+
+export {
+    listTemplateCatalog,
+    getBuiltinTemplateInfo,
+} from "@mailforge/templates";
+
+export type {
+    TemplateCategory,
+    TemplateCatalogEntry,
+} from "@mailforge/templates";
+
+export {
+    EmailRenderBudgetError,
+    assertRenderBudget,
+} from "./security/RenderGuard.js";

@@ -30,10 +30,14 @@ import {
 import {
     getBuiltinTemplate,
     listBuiltinTemplates,
+    listTemplateCatalog,
+    getBuiltinTemplateInfo,
     isBuiltinTemplateName,
     assertBuiltinTemplateData,
     type BuiltinTemplateName,
     type BuiltinTemplateDataMap,
+    type TemplateCategory,
+    type TemplateCatalogEntry,
 } from "@mailforge/templates";
 
 import {
@@ -86,6 +90,10 @@ import type {
     EmailLayoutOptions,
     ResolvedEmailLayout,
 } from "./layout/Layout.types.js";
+
+import {
+    assertRenderBudget,
+} from "./security/RenderGuard.js";
 
 export interface TemplateRenderOptions
     extends RenderOptions {
@@ -198,6 +206,26 @@ export class MailForgeEmail {
         BuiltinTemplateName[] {
         return listBuiltinTemplates();
     }
+
+    /**
+     * List built-in templates with metadata.
+     * Optionally filter by business domain.
+     */
+    public listTemplateCatalog(
+        category?: TemplateCategory,
+    ): TemplateCatalogEntry[] {
+        return listTemplateCatalog(category);
+    }
+
+    /**
+     * Get metadata for one built-in template.
+     */
+    public getBuiltinTemplateInfo(
+        name: BuiltinTemplateName,
+    ): TemplateCatalogEntry {
+        return getBuiltinTemplateInfo(name);
+    }
+
 
     // ---------------------------------------
     // CUSTOM TEMPLATE REGISTRATION
@@ -368,6 +396,14 @@ export class MailForgeEmail {
             expanded,
             theme,
         );
+
+        // Revalidate the final styled document.
+        // This catches problems introduced after
+        // component expansion or theme application.
+        this.validator.validateOrThrow(themed);
+
+        // Enforce final rendering resource budgets.
+        assertRenderBudget(themed);
 
         // 7. Generate HTML and plain text.
         return this.mjmlRenderer.render(

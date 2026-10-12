@@ -15,6 +15,10 @@ import {
     ComponentCatalog,
 } from "./ComponentCatalog.js";
 
+import {
+    assertBoundedHandlerOutput,
+} from "../security/OutputBudget.js";
+
 const MAX_EXPANSIONS = 250;
 const MAX_NODES = 1000;
 const MAX_DEPTH = 20;
@@ -382,6 +386,12 @@ export class ComponentExpander {
                 output = definition.render(
                     safeProps,
                     context,
+                );
+                // Protect against oversized or cyclic handler output
+                // before attempting deep copies or recursive expansion.
+                assertBoundedHandlerOutput(
+                    output,
+                    node.type,
                 );
             } catch (error) {
                 const reason = error instanceof Error
