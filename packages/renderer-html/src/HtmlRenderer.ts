@@ -1,11 +1,12 @@
 
 import sanitizeHtml from "sanitize-html";
 import { convert } from "html-to-text";
-import juice from "juice";
+import { CssProcessor } from "./CssProcessor.js";
 
 import type {
     RenderOptions,
     RenderResult,
+    EmailRenderer,
 } from "@mailforge/core";
 
 export interface HtmlRenderInput {
@@ -31,24 +32,25 @@ const escapeHtml = (value: string): string =>
         return entities[character] ?? character;
     });
 
-export class HtmlRenderer {
+export class HtmlRenderer implements EmailRenderer<HtmlRenderInput> {
     public readonly name = "html";
+    private readonly cssProcessor = new CssProcessor();
 
     public async render(
         input: HtmlRenderInput,
         options: RenderOptions = {},
     ): Promise<RenderResult> {
-        if (!input.subject.trim()) {
+        if (!input.subject.trim() || /[\r\n]/.test(input.subject)) {
             throw new Error("Email subject is required");
         }
 
-        if (input.html.length > MAX_HTML_LENGTH) {
+        if (Buffer.byteLength(input.html, "utf8") > MAX_HTML_LENGTH) {
             throw new Error("HTML document is too large");
         }
 
         if (
             input.css &&
-            input.css.length > MAX_CSS_LENGTH
+            Buffer.byteLength(input.css, "utf8") > MAX_CSS_LENGTH
         ) {
             throw new Error("Custom CSS is too large");
         }
@@ -146,7 +148,6 @@ export class HtmlRenderer {
                 disallowedTagsMode:
                     "completelyDiscard",
 
-                enforceHtmlBoundary: true,
             });
 
             // Wrap the sanitized fragment in an email document.
@@ -164,34 +165,12 @@ export class HtmlRenderer {
             ].join("\n");
         }
 
-        if (trust === "trusted" && input.css) {
-            // Pass CSS directly to Juice rather than
-            // manually inserting an unsafe style tag.
-            if (options.inlineCss === false) {
-                // Add the supplied CSS to the document head.
-                // CSS remains trusted, not sanitized.
-                const styleTag = `<style>${input.css}</style>`;
-
-                if (/<\/head\s*>/i.test(html)) {
-                    html = html.replace(
-                        /<\/head\s*>/i,
-                        () => `${styleTag}</head>`,
-                    );
-                } else {
-                    html = styleTag + html;
-                }
-            }
-        }
-
-        if (
-            trust === "trusted" &&
-            options.inlineCss !== false
-        ) {
-            html = juice(html, {
-                applyStyleTags: true,
-                removeStyleTags: false,
-                extraCss: input.css ?? "",
-            });
+        if (trust === "trusted") {
+            html = this.cssProcessor.process(
+                html,
+                input.css ?? "",
+                options.inlineCss !== false,
+            );
         }
 
         const text = convert(html, {

@@ -5,3 +5,4 @@ export {
 export type {
     HtmlRenderInput,
 } from "./HtmlRenderer.js";
+export { CssProcessor } from "./CssProcessor.js";

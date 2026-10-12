@@ -1,4 +1,3 @@
-
 import sanitizeHtml from "sanitize-html";
 
 export function escapeHtml(value: unknown): string {
@@ -10,27 +9,38 @@ export function escapeHtml(value: unknown): string {
         .replace(/'/g, "&#39;");
 }
 
+/** Only absolute HTTP(S) URLs are permitted for email links. */
 export function safeUrl(value: unknown): string {
-    if (typeof value !== "string") {
-        throw new Error("URL must be a string");
+    if (typeof value !== "string" || value.length > 4096) {
+        throw new Error("URL must be a string of at most 4096 characters");
     }
-
-    const url = new URL(value);
-
-    if (!["https:", "http:"].includes(url.protocol)) {
+    let url: URL;
+    try {
+        url = new URL(value);
+    } catch {
+        throw new Error("Invalid absolute URL");
+    }
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
         throw new Error("Unsafe URL protocol");
     }
-
     return url.toString();
+}
+
+/** CID images are for attached images; inline data images are intentionally excluded. */
+export function safeImageUrl(value: unknown): string {
+    if (typeof value === "string" && /^cid:[a-z0-9][a-z0-9._@+-]*$/i.test(value)) {
+        return value;
+    }
+    if (typeof value === "string" && /^data:image\/(png|jpeg|gif|webp);base64,/i.test(value)) {
+        // Only permitted in trusted mode by the MJML renderer, and validated by core.
+        return value;
+    }
+    return safeUrl(value);
 }
 
 export function safeRichHtml(html: string): string {
     return sanitizeHtml(html, {
-        allowedTags: [
-            "p", "b", "strong", "em", "i",
-            "u", "span", "br", "div",
-            "ul", "ol", "li", "a",
-        ],
+        allowedTags: ["p", "b", "strong", "em", "i", "u", "span", "br", "div", "ul", "ol", "li", "a"],
         allowedAttributes: {
             a: ["href", "title"],
             "*": ["title", "class", "data-*", "aria-*"],
@@ -55,38 +65,35 @@ const STYLE_ATTRIBUTES: Record<string, string> = {
     borderRadius: "border-radius",
 };
 
+// MJML validates attributes per element. Do not emit CSS for unsupported targets.
+const TARGET_STYLES: Record<string, readonly string[]> = {
+    "mj-text": ["color", "backgroundColor", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "padding", "height"],
+    "mj-button": ["color", "backgroundColor", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "padding", "width", "height", "borderRadius"],
+    "mj-image": ["width", "height", "padding", "borderRadius", "textAlign"],
+    "mj-section": ["backgroundColor", "padding", "textAlign"],
+    "mj-column": ["backgroundColor", "width", "padding"],
+    "mj-divider": ["color", "padding", "width"],
+    "mj-spacer": ["height", "padding"],
+};
+
 export function mjmlStyles(
     styles: Record<string, string | number> = {},
+    target?: string,
 ): string {
     const attributes: string[] = [];
-
     for (const [key, value] of Object.entries(styles)) {
-        const attr = STYLE_ATTRIBUTES[key];
-
-        if (!attr) {
-            throw new Error(`Unsupported style: ${key}`);
+        const name = STYLE_ATTRIBUTES[key];
+        if (!name || (target && !TARGET_STYLES[target]?.includes(key))) {
+            throw new Error(`Unsupported style '${key}' for ${target ?? "MJML"}`);
         }
-
-        const formatted =
-            typeof value === "number" &&
-                ["fontSize", "lineHeight", "width", "height",
-                    "padding", "borderRadius"].includes(key)
-                ? `${value}px`
-                : String(value);
-
-        // Prevent markup injection through style properties.
-        if (
-            formatted.length > 256 ||
-            /[<>"'`\\]/.test(formatted) ||
-            /url\s*\(|expression\s*\(|@import/i.test(formatted)
-        ) {
+        const formatted = typeof value === "number" &&
+            ["fontSize", "lineHeight", "width", "height", "padding", "borderRadius"].includes(key)
+            ? `${value}px`
+            : String(value);
+        if (formatted.length > 256 || /[<>"'`\\]/.test(formatted) || /url\s*\(|expression\s*\(|@import/i.test(formatted)) {
             throw new Error(`Unsafe style value: ${key}`);
         }
-
-        attributes.push(
-            `${attr}="${escapeHtml(formatted)}"`,
-        );
+        attributes.push(`${name}="${escapeHtml(formatted)}"`);
     }
-
     return attributes.join(" ");
 }

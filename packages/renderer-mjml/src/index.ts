@@ -5,6 +5,7 @@ export {
 export {
     escapeHtml,
     safeUrl,
+    safeImageUrl,
     safeRichHtml,
     mjmlStyles,
 } from "./RenderUtils.js";

@@ -23,11 +23,11 @@ export interface RenderResult {
     warnings: RenderWarning[];
 }
 
-export interface EmailRenderer {
+export interface EmailRenderer<TInput = EmailDocument> {
     readonly name: string;
 
     render(
-        document: EmailDocument,
+        document: TInput,
         options?: RenderOptions,
     ): Promise<RenderResult>;
 }
