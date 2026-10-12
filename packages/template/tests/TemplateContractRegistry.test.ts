@@ -26,7 +26,7 @@ const invoiceData = () => ({
 
 describe("Unified template contracts", () => {
     it("lists all nine contracts", () => {
-        expect(registry.list()).toHaveLength(9);
+        expect(registry.list()).toHaveLength(10);
     });
 
     it("exposes required OTP fields", () => {

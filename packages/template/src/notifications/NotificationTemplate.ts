@@ -2,9 +2,11 @@ import type { EmailDocument } from "@mailforge/core";
 
 import {
   createTemplateDocument,
-  heading,
-  paragraph,
+  contentHeading,
+  contentParagraph,
+  mutedParagraph,
   actionButton,
+  panel,
 } from "../shared/TemplateNodes.js";
 
 export function buildNotificationTemplate(): EmailDocument {
@@ -13,11 +15,31 @@ export function buildNotificationTemplate(): EmailDocument {
     "{{title}}",
     "You have a new notification.",
     [
-      heading("notification-heading", "{{title}}"),
+      contentHeading("notification-heading", "{{title}}"),
 
-      paragraph("notification-message", "{{message}}"),
+      contentParagraph("notification-message", "{{message}}"),
 
       actionButton("notification-action", "View Details", "{{actionUrl}}"),
+      panel("notification-followup", [
+        {
+          id: "notification-followup-text",
+          type: "text",
+          props: {
+            text: "You can review the full details at any time from your " +
+              "account.",
+          },
+          styles: {
+            fontSize: 13,
+            lineHeight: "22px",
+            color: "#64748b",
+            padding: "0",
+          },
+        },
+      ]),
+      mutedParagraph(
+        "notification-support",
+        "If you have questions, contact our support team.",
+      ),
     ],
   );
 }

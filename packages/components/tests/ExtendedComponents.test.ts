@@ -168,16 +168,19 @@ describe("MailForge Extended Components", () => {
         });
 
         expect(output).toHaveLength(1);
-        const column = output[0]?.children?.[0];
-        expect(column?.children).toHaveLength(2);
+        const columns = output[0]?.children;
+        expect(columns).toHaveLength(2);
 
-        expect(column?.children?.[0]?.type).toBe("button");
-        expect(column?.children?.[0]?.props?.text).toBe("Source Code");
-        expect(column?.children?.[0]?.props?.href).toBe("https://github.com/mailforge");
+        const firstButton = columns?.[0]?.children?.[0];
+        expect(firstButton?.type).toBe("button");
+        expect(firstButton?.props?.text).toBe("GH");
+        expect(firstButton?.props?.href).toBe("https://github.com/mailforge");
+        expect(firstButton?.attrs?.["aria-label"]).toBe("Source Code");
 
-        expect(column?.children?.[1]?.type).toBe("button");
-        expect(column?.children?.[1]?.props?.text).toBe("Twitter");
-        expect(column?.children?.[1]?.props?.href).toBe("https://twitter.com/mailforge");
+        const secondButton = columns?.[1]?.children?.[0];
+        expect(secondButton?.type).toBe("button");
+        expect(secondButton?.props?.text).toBe("X");
+        expect(secondButton?.props?.href).toBe("https://twitter.com/mailforge");
     });
 
     it("7. rejects unsafe HTTP URLs in SocialLinks", () => {
@@ -195,6 +198,35 @@ describe("MailForge Extended Components", () => {
                 },
             });
         }).toThrow(/HTTPS/);
+    });
+
+    it("supports common platforms and per-link visual overrides", () => {
+        const output = expand({
+            id: "social-custom",
+            type: "mf-social-links",
+            props: {
+                links: [
+                    {
+                        platform: "instagram",
+                        url: "https://instagram.com/mailforge",
+                        icon: "IG",
+                        fallbackIcon: "◎",
+                        color: "#123456",
+                    },
+                    {
+                        platform: "whatsapp",
+                        url: "https://wa.me/123",
+                    },
+                ],
+            },
+        });
+
+        const firstButton = output[0]?.children?.[0]?.children?.[0];
+        expect(firstButton?.props?.text).toBe("IG");
+        expect(firstButton?.styles?.backgroundColor).toBe("#123456");
+        expect(firstButton?.attrs?.["data-fallback-icon"]).toBe("◎");
+        expect(output[0]?.children?.[1]?.children?.[0]?.props?.text)
+            .toBe("WA");
     });
 
     it("8. registerAllComponents registers standard, composite, and extended components together", () => {

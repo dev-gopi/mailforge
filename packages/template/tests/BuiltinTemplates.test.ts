@@ -15,6 +15,7 @@ describe("MailForge Built-in Templates", () => {
     expect(listBuiltinTemplates()).toEqual([
       "welcome",
       "otp",
+      "login",
       "password-reset",
       "invitation",
       "notification",
@@ -66,9 +67,12 @@ describe("MailForge Built-in Templates", () => {
     const first = getBuiltinTemplate("welcome");
     const second = getBuiltinTemplate("welcome");
 
-    first.body[0]!.props!.text = "Changed";
+    first.body.find(node => node.id === "welcome-heading")!.props!.text =
+      "Changed";
 
-    expect(second.body[0]?.props?.text).toBe("Welcome, {{user.firstName}}!");
+    expect(
+      second.body.find(node => node.id === "welcome-heading")?.props?.text,
+    ).toBe("Welcome to your new workspace.");
   });
 
   it("7. uses unique nodes without raw HTML", () => {

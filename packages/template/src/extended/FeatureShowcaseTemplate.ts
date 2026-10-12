@@ -24,6 +24,15 @@ const item = z.object({
     unitPriceCents: z.number().int().min(0),
 }).strict();
 
+const designSchema = z.object({
+    primary: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#2563eb"),
+    surface: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#ffffff"),
+    background: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#f3f6fa"),
+    text: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#172033"),
+    muted: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#64748b"),
+    border: z.string().regex(/^#[0-9a-fA-F]{6}$/).default("#e2e8f0"),
+}).strict();
+
 /**
  * Data for the complete component showcase. It is also a practical
  * starting point for product launches, account summaries, or orders.
@@ -32,10 +41,11 @@ export const featureShowcaseSchema = z.object({
     recipientName: z.string().min(1).max(120),
     title: z.string().min(1).max(160),
     summary: z.string().min(1).max(1_000),
-    imageUrl: httpsUrl,
-    imageAlt: z.string().min(1).max(300),
+    imageUrl: httpsUrl.optional(),
+    imageAlt: z.string().min(1).max(300).optional(),
     primaryUrl: httpsUrl,
     secondaryUrl: httpsUrl,
+    design: designSchema.optional(),
     order: z.object({
         id: z.string().min(1).max(80),
         currency: z.enum(["USD", "EUR", "GBP", "INR"]),
@@ -55,7 +65,15 @@ export const featureShowcaseSchema = z.object({
         url: httpsUrl,
         label: z.string().min(1).max(60).optional(),
     }).strict()).min(1).max(8),
-}).strict();
+}).strict().superRefine((value, context) => {
+    if ((value.imageUrl === undefined) !== (value.imageAlt === undefined)) {
+        context.addIssue({
+            code: "custom",
+            path: ["imageUrl"],
+            message: "imageUrl and imageAlt must be provided together",
+        });
+    }
+});
 
 export type FeatureShowcaseData = z.input<typeof featureShowcaseSchema>;
 
@@ -71,33 +89,62 @@ export function buildFeatureShowcaseTemplate(
     input: FeatureShowcaseData,
 ): EmailDocument {
     const data = featureShowcaseSchema.parse(input);
+    const design = data.design ?? designSchema.parse({});
 
     return createTemplateDocument(
         "feature-showcase",
         data.title,
         data.summary,
         [
-            heading("showcase-title", data.title),
-            paragraph(
-                "showcase-greeting",
-                `Hello ${data.recipientName}, ${data.summary}`,
-            ),
             {
-                id: "showcase-image",
-                type: "mf-image-caption",
-                props: {
-                    src: data.imageUrl,
-                    alt: data.imageAlt,
-                    caption: "A closer look at what is new.",
+                id: "showcase-hero",
+                type: "container",
+                styles: {
+                    backgroundColor: design.surface,
+                    padding: "28px 32px 24px",
                 },
-            },
-            {
-                id: "showcase-status",
-                type: "mf-status-badge",
-                props: {
-                    label: "Everything is ready",
-                    status: "success",
-                },
+                children: [
+                    {
+                        ...heading("showcase-title", data.title),
+                        styles: {
+                            color: design.text,
+                            fontSize: 28,
+                            lineHeight: "34px",
+                            padding: "0 0 10px",
+                        },
+                    },
+                    {
+                        ...paragraph(
+                            "showcase-greeting",
+                            `Hello ${data.recipientName}, ${data.summary}`,
+                        ),
+                        styles: {
+                            color: design.muted,
+                            fontSize: 16,
+                            lineHeight: "24px",
+                            padding: "0 0 18px",
+                        },
+                    },
+                    ...(data.imageUrl && data.imageAlt
+                        ? [{
+                            id: "showcase-image",
+                            type: "mf-image-caption" as const,
+                            props: {
+                                src: data.imageUrl,
+                                alt: data.imageAlt,
+                                caption: "A closer look at what is new.",
+                            },
+                        }]
+                        : []),
+                    {
+                        id: "showcase-status",
+                        type: "mf-status-badge",
+                        props: {
+                            label: "Everything is ready",
+                            status: "success",
+                        },
+                    },
+                ],
             },
             {
                 id: "showcase-callout",
@@ -134,15 +181,23 @@ export function buildFeatureShowcaseTemplate(
                 props: { text: "ORDER SUMMARY" },
             },
             {
-                id: "showcase-order",
-                type: "mf-order-summary",
-                props: {
-                    orderId: data.order.id,
-                    currency: data.order.currency,
-                    items: data.order.items,
-                    shippingCents: data.order.shippingCents,
-                    discountCents: data.order.discountCents,
+                id: "showcase-order-card",
+                type: "container",
+                styles: {
+                    backgroundColor: design.surface,
+                    padding: "18px 32px",
                 },
+                children: [{
+                    id: "showcase-order",
+                    type: "mf-order-summary",
+                    props: {
+                        orderId: data.order.id,
+                        currency: data.order.currency,
+                        items: data.order.items,
+                        shippingCents: data.order.shippingCents,
+                        discountCents: data.order.discountCents,
+                    },
+                }],
             },
             {
                 id: "showcase-details",
@@ -157,18 +212,36 @@ export function buildFeatureShowcaseTemplate(
                 },
             },
             {
-                id: "showcase-actions",
-                type: "mf-button-group",
-                props: {
-                    items: [
-                        { label: "View order", href: data.primaryUrl },
-                        {
-                            label: "Contact support",
-                            href: data.secondaryUrl,
-                            variant: "secondary",
-                        },
-                    ],
+                id: "showcase-actions-card",
+                type: "container",
+                styles: {
+                    backgroundColor: design.surface,
+                    padding: "20px 32px 24px",
                 },
+                children: [
+                    {
+                        id: "showcase-actions",
+                        type: "mf-button-group",
+                        props: {
+                            items: [
+                                { label: "View order", href: data.primaryUrl },
+                                {
+                                    label: "Contact support",
+                                    href: data.secondaryUrl,
+                                    variant: "secondary",
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        id: "showcase-security",
+                        type: "mf-security-notice",
+                        props: {
+                            severity: "info",
+                            message: "We will never ask for your password or payment details by email.",
+                        },
+                    },
+                ],
             },
             {
                 id: "showcase-social",
@@ -181,14 +254,6 @@ export function buildFeatureShowcaseTemplate(
                             ? { label: link.label }
                             : {}),
                     })),
-                },
-            },
-            {
-                id: "showcase-security",
-                type: "mf-security-notice",
-                props: {
-                    severity: "info",
-                    message: "We will never ask for your password or payment details by email.",
                 },
             },
         ],

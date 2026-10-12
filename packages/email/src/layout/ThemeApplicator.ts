@@ -41,7 +41,7 @@ function defaultStyles(
 
             return {
                 backgroundColor: colors.surface,
-                padding: `${spacing.lg}px`,
+                padding: `${spacing.md}px ${spacing.md}px`,
             };
 
         case "footer":
@@ -52,24 +52,25 @@ function defaultStyles(
             }
 
             return {
-                backgroundColor: colors.background,
-                padding: `${spacing.md}px`,
+                backgroundColor: colors.surface,
+                padding: `${spacing.sm}px ${spacing.md}px`,
             };
 
         case "section":
         case "row":
             return {
                 backgroundColor: colors.surface,
-                padding: `${spacing.md}px`,
+                padding: `0 ${spacing.md}px`,
             };
 
         case "heading":
             return {
                 color: colors.text,
                 fontFamily: typography.headingFontFamily,
-                fontSize: typography.headingSize,
+                fontSize: Math.min(typography.headingSize, 24),
                 fontWeight: "bold",
-                padding: `${spacing.sm}px`,
+                lineHeight: "1.25",
+                padding: `0 0 ${spacing.sm}px`,
             };
 
         case "text":
@@ -78,7 +79,7 @@ function defaultStyles(
                 fontFamily: typography.fontFamily,
                 fontSize: typography.baseSize,
                 lineHeight,
-                padding: `${spacing.sm}px`,
+                padding: `0 0 ${spacing.sm}px`,
             };
 
         case "copyright":
@@ -90,7 +91,7 @@ function defaultStyles(
                     typography.baseSize - 2,
                 ),
                 textAlign: "center",
-                padding: `${spacing.sm}px`,
+                padding: `${spacing.xs}px ${spacing.sm}px`,
             };
 
         case "button":
@@ -98,15 +99,17 @@ function defaultStyles(
                 backgroundColor: colors.primary,
                 color: "#ffffff",
                 fontFamily: typography.fontFamily,
-                fontSize: typography.baseSize,
+                fontSize: Math.max(13, typography.baseSize - 1),
+                fontWeight: "bold",
                 borderRadius: "6px",
-                padding: `${spacing.md}px`,
+                textAlign: "center",
+                padding: `${spacing.sm + 1}px ${spacing.md}px`,
             };
 
         case "image":
             return {
                 width: 140,
-                padding: `${spacing.sm}px`,
+                padding: `${spacing.xs}px 0`,
             };
 
         case "divider":

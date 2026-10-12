@@ -10,8 +10,10 @@ import type {
 
 import {
     createTemplateDocument,
-    heading,
-    paragraph,
+    contentHeading,
+    contentParagraph,
+    mutedParagraph,
+    panel,
 } from "../shared/TemplateNodes.js";
 
 type AlertData =
@@ -46,11 +48,11 @@ export function buildSecurityAlertTemplate(
         (location ? ` Location: ${location}.` : "");
 
     const body: EmailNode[] = [
-        heading(
+        contentHeading(
             "security-heading",
             "Security Alert",
         ),
-        paragraph(
+        contentParagraph(
             "security-greeting",
             `Hello ${firstName},`,
         ),
@@ -77,9 +79,14 @@ export function buildSecurityAlertTemplate(
         });
     } else {
         body.push(
-            paragraph(
+            panel(
                 "security-notice-preview",
-                description,
+                [paragraphNode(description)],
+                "#fef2f2",
+            ),
+            contentParagraph(
+                "security-notice-summary",
+                "A recent security event was detected on your account.",
             ),
             {
                 id: "security-action",
@@ -93,7 +100,7 @@ export function buildSecurityAlertTemplate(
     }
 
     body.push(
-        paragraph(
+        mutedParagraph(
             "security-advice",
             "If you do not recognize this activity, " +
             "review your account and secure your credentials.",
@@ -106,4 +113,18 @@ export function buildSecurityAlertTemplate(
         "Review recent account security activity.",
         body,
     );
+}
+
+function paragraphNode(text: string): EmailNode {
+    return {
+        id: "security-notice-message",
+        type: "text",
+        props: { text },
+        styles: {
+            color: "#991b1b",
+            fontSize: 14,
+            lineHeight: "22px",
+            padding: "0",
+        },
+    };
 }

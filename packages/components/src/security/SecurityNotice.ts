@@ -22,6 +22,12 @@ const NOTICE_STYLES = {
     },
 } as const;
 
+const NOTICE_ICONS = {
+    info: "ℹ",
+    warning: "⚠",
+    danger: "!",
+} as const;
+
 export function createSecurityNoticeDefinition():
     ReusableComponentDefinition {
     return {
@@ -37,6 +43,7 @@ export function createSecurityNoticeDefinition():
                 "warning",
                 "danger",
             ]),
+            icon: z.string().min(1).max(4).optional(),
         }).strict(),
 
         defaults: {
@@ -49,18 +56,35 @@ export function createSecurityNoticeDefinition():
 
             return {
                 id: context.nodeId,
-                type: "text",
-
-                props: {
-                    text: `${severity.toUpperCase()}: ` +
-                        String(props.message),
-                },
-
+                type: "section",
                 styles: {
-                    ...NOTICE_STYLES[severity],
-                    padding: "12px",
-                    fontSize: 14,
+                    padding: "0 36px 24px",
                 },
+                children: [{
+                    id: `${context.nodeId}-column`,
+                    type: "column",
+                    styles: {
+                        backgroundColor:
+                            NOTICE_STYLES[severity].backgroundColor,
+                        padding: "16px 20px",
+                    },
+                    children: [{
+                        id: `${context.nodeId}-message`,
+                        type: "text",
+                        props: {
+                            text: `${String(
+                                props.icon ?? NOTICE_ICONS[severity],
+                            )} ${severity.toUpperCase()}: ` +
+                                String(props.message),
+                        },
+                        styles: {
+                            color: NOTICE_STYLES[severity].color,
+                            fontSize: 14,
+                            lineHeight: "22px",
+                            padding: "0",
+                        },
+                    }],
+                }],
             };
         },
     };

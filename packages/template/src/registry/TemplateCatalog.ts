@@ -21,6 +21,10 @@ import {
 } from "../authentication/OtpTemplate.js";
 
 import {
+  buildLoginTemplate,
+} from "../authentication/LoginTemplate.js";
+
+import {
   buildPasswordResetTemplate,
 } from "../authentication/PasswordResetTemplate.js";
 
@@ -90,6 +94,17 @@ const CATALOG: Record<
       description: "Verification code delivery",
     },
     build: buildOtpTemplate,
+  },
+
+  login: {
+    info: {
+      id: "login",
+      version: "1.0.0",
+      category: "authentication",
+      title: "Login Link",
+      description: "Secure sign-in link delivery",
+    },
+    build: buildLoginTemplate,
   },
 
   "password-reset": {

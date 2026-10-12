@@ -149,12 +149,12 @@ describe("MailForge Standard Components", () => {
             },
         });
 
-        expect(result.type).toBe("text");
+        expect(result.type).toBe("section");
 
-        expect(result.props?.text)
-            .toBe("WARNING: New device detected");
+        expect(result.children?.[0]?.children?.[0]?.props?.text)
+            .toBe("⚠ WARNING: New device detected");
 
-        expect(result.styles?.color)
+        expect(result.children?.[0]?.children?.[0]?.styles?.color)
             .toBe("#92400e");
     });
 
@@ -297,6 +297,6 @@ describe("MailForge Standard Components", () => {
         const result = expander.expand(source);
 
         expect(source).toEqual(snapshot);
-        expect(result.body[0]?.type).toBe("text");
+        expect(result.body[0]?.type).toBe("section");
     });
 });

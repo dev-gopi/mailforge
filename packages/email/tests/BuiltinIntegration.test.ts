@@ -13,7 +13,7 @@ describe("MailForge Built-in Template Integration", () => {
     it("1. lists built-ins separately from custom templates", () => {
         const email = createEmail();
 
-        expect(email.listBuiltinTemplates()).toHaveLength(9);
+        expect(email.listBuiltinTemplates()).toHaveLength(10);
         expect(email.listTemplates()).toEqual([]);
     });
 
@@ -59,6 +59,21 @@ describe("MailForge Built-in Template Integration", () => {
         expect(result.text).toContain("004271");
         expect(result.text).toContain("5 minutes");
         expect(result.subject).toBe("Your verification code");
+    });
+
+    it("renders a purpose-specific login email", async () => {
+        const result = await createEmail().render("login", {
+            data: {
+                user: { firstName: "Maya" },
+                loginUrl: "https://example.com/login/token",
+                expiresInMinutes: 10,
+            },
+        });
+
+        expect(result.subject).toBe("Sign in to your account");
+        expect(result.html).toContain("Sign In Securely");
+        expect(result.html).toContain("10 minutes");
+        expect(result.text).toContain("Never share your sign-in link");
     });
 
     it("5. rejects invalid OTP codes", async () => {

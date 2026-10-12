@@ -14,6 +14,7 @@ describe("MailForge Template Catalog", () => {
     expect(listBuiltinTemplates()).toEqual([
       "welcome",
       "otp",
+      "login",
       "password-reset",
       "invitation",
       "notification",
@@ -27,7 +28,7 @@ describe("MailForge Template Catalog", () => {
   it("2. groups authentication templates", () => {
     expect(
       listTemplateCatalog("authentication").map((item) => item.id),
-    ).toEqual(["otp", "password-reset"]);
+    ).toEqual(["otp", "login", "password-reset"]);
   });
 
   it("3. groups account templates", () => {
@@ -72,9 +73,12 @@ describe("MailForge Template Catalog", () => {
     const first = getBuiltinTemplate("welcome");
     const second = getBuiltinTemplate("welcome");
 
-    first.body[0]!.props!.text = "Changed";
+    first.body.find(node => node.id === "welcome-heading")!.props!.text =
+      "Changed";
 
-    expect(second.body[0]?.props?.text).toBe("Welcome, {{user.firstName}}!");
+    expect(
+      second.body.find(node => node.id === "welcome-heading")?.props?.text,
+    ).toBe("Welcome to your new workspace.");
 
     const info = getBuiltinTemplateInfo("welcome");
 
@@ -93,7 +97,11 @@ describe("MailForge Template Catalog", () => {
     const otp = getBuiltinTemplate("otp");
     const reset = getBuiltinTemplate("password-reset");
 
-    expect(otp.body[2]?.props?.text).toBe("{{code}}");
+    expect(otp.body[2]?.type).toBe("section");
+    expect(otp.body[2]?.children?.[0]?.children?.[1]?.type)
+        .toBe("mf-otp-code");
+    expect(otp.body[2]?.children?.[0]?.children?.[1]?.props?.code)
+        .toBe("{{code}}");
 
     expect(reset.body[3]?.props?.href).toBe("{{resetUrl}}");
 

@@ -10,9 +10,11 @@ import type {
 
 import {
     createTemplateDocument,
-    heading,
-    paragraph,
+    contentHeading,
+    contentParagraph,
+    mutedParagraph,
     actionButton,
+    panel,
 } from "../shared/TemplateNodes.js";
 
 type OrderData =
@@ -30,15 +32,15 @@ export function buildOrderConfirmationTemplate(
         "{{order.placedOn}}";
 
     const body: EmailNode[] = [
-        heading(
+        contentHeading(
             "order-heading",
             "Your Order Is Confirmed",
         ),
-        paragraph(
+        contentParagraph(
             "order-greeting",
             `Hello ${firstName}, thank you for your order.`,
         ),
-        paragraph(
+        mutedParagraph(
             "order-date",
             `Order placed on ${placedOn}`,
         ),
@@ -62,9 +64,21 @@ export function buildOrderConfirmationTemplate(
         });
     } else {
         body.push(
-            paragraph(
-                "order-preview",
-                "Order items and totals are generated from validated data.",
+            panel(
+                "order-preview-panel",
+                [{
+                    id: "order-preview-message",
+                    type: "text",
+                    props: {
+                        text: "Order items and totals are generated from " +
+                            "validated data.",
+                    },
+                    styles: {
+                        fontSize: 13,
+                        color: "#64748b",
+                        padding: "0",
+                    },
+                }],
             ),
         );
     }

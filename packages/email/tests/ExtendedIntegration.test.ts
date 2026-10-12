@@ -206,5 +206,7 @@ describe("MailForge Extended Components & Templates Integration", () => {
         expect(result.html).toContain("MailForge Pro");
         expect(result.html).toContain("Account details");
         expect(result.html).toContain("GitHub");
+        expect(result.html).toContain('aria-label="GitHub"');
+        expect(result.html).toContain("border-radius:8px");
     });
 });

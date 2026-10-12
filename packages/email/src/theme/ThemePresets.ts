@@ -24,20 +24,20 @@ const PRESETS: Record<
         preset: "modern",
 
         colors: {
-            primary: "#2563eb",
+            primary: "#111827",
             secondary: "#475569",
-            background: "#f1f5f9",
+            background: "#f5f6f8",
             surface: "#ffffff",
-            text: "#0f172a",
+            text: "#111827",
             muted: "#64748b",
-            border: "#e2e8f0",
+            border: "#e5e7eb",
         },
 
         typography: {
-            fontFamily: "Arial, sans-serif",
-            headingFontFamily: "Arial, sans-serif",
+            fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
+            headingFontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
             baseSize: 14,
-            headingSize: 26,
+            headingSize: 28,
             lineHeight: 1.5,
         },
 
@@ -64,8 +64,8 @@ const PRESETS: Record<
         },
 
         typography: {
-            fontFamily: "Arial, sans-serif",
-            headingFontFamily: "Arial, sans-serif",
+            fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
+            headingFontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
             baseSize: 14,
             headingSize: 24,
             lineHeight: 1.5,
@@ -94,8 +94,8 @@ const PRESETS: Record<
         },
 
         typography: {
-            fontFamily: "Georgia, serif",
-            headingFontFamily: "Georgia, serif",
+            fontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
+            headingFontFamily: "-apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif",
             baseSize: 15,
             headingSize: 28,
             lineHeight: 1.5,

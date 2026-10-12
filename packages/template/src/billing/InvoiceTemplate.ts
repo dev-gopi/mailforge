@@ -7,9 +7,11 @@ import type {
 
 import {
     createTemplateDocument,
-    heading,
-    paragraph,
+    contentHeading,
+    contentParagraph,
+    mutedParagraph,
     actionButton,
+    panel,
 } from "../shared/TemplateNodes.js";
 
 import {
@@ -35,15 +37,15 @@ export function buildInvoiceTemplate(
         "{{customer.name}}";
 
     const body: EmailNode[] = [
-        heading(
+        contentHeading(
             "invoice-heading",
             `Invoice #${number}`,
         ),
-        paragraph(
+        contentParagraph(
             "invoice-customer",
             `Bill to: ${customer}`,
         ),
-        paragraph(
+        mutedParagraph(
             "invoice-dates",
             `Issued: ${issuedOn} | Due: ${dueOn}`,
         ),
@@ -58,9 +60,21 @@ export function buildInvoiceTemplate(
         );
     } else {
         body.push(
-            paragraph(
-                "invoice-preview",
-                "Invoice line items are generated from validated data.",
+            panel(
+                "invoice-preview-panel",
+                [{
+                    id: "invoice-preview-message",
+                    type: "text",
+                    props: {
+                        text: "Invoice line items are generated from " +
+                            "validated data.",
+                    },
+                    styles: {
+                        fontSize: 13,
+                        color: "#64748b",
+                        padding: "0",
+                    },
+                }],
             ),
         );
     }

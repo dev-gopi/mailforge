@@ -7,9 +7,11 @@ import type {
 
 import {
     createTemplateDocument,
-    heading,
-    paragraph,
+    contentHeading,
+    contentParagraph,
+    mutedParagraph,
     actionButton,
+    panel,
 } from "../shared/TemplateNodes.js";
 
 import {
@@ -35,19 +37,19 @@ export function buildPaymentReceiptTemplate(
         "{{customer.name}}";
 
     const body: EmailNode[] = [
-        heading(
+        contentHeading(
             "receipt-heading",
             "Payment Received",
         ),
-        paragraph(
+        contentParagraph(
             "receipt-customer",
             `Thank you, ${customer}. Your payment was received.`,
         ),
-        paragraph(
+        mutedParagraph(
             "receipt-reference",
             `Receipt: ${number} | Transaction: ${transactionId}`,
         ),
-        paragraph(
+        mutedParagraph(
             "receipt-date",
             `Paid on: ${paidOn}`,
         ),
@@ -62,9 +64,21 @@ export function buildPaymentReceiptTemplate(
         );
     } else {
         body.push(
-            paragraph(
-                "receipt-preview",
-                "Payment details are generated from validated data.",
+            panel(
+                "receipt-preview-panel",
+                [{
+                    id: "receipt-preview-message",
+                    type: "text",
+                    props: {
+                        text: "Payment details are generated from validated " +
+                            "data.",
+                    },
+                    styles: {
+                        fontSize: 13,
+                        color: "#64748b",
+                        padding: "0",
+                    },
+                }],
             ),
         );
     }

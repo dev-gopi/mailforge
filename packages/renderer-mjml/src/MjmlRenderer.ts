@@ -139,7 +139,11 @@ export class MjmlRenderer implements EmailRenderer {
 
         const source =
             `<mjml><mj-head>${head}</mj-head>` +
-            `<mj-body${bodyAttributes}>${body}</mj-body></mjml>`;        // MJML 5 supports an async compiler; strict mode throws on validation errors.
+            `<mj-body width="560px"${bodyAttributes}>` +
+            `<mj-wrapper background-color="#ffffff" ` +
+            `border="1px solid #e5e7eb" border-radius="12px" ` +
+            `padding="0">${body}</mj-wrapper>` +
+            `</mj-body></mjml>`;        // MJML 5 supports an async compiler; strict mode throws on validation errors.
         const compiled = await mjml2html(source, {
             validationLevel: "strict",
             keepComments: false,
@@ -229,6 +233,9 @@ export class MjmlRenderer implements EmailRenderer {
         }
         if (node.type === "section" || node.type === "row") {
             const attributes = targetAttributes(node, "mj-section", state);
+            const sectionAttributes = node.styles?.padding === undefined
+                ? `${attributes} padding="0"`
+                : attributes;
             const children = node.children ?? [];
             const withColumns = children.some(child => child.type === "column");
             const columns = withColumns
@@ -239,9 +246,9 @@ export class MjmlRenderer implements EmailRenderer {
                     return this.column(child, state, trust);
                 }).join("\n")
                 : `<mj-column>${children.map(child => this.leaf(child, state, trust)).join("\n")}</mj-column>`;
-            return `<mj-section ${attributes}>${columns}</mj-section>`;
+            return `<mj-section ${sectionAttributes}>${columns}</mj-section>`;
         }
-        return `<mj-section><mj-column>${this.leaf(node, state, trust)}</mj-column></mj-section>`;
+        return `<mj-section padding="0"><mj-column>${this.leaf(node, state, trust)}</mj-column></mj-section>`;
     }
 
     private column(node: EmailNode, state: State, trust: Trust): string {

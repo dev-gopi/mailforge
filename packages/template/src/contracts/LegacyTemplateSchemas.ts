@@ -50,6 +50,15 @@ export const LEGACY_TEMPLATE_SCHEMAS = {
         expiresInMinutes: expiration,
     }).loose(),
 
+    login: z.object({
+        user: z.object({
+            firstName: text(80),
+        }).loose(),
+
+        loginUrl: httpsUrl,
+        expiresInMinutes: expiration,
+    }).loose(),
+
     "password-reset": z.object({
         user: z.object({
             firstName: text(80),

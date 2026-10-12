@@ -10,6 +10,7 @@ import {
 export const BUILTIN_TEMPLATE_NAMES = [
   "welcome",
   "otp",
+  "login",
   "password-reset",
   "invitation",
   "notification",
@@ -28,6 +29,14 @@ export interface BuiltinTemplateDataMap extends DomainTemplateDataMap {
 
   otp: {
     code: string;
+    expiresInMinutes: number;
+  };
+
+  login: {
+    user: {
+      firstName: string;
+    };
+    loginUrl: string;
     expiresInMinutes: number;
   };
 
@@ -228,6 +237,19 @@ export function assertBuiltinTemplateData(
         );
       }
 
+      requiredExpiration(
+        field(data, "expiresInMinutes"),
+        "data.expiresInMinutes",
+      );
+
+      return;
+    }
+
+    case "login": {
+      const user = plainObject(field(data, "user"), "data.user");
+
+      requiredText(field(user, "firstName"), "data.user.firstName", 80);
+      requiredHttps(field(data, "loginUrl"), "data.loginUrl");
       requiredExpiration(
         field(data, "expiresInMinutes"),
         "data.expiresInMinutes",

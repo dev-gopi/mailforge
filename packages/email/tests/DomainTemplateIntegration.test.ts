@@ -38,9 +38,9 @@ const alert=()=>({
 });
 
 describe("Task 7.8.1 end-to-end email integration", () => {
-  it("01 lists nine built-in templates", () => {
+  it("01 lists ten built-in templates", () => {
     const email=createEmail();
-    expect(email.listBuiltinTemplates()).toHaveLength(9);
+    expect(email.listBuiltinTemplates()).toHaveLength(10);
     expect(email.listTemplateCatalog("billing").map(x=>x.id)).toEqual(["invoice","payment-receipt"]);
   });
   it("02 renders branded invoice with verified totals", async () => {

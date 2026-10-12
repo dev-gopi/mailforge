@@ -2,9 +2,11 @@ import type { EmailDocument } from "@mailforge/core";
 
 import {
   createTemplateDocument,
-  heading,
-  paragraph,
+  contentHeading,
+  contentParagraph,
+  mutedParagraph,
   actionButton,
+  panel,
 } from "../shared/TemplateNodes.js";
 
 export function buildInvitationTemplate(): EmailDocument {
@@ -13,18 +15,46 @@ export function buildInvitationTemplate(): EmailDocument {
     "Invitation to {{organizationName}}",
     "{{inviterName}} invited you to join.",
     [
-      heading("invitation-heading", "You're Invited!"),
+      {
+        id: "invitation-icon",
+        type: "text",
+        props: { text: "✦" },
+        styles: {
+          backgroundColor: "#eff6ff",
+          color: "#2563eb",
+          fontSize: 26,
+          textAlign: "center",
+          padding: "12px",
+        },
+      },
+      contentHeading("invitation-heading", "You're Invited!"),
 
-      paragraph("invitation-greeting", "Hello {{invitee.firstName}},"),
+      contentParagraph("invitation-greeting", "Hello {{invitee.firstName}},"),
 
-      paragraph(
+      contentParagraph(
         "invitation-description",
         "{{inviterName}} has invited you to join " + "{{organizationName}}.",
       ),
 
       actionButton("invitation-action", "Accept Invitation", "{{inviteUrl}}"),
 
-      paragraph(
+      panel("invitation-details", [
+        {
+          id: "invitation-details-text",
+          type: "text",
+          props: {
+            text: "Join your organization to collaborate, share work, and " +
+              "get started with your new workspace.",
+          },
+          styles: {
+            fontSize: 13,
+            lineHeight: "22px",
+            color: "#64748b",
+            padding: "0",
+          },
+        },
+      ]),
+      mutedParagraph(
         "invitation-note",
         "If you were not expecting this invitation, " +
           "you can ignore this message.",

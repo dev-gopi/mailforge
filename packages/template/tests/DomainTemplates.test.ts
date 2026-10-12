@@ -25,7 +25,7 @@ const receipt = () => ({
 });
 
 describe("Task 7.8.1 domain document builders", () => {
-  it("01 registers all nine built-ins", () => expect(listBuiltinTemplates()).toHaveLength(9));
+  it("01 registers all ten built-ins", () => expect(listBuiltinTemplates()).toHaveLength(10));
   it("02 groups billing templates", () => {
     expect(listTemplateCatalog("billing").map(x=>x.id)).toEqual(["invoice","payment-receipt"]);
   });

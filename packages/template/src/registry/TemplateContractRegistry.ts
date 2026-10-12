@@ -81,6 +81,12 @@ const FIELDS: Record<
         required("expiresInMinutes", "integer"),
     ],
 
+    login: [
+        required("user.firstName", "text"),
+        required("loginUrl", "url"),
+        required("expiresInMinutes", "integer"),
+    ],
+
     "password-reset": [
         required("user.firstName", "text"),
         required("resetUrl", "url"),
