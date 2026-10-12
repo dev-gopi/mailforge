@@ -1,0 +1,36 @@
+{
+    "name": "@mailforge/renderer-html",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+        "build": "tsc -p tsconfig.json",
+        "typecheck": "tsc --noEmit -p tsconfig.json",
+        "test": "vitest run"
+    },
+    "dependencies": {
+        "@mailforge/core": "workspace:*",
+        "html-to-text": "^10.0.1",
+        "juice": "^12.2.0",
+        "sanitize-html": "^2.18.0"
+    },
+    "devDependencies": {
+        "@types/html-to-text": "^9.0.4",
+        "@types/node": "^26.6.5",
+        "@types/sanitize-html": "^2.16.2"
+    },
+    "sideEffects": false
+}
