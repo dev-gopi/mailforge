@@ -111,3 +111,17 @@ export type {
 export type {
     HtmlRenderInput,
 } from "@mailforge/renderer-html";
+
+// Built-in email templates
+export {
+    getBuiltinTemplate,
+    listBuiltinTemplates,
+    isBuiltinTemplateName,
+    assertBuiltinTemplateData,
+    BuiltinTemplateDataError,
+} from "@mailforge/templates";
+
+export type {
+    BuiltinTemplateName,
+    BuiltinTemplateDataMap,
+} from "@mailforge/templates";

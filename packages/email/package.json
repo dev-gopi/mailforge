@@ -23,7 +23,8 @@
     "dependencies": {
         "@mailforge/core": "workspace:*",
         "@mailforge/renderer-mjml": "workspace:*",
-        "@mailforge/renderer-html": "workspace:*"
+        "@mailforge/renderer-html": "workspace:*",
+        "@mailforge/templates": "workspace:*"
     },
     "devDependencies": {
         "@types/node": "^26.6.5"

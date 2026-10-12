@@ -44,6 +44,9 @@ importers:
       '@mailforge/renderer-mjml':
         specifier: workspace:*
         version: link:../renderer-mjml
+      '@mailforge/templates':
+        specifier: workspace:*
+        version: link:../templates
     devDependencies:
       '@types/node':
         specifier: ^26.6.5
@@ -104,6 +107,12 @@ importers:
       '@types/sanitize-html':
         specifier: ^2.16.2
         version: 2.16.2
+
+  packages/templates:
+    dependencies:
+      '@mailforge/core':
+        specifier: workspace:*
+        version: link:../core
 
 packages:
 

@@ -19,6 +19,15 @@ import {
 } from "@mailforge/renderer-html";
 
 import {
+    getBuiltinTemplate,
+    listBuiltinTemplates,
+    isBuiltinTemplateName,
+    assertBuiltinTemplateData,
+    type BuiltinTemplateName,
+    type BuiltinTemplateDataMap,
+} from "@mailforge/templates";
+
+import {
     resolveEmailConfig,
 } from "./config/ConfigResolver.js";
 
@@ -69,9 +78,6 @@ import type {
     ResolvedEmailLayout,
 } from "./layout/Layout.types.js";
 
-/**
- * Additional properties accepted by render().
- */
 export interface TemplateRenderOptions
     extends RenderOptions {
     data?: TemplateData;
@@ -98,6 +104,7 @@ export class MailForgeEmail {
     private readonly htmlRenderer =
         new HtmlRenderer();
 
+    // Only developer-registered templates live here.
     private readonly templates =
         new Map<string, EmailDocument>();
 
@@ -105,9 +112,9 @@ export class MailForgeEmail {
         this.config = resolveEmailConfig(options);
     }
 
-    // -----------------------------
+    // ---------------------------------------
     // BRAND AND THEME CONFIGURATION
-    // -----------------------------
+    // ---------------------------------------
 
     public getBrand(): ResolvedEmailBrand {
         return structuredClone(this.config.brand);
@@ -151,19 +158,25 @@ export class MailForgeEmail {
         );
     }
 
-    // -----------------------------
-    // TEMPLATE REGISTRATION
-    // -----------------------------
+    // ---------------------------------------
+    // BUILT-IN TEMPLATES
+    // ---------------------------------------
+
+    /**
+     * List the five templates bundled with MailForge.
+     */
+    public listBuiltinTemplates():
+        BuiltinTemplateName[] {
+        return listBuiltinTemplates();
+    }
+
+    // ---------------------------------------
+    // CUSTOM TEMPLATE REGISTRATION
+    // ---------------------------------------
 
     public registerTemplate(
         document: EmailDocument,
     ): this {
-        /**
-         * Validate a temporary copy where variable
-         * URLs are replaced with safe example URLs.
-         *
-         * Store the original template unchanged.
-         */
         const validationCopy =
             prepareTemplateForValidation(document);
 
@@ -183,32 +196,62 @@ export class MailForgeEmail {
         return this;
     }
 
+    /**
+     * Preserve the existing Task 7.1 behavior:
+     * list only templates explicitly registered
+     * by the developer.
+     */
     public listTemplates(): string[] {
         return [...this.templates.keys()].sort();
     }
 
+    /**
+     * Custom templates take priority.
+     * Otherwise, fall back to a built-in.
+     */
     public getTemplate(
         templateId: string,
     ): EmailDocument {
-        const document = this.templates.get(templateId);
+        const custom = this.templates.get(templateId);
 
-        if (!document) {
-            throw new Error(
-                `Template not found: ${templateId}`,
-            );
+        if (custom) {
+            return structuredClone(custom);
         }
 
-        return structuredClone(document);
+        if (isBuiltinTemplateName(templateId)) {
+            return getBuiltinTemplate(templateId);
+        }
+
+        throw new Error(
+            `Template not found: ${templateId}`,
+        );
     }
 
-    // -----------------------------
+    // ---------------------------------------
     // EMAIL RENDERING
-    // -----------------------------
+    // ---------------------------------------
 
     public async render(
         templateId: string,
         options: TemplateRenderOptions = {},
     ): Promise<RenderResult> {
+        /**
+         * When using a built-in directly,
+         * validate its required data.
+         *
+         * Custom templates with the same ID are
+         * unaffected by built-in requirements.
+         */
+        if (
+            !this.templates.has(templateId) &&
+            isBuiltinTemplateName(templateId)
+        ) {
+            assertBuiltinTemplateData(
+                templateId,
+                options.data,
+            );
+        }
+
         const document = this.getTemplate(templateId);
 
         return this.renderDocument(
@@ -217,11 +260,38 @@ export class MailForgeEmail {
         );
     }
 
+    /**
+     * Type-safe helper that always renders the
+     * packaged template, even if a custom
+     * template has the same name.
+     */
+    public async renderBuiltin<
+        Name extends BuiltinTemplateName
+    >(
+        name: Name,
+        data: BuiltinTemplateDataMap[Name],
+        options: Omit<TemplateRenderOptions, "data"> = {},
+    ): Promise<RenderResult> {
+        assertBuiltinTemplateData(name, data);
+
+        return this.renderDocument(
+            getBuiltinTemplate(name),
+            {
+                ...options,
+                data,
+            },
+        );
+    }
+
+    /**
+     * Existing structured-document pipeline
+     * from Task 7.5.
+     */
     public async renderDocument(
         document: EmailDocument,
         options: TemplateRenderOptions = {},
     ): Promise<RenderResult> {
-        // Step 1: Resolve configuration for this email.
+        // 1. Resolve layout and theme.
         const layout = this.resolveLayout(
             options.layout ?? {},
         );
@@ -234,59 +304,58 @@ export class MailForgeEmail {
             ? {}
             : options.data;
 
-        // Step 2: Add missing branded sections.
+        // 2. Create missing header, footer,
+        // and copyright.
         const withDefaults = applyDefaultLayout(
             document,
             this.config.brand,
             layout,
         );
 
-        // Step 3: Resolve variables before component
-        // validation, especially dynamic URLs.
+        // 3. Resolve variables inside the document.
         const interpolated = interpolateEmailDocument(
             withDefaults,
             data,
         );
 
-        // Step 4: Resolve variables inside patches.
+        // 4. Resolve variables in custom patches.
         const patches = interpolateDocumentPatches(
             options.patches ?? [],
             data,
         );
 
-        // Step 5: Apply patches atomically.
-        // This validates the fully resolved document.
+        // 5. Apply patches atomically and validate.
         const customized = this.customizer.apply(
             interpolated,
             patches,
         );
 
-        // Step 6: Apply theme styling.
+        // 6. Apply colors, typography and spacing.
         const themed = applyEmailTheme(
             customized,
             theme,
         );
 
-        // Step 7: Render the completed email.
+        // 7. Generate HTML and plain text.
         return this.mjmlRenderer.render(
             themed,
             {
                 trust: options.trust ?? "safe",
-                bodyBackgroundColor: theme.colors.background,
+                bodyBackgroundColor:
+                    theme.colors.background,
 
                 ...(options.inlineCss !== undefined
-                    ? { inlineCss: options.inlineCss }
+                    ? {
+                        inlineCss: options.inlineCss,
+                    }
                     : {}),
             },
         );
     }
 
     /**
-     * Existing standalone HTML API.
-     *
-     * This does not interpolate {{variables}}.
-     * HTML-template interpolation requires a
-     * separate, context-aware API in a later task.
+     * Existing standalone HTML renderer.
+     * Kept separate from structured templates.
      */
     public async renderHtml(
         input: HtmlRenderInput,
@@ -302,9 +371,6 @@ export class MailForgeEmail {
     }
 }
 
-/**
- * Main plug-and-play factory.
- */
 export function createEmail(
     config: EmailConfigOptions = {},
 ): MailForgeEmail {
