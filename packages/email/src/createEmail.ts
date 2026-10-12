@@ -22,6 +22,7 @@ import {
 import {
     ComponentCatalog,
     ComponentExpander,
+    registerStandardComponents,
     type ReusableComponentDefinition,
 } from "@mailforge/components";
 
@@ -126,6 +127,12 @@ export class MailForgeEmail {
 
     constructor(options: EmailConfigOptions = {}) {
         this.config = resolveEmailConfig(options);
+
+        // Register six standard reusable components
+        // in this engine's existing component catalog.
+        registerStandardComponents(
+            this.componentCatalog,
+        );
     }
 
     // ---------------------------------------

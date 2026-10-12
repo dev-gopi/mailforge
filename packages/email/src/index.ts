@@ -135,3 +135,8 @@ import {
 import type {
     ComponentInfo,
 } from "@mailforge/core";
+
+export {
+    STANDARD_COMPONENT_NAMES,
+    getStandardComponentDefinitions,
+} from "@mailforge/components";

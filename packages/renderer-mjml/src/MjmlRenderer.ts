@@ -265,13 +265,68 @@ export class MjmlRenderer implements EmailRenderer {
                 const attrs = targetAttributes(node, "mj-button", state);
                 return `<mj-button ${attrs}${xmlAttribute("href", safeUrl(props.href))}>${escapeHtml(props.text)}</mj-button>`;
             }
+
             case "image": {
-                const attrs = targetAttributes(node, "mj-image", state);
+                const attrs = targetAttributes(
+                    node,
+                    "mj-image",
+                    state,
+                );
+
                 const src = safeImageUrl(props.src);
-                if (src.startsWith("data:") && trust !== "trusted") {
-                    throw new Error("Inline data images require trusted rendering mode");
+
+                if (
+                    src.startsWith("data:") &&
+                    trust !== "trusted"
+                ) {
+                    throw new Error(
+                        "Inline data images require trusted rendering mode",
+                    );
                 }
-                return `<mj-image ${attrs}${xmlAttribute("src", src)}${xmlAttribute("alt", props.alt)} />`;
+
+                const image =
+                    `<mj-image ${attrs}` +
+                    `${xmlAttribute("src", src)}` +
+                    `${xmlAttribute("alt", props.alt)} />`;
+
+                // Ordinary images work exactly as before.
+                if (props.caption === undefined) {
+                    return image;
+                }
+
+                // Validate optional caption properties, even
+                // if the image was not created by ImageCaption.
+                if (
+                    typeof props.caption !== "string" ||
+                    props.caption.length === 0 ||
+                    props.caption.length > 500
+                ) {
+                    throw new Error(
+                        `Invalid image caption on '${node.id}'`,
+                    );
+                }
+
+                const captionColor =
+                    props.captionColor ?? "#64748b";
+
+                if (
+                    typeof captionColor !== "string" ||
+                    !/^#[0-9a-fA-F]{6}$/.test(captionColor)
+                ) {
+                    throw new Error(
+                        `Invalid image caption color on '${node.id}'`,
+                    );
+                }
+
+                const caption =
+                    `<mj-text align="center" ` +
+                    `font-size="12px" ` +
+                    `color="${escapeHtml(captionColor)}" ` +
+                    `padding="4px 8px">` +
+                    `${escapeHtml(props.caption)}` +
+                    `</mj-text>`;
+
+                return image + caption;
             }
             case "divider":
                 return `<mj-divider ${targetAttributes(node, "mj-divider", state)} />`;
