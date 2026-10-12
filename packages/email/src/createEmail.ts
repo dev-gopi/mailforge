@@ -26,23 +26,45 @@ import {
     type ReusableComponentDefinition,
 } from "@mailforge/components";
 
+
 import {
     getBuiltinTemplate,
     listBuiltinTemplates,
     listTemplateCatalog,
     getBuiltinTemplateInfo,
     isBuiltinTemplateName,
-    assertBuiltinTemplateData,
     DOMAIN_TEMPLATE_NAMES,
-    buildDomainTemplate,
     TemplateContractRegistry,
+    buildParsedDomainTemplate,
+
+    type ValidatedBuiltinTemplateDataMap,
+    type ParsedDomainTemplateDataMap,
     type TemplateContractDefinition,
     type BuiltinTemplateName,
     type BuiltinTemplateDataMap,
     type DomainTemplateName,
     type TemplateCategory,
     type TemplateCatalogEntry,
+    buildDomainTemplate,
+    assertBuiltinTemplateData,
 } from "@mailforge/templates";
+
+import {
+    TemplatePresetRegistry,
+    ThemeProfileRegistry,
+} from "./presets/PresetRegistry.js";
+
+import {
+    TemplatePresetError,
+    type TemplatePresetDefinition,
+    type TemplatePresetInfo,
+    type TemplateCustomizer,
+} from "./presets/Preset.types.js";
+
+import {
+    mergeThemeOverrides,
+    mergeLayoutOverrides,
+} from "./presets/PresetMerge.js";
 
 import {
     resolveEmailConfig,
@@ -105,6 +127,11 @@ export interface TemplateRenderOptions
     patches?: readonly DocumentPatch[];
     layout?: EmailLayoutOptions;
     theme?: ThemeOverrides;
+
+    /**
+     * Optional name of a reusable theme profile.
+     */
+    themeProfile?: string;
 }
 
 function isDomainTemplateName(
@@ -116,6 +143,12 @@ function isDomainTemplateName(
 }
 
 export class MailForgeEmail {
+    private readonly templatePresets =
+        new TemplatePresetRegistry();
+
+    private readonly themeProfiles =
+        new ThemeProfileRegistry();
+
     private readonly config: ResolvedEmailConfig;
 
     private readonly registry =

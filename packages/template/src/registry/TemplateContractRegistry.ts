@@ -25,6 +25,15 @@ import {
     getBuiltinTemplateInfo,
 } from "./TemplateCatalog.js";
 
+import type {
+    DomainTemplateName,
+    ParsedDomainTemplateDataMap,
+} from "../DomainTemplateData.js";
+
+export type ValidatedBuiltinTemplateDataMap =
+    Omit<BuiltinTemplateDataMap, DomainTemplateName> &
+    ParsedDomainTemplateDataMap;
+
 const SCHEMAS = {
     ...LEGACY_TEMPLATE_SCHEMAS,
     ...DOMAIN_TEMPLATE_SCHEMAS,
@@ -165,7 +174,7 @@ export class TemplateContractRegistry {
     public validate<Name extends BuiltinTemplateName>(
         name: Name,
         input: unknown,
-    ): BuiltinTemplateDataMap[Name] {
+    ): ValidatedBuiltinTemplateDataMap[Name] {
         // Prevent Zod or future validation logic from
         // invoking getters inside untrusted data.
         try {
@@ -198,6 +207,6 @@ export class TemplateContractRegistry {
             );
         }
 
-        return result.data as BuiltinTemplateDataMap[Name];
+        return result.data as ValidatedBuiltinTemplateDataMap[Name];
     }
 }

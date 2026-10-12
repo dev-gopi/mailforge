@@ -61,3 +61,11 @@ export type {
   TemplateContractField,
   TemplateContractDefinition,
 } from "./contracts/TemplateContract.types.js";
+
+export {
+  buildParsedDomainTemplate,
+} from "./registry/DomainTemplateBuilder.js";
+
+export type {
+  ValidatedBuiltinTemplateDataMap,
+} from "./registry/TemplateContractRegistry.js";

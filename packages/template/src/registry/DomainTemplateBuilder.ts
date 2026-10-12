@@ -5,6 +5,7 @@ import type {
 
 import type {
     DomainTemplateName,
+    ParsedDomainTemplateDataMap,
 } from "../DomainTemplateData.js";
 
 import {
@@ -28,35 +29,49 @@ import {
 } from "../notifications/SecurityAlertTemplate.js";
 
 /**
- * Validate the data and create a completed
- * structured document containing typed components.
+ * Build a document from data already validated
+ * by TemplateContractRegistry.
  *
- * No network calls, database queries or email
- * delivery are performed here.
+ * Do not call this with untrusted raw input.
+ */
+export function buildParsedDomainTemplate(
+    name: DomainTemplateName,
+    data: ParsedDomainTemplateDataMap[DomainTemplateName],
+): EmailDocument {
+    switch (name) {
+        case "invoice":
+            return buildInvoiceTemplate(
+                data as ParsedDomainTemplateDataMap["invoice"],
+            );
+
+        case "payment-receipt":
+            return buildPaymentReceiptTemplate(
+                data as ParsedDomainTemplateDataMap["payment-receipt"],
+            );
+
+        case "order-confirmation":
+            return buildOrderConfirmationTemplate(
+                data as ParsedDomainTemplateDataMap["order-confirmation"],
+            );
+
+        case "security-alert":
+            return buildSecurityAlertTemplate(
+                data as ParsedDomainTemplateDataMap["security-alert"],
+            );
+    }
+}
+
+/**
+ * Backward-compatible public builder.
+ *
+ * This version still accepts untrusted input,
+ * validates it, then builds the document.
  */
 export function buildDomainTemplate(
     name: DomainTemplateName,
     input: unknown,
 ): EmailDocument {
-    switch (name) {
-        case "invoice":
-            return buildInvoiceTemplate(
-                parseDomainTemplateData("invoice", input),
-            );
+    const parsed = parseDomainTemplateData(name, input);
 
-        case "payment-receipt":
-            return buildPaymentReceiptTemplate(
-                parseDomainTemplateData("payment-receipt", input),
-            );
-
-        case "order-confirmation":
-            return buildOrderConfirmationTemplate(
-                parseDomainTemplateData("order-confirmation", input),
-            );
-
-        case "security-alert":
-            return buildSecurityAlertTemplate(
-                parseDomainTemplateData("security-alert", input),
-            );
-    }
+    return buildParsedDomainTemplate(name, parsed);
 }
