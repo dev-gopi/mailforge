@@ -206,6 +206,29 @@ function scalar(
 }
 
 /**
+ * Encode a dynamic URL path/query value.
+ *
+ * Invalid Unicode must produce a MailForge
+ * error rather than an unexpected URIError.
+ */
+function encodeUrlVariable(
+    value: string,
+    expression: string,
+    location: string,
+): string {
+    try {
+        return encodeURIComponent(value);
+    } catch {
+        fail(
+            "EMAIL_VARIABLE_INVALID",
+            location,
+            `Variable "${expression}" contains invalid Unicode`,
+            expression,
+        );
+    }
+}
+
+/**
  * Substitute one string.
  *
  * For a URL:
@@ -314,7 +337,11 @@ function replaceValue(
                 );
 
             if (context === "url" && !wholeUrl) {
-                return encodeURIComponent(value);
+                return encodeUrlVariable(
+                    value,
+                    expression,
+                    location,
+                );
             }
 
             // Text is not HTML here.
@@ -335,6 +362,32 @@ function replaceValue(
 
     if (context === "url") {
         let url: URL;
+
+        // Check the final size after variable expansion.
+        if (output.length > MAX_STRING) {
+            fail(
+                "EMAIL_VARIABLE_INVALID",
+                location,
+                `Resolved string exceeds ${MAX_STRING} characters`,
+            );
+        }
+
+        // Reject control characters before URL parsing.
+        // The built-in URL parser can normalize away
+        // some characters such as carriage returns.
+        if (
+            context === "url" &&
+            Array.from(output).some((character) => {
+                const code = character.charCodeAt(0);
+                return code <= 31 || code === 127;
+            })
+        ) {
+            fail(
+                "EMAIL_VARIABLE_UNSAFE_URL",
+                location,
+                "Dynamic URL contains control characters",
+            );
+        }
 
         try {
             url = new URL(

@@ -230,7 +230,9 @@ export class MailForgeEmail {
             options.theme ?? {},
         );
 
-        const data = options.data ?? {};
+        const data = options.data === undefined
+            ? {}
+            : options.data;
 
         // Step 2: Add missing branded sections.
         const withDefaults = applyDefaultLayout(
