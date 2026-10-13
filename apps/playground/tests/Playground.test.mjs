@@ -7,7 +7,7 @@ import { getTemplatePreviewData } from "../../../scripts/template-preview-fixtur
 
 const templates = new Set(["welcome", "invoice"]);
 const themes = ["modern", "minimal", "corporate"];
-const valid = { templateId: "welcome", data: { user: { firstName: "Priya" } }, theme: "modern", brandColor: "#2563eb" };
+const valid = { templateId: "welcome", data: { user: { firstName: "Gopi" } }, theme: "modern", brandColor: "#2563eb" };
 
 describe("Stage 8.2 Playground — validation", () => {
   it("accepts valid branding, layout, variant and display settings", () => {

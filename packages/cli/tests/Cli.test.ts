@@ -49,7 +49,7 @@ describe("Stage 8.3: MailForge CLI", () => {
 
   it("validates and renders a real welcome email with safe HTML and text output", async () => {
     const cwd = await folder();
-    await writeFile(join(cwd, "data.json"), JSON.stringify({ user: { firstName: "Priya" }, actionUrl: "https://example.com/dashboard" }));
+    await writeFile(join(cwd, "data.json"), JSON.stringify({ user: { firstName: "Gopi" }, actionUrl: "https://example.com/dashboard" }));
     const out = output();
     await runCli(["validate", "welcome", "--data", "data.json"], cwd, out);
     expect(out.lines[0]).toContain("VALID: welcome");
@@ -59,7 +59,7 @@ describe("Stage 8.3: MailForge CLI", () => {
     ], cwd, out);
     const html = await readFile(join(cwd, "generated", "welcome.html"), "utf8");
     const text = await readFile(join(cwd, "generated", "welcome.txt"), "utf8");
-    expect(html).toContain("Priya");
+    expect(html).toContain("Gopi");
     expect(html).not.toContain("Welcome to your new workspace.");
     expect(text.length).toBeGreaterThan(10);
     await expect(runCli(["render", "welcome", "--data", "data.json", "--out", "generated/welcome"], cwd, out)).rejects.toThrow(/already exists/);
@@ -70,7 +70,7 @@ describe("Stage 8.3: MailForge CLI", () => {
     const out = output();
     await writeFile(join(cwd, "broken.json"), "{");
     await expect(runCli(["validate", "welcome", "--data", "broken.json"], cwd, out)).rejects.toThrow(/Invalid JSON/);
-    await writeFile(join(cwd, "data.json"), JSON.stringify({ user: { firstName: "Priya" }, actionUrl: "https://example.com/dashboard" }));
+    await writeFile(join(cwd, "data.json"), JSON.stringify({ user: { firstName: "Gopi" }, actionUrl: "https://example.com/dashboard" }));
     await writeFile(join(cwd, "unsafe.json"), JSON.stringify({ trust: "trusted" }));
     await expect(runCli(["validate", "welcome", "--data", "data.json", "--options", "unsafe.json"], cwd, out)).rejects.toThrow(/safe rendering/);
     await writeFile(join(cwd, "huge.json"), " ".repeat(1_100_000));

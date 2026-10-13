@@ -18,6 +18,6 @@ describe("Stage 8 professional components", () => {
     });
     it("renders a signature without requiring optional details", () => {
         const item = getProfessionalComponentDefinitions()[3]!;
-        expect(JSON.stringify(item.render({ name: "Priya", organization: "Northstar" }, ctx))).toContain("Northstar");
+        expect(JSON.stringify(item.render({ name: "Gopi", organization: "Northstar" }, ctx))).toContain("Northstar");
     });
 });

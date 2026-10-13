@@ -102,7 +102,7 @@ export async function runCli(
     if (!flags.force) { await ensureNotExists(configuration); await ensureNotExists(data); }
     await mkdir(dir, { recursive: true });
     await writeFile(configuration, JSON.stringify({ brand: { name: "Acme", primaryColor: "#2563eb", supportEmail: "support@example.com" }, theme: { preset: "modern" } }, null, 2) + "\n");
-    await writeFile(data, JSON.stringify({ user: { firstName: "Priya" }, actionUrl: "https://example.com/dashboard" }, null, 2) + "\n");
+    await writeFile(data, JSON.stringify({ user: { firstName: "Gopi" }, actionUrl: "https://example.com/dashboard" }, null, 2) + "\n");
     output.log(`Created ${configuration}\nCreated ${data}`);
     return;
   }

@@ -10,13 +10,13 @@ import {
     resolveEmailDirection,
 } from "../src/index.js";
 
-const welcomeData = { user: { firstName: "Priya" }, actionUrl: "https://example.com/home" };
+const welcomeData = { user: { firstName: "Gopi" }, actionUrl: "https://example.com/home" };
 
 describe("Task 8.1: email localization", () => {
     it("keeps legacy email rendering unchanged when localization is unused", async () => {
         const email = createEmail();
         const result = await email.render("welcome", { data: welcomeData });
-        expect(result.subject).toBe("Welcome, Priya!");
+        expect(result.subject).toBe("Welcome, Gopi!");
         expect(result.html).toMatch(/lang="en"/);
     });
 
@@ -33,13 +33,13 @@ describe("Task 8.1: email localization", () => {
             },
         });
         const out = await email.render("welcome", { data: welcomeData, locale: "bn-IN" });
-        expect(out.subject).toContain("Priya");
+        expect(out.subject).toContain("Gopi");
         expect(out.subject).toContain("স্বাগতম");
         expect(out.preheader).toBe("আপনার অ্যাকাউন্ট প্রস্তুত");
         expect(out.html).toContain('lang="bn-IN"');
         expect(out.html).toContain('dir="ltr"');
         expect(out.text).toContain("ড্যাশবোর্ড খুলুন");
-        expect(out.text).toContain("নমস্কার Priya");
+        expect(out.text).toContain("নমস্কার Gopi");
     });
 
     it("merges fallback translations before language and regional overrides", async () => {
@@ -48,7 +48,7 @@ describe("Task 8.1: email localization", () => {
         email.registerTranslations("fr", "welcome", { subject: "Bienvenue {{user.firstName}}" });
         email.registerTranslations("fr-CA", "welcome", { nodes: { "welcome-heading": "Bonjour du Canada" }});
         const out = await email.render("welcome", { data: welcomeData, locale: "fr-CA", fallbackLocale: "en" });
-        expect(out.subject).toBe("Bienvenue Priya");
+        expect(out.subject).toBe("Bienvenue Gopi");
         expect(out.text).toContain("Bonjour du Canada");
         expect(out.text).toContain("Fallback action");
     });

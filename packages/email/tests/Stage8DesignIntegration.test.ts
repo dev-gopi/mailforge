@@ -6,7 +6,7 @@ describe("Stage 8 end-to-end visual contracts", () => {
     it("renders responsive HTML while preserving MJML's fallback tables", async () => {
         const email = createEmail();
         const result = await email.render("welcome", {
-            data: { user: { firstName: "Priya" }, actionUrl: "https://example.com/dashboard" },
+            data: { user: { firstName: "Gopi" }, actionUrl: "https://example.com/dashboard" },
             responsive: true,
         });
         expect(result.html).toContain("<table");

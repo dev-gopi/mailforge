@@ -171,6 +171,8 @@ importers:
         specifier: ^26.6.5
         version: 26.6.5
 
+  packages/transport: {}
+
 packages:
 
   '@babel/code-frame@7.29.7':
