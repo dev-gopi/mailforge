@@ -14,3 +14,7 @@ export { ThemeRegistry } from "./registry/ThemeRegistry.js";
 export type { ThemeDefinition, ThemeImportOptions } from "./registry/ThemeRegistry.js";
 export { ThemeVersionRegistry } from "./registry/ThemeVersionRegistry.js";
 export type { ThemeVersionInfo } from "./registry/ThemeVersionRegistry.js";
+
+// Stage 8: Theme catalog and accessibility diagnostics
+export { listThemeCatalog, getContrastRatio, auditThemeContrast } from "./catalog/ThemeCatalog.js";
+export type { ThemeCatalogEntry, ThemeContrastFinding } from "./catalog/ThemeCatalog.js";

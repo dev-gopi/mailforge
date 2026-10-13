@@ -1331,6 +1331,9 @@ export class MailForgeEmail {
                 surfaceColor: theme.colors.surface,
                 sectionColor: theme.colors.section,
                 borderColor: theme.colors.border,
+                ...(options.responsive !== undefined ? { responsive: options.responsive } : {}),
+                ...(options.darkMode !== undefined ? { darkMode: options.darkMode } : {}),
+                ...(options.darkModeColors !== undefined ? { darkModeColors: options.darkModeColors } : {}),
                 containerWidth: theme.appearance.containerWidth,
                 containerRadius: theme.appearance.cardRadius,
 

@@ -9,3 +9,5 @@ export {
     safeRichHtml,
     mjmlStyles,
 } from "./RenderUtils.js";
+export { emailClientHead, resolveEmailClientStyles } from "./EmailClientStyles.js";
+export type { EmailClientStyleOptions, EmailDarkColors } from "./EmailClientStyles.js";

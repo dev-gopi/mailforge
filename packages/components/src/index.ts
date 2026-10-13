@@ -119,3 +119,11 @@ export {
     registerAllComponents,
 } from "./registry/ExtendedComponents.js";
 
+
+// Stage 8: Optional professional reusable components
+export {
+    createHeroSectionDefinition, createStatisticBlockDefinition,
+    createProgressTimelineDefinition, createCompanySignatureDefinition,
+    PROFESSIONAL_COMPONENT_NAMES, getProfessionalComponentDefinitions,
+    registerProfessionalComponents,
+} from "./professional/ProfessionalComponents.js";

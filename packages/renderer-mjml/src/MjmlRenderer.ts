@@ -11,6 +11,7 @@ import {
     type RenderResult,
 } from "@mailforge/core";
 import { escapeHtml, safeUrl, safeImageUrl, safeRichHtml, mjmlStyles } from "./RenderUtils.js";
+import { emailClientHead } from "./EmailClientStyles.js";
 
 type Trust = "safe" | "trusted";
 interface State {
@@ -53,7 +54,11 @@ function nodeAttributes(node: EmailNode, state: State): string {
     if (selectors.length) {
         state.selectors.push(`<mj-selector path=".${className}">${selectors.join("")}</mj-selector>`);
     }
-    return `css-class="${className}${extraClasses ? ` ${escapeHtml(extraClasses)}` : ""}"`;
+    const responsive = ["heading", "text", "copyright"].includes(node.type)
+        ? "mf-responsive-copy" : node.type === "button" ? "mf-responsive-action" : "";
+    const muted = node.attrs?.["data-mf-style"] === "muted" ? "mf-muted-copy" : "";
+    const suffix = [extraClasses, responsive, muted].filter(Boolean).join(" ");
+    return `css-class="${className}${suffix ? ` ${escapeHtml(suffix)}` : ""}"`;
 }
 
 function targetAttributes(node: EmailNode, target: string, state: State): string {
@@ -131,6 +136,7 @@ export class MjmlRenderer implements EmailRenderer {
             document.head?.title ? `<mj-title>${escapeHtml(document.head.title)}</mj-title>` : "",
             document.preheader ? `<mj-preview>${escapeHtml(document.preheader)}</mj-preview>` : "",
             css ? `<mj-style inline="inline">${css}</mj-style>` : "",
+            emailClientHead(options),
             state.selectors.length ? `<mj-html-attributes>${state.selectors.join("\n")}</mj-html-attributes>` : "",
         ].join("\n");
 
@@ -158,7 +164,7 @@ export class MjmlRenderer implements EmailRenderer {
         const source =
             `<mjml><mj-head>${head}</mj-head>` +
             `<mj-body width="${width}px"${bodyAttributes}>` +
-            `<mj-wrapper background-color="${surface}" ` +
+            `<mj-wrapper css-class="mf-email-shell" background-color="${surface}" ` +
             `border="1px solid ${border}" border-radius="${radius}px" ` +
             `padding="0">${body}</mj-wrapper>` +
             `</mj-body></mjml>`;        // MJML 5 supports an async compiler; strict mode throws on validation errors.
