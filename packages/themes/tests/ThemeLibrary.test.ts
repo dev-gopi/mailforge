@@ -5,8 +5,9 @@ import {
 } from "../src/index.js";
 
 describe("Standalone @mailforge/themes contract", () => {
-    it("exposes the three existing presets", () => {
-        expect(listThemePresets()).toEqual(["modern", "minimal", "corporate"]);
+    it("preserves the original three and exposes ten presets", () => {
+        expect(listThemePresets().slice(0, 3)).toEqual(["modern", "minimal", "corporate"]);
+        expect(listThemePresets()).toHaveLength(10);
         expect(getThemePreset("modern").colors.primary).toBe("#2563eb");
     });
 

@@ -5,7 +5,14 @@
 export type ThemePreset =
     | "modern"
     | "minimal"
-    | "corporate";
+    | "corporate"
+    | "dark"
+    | "premium"
+    | "ocean"
+    | "forest"
+    | "sunset"
+    | "elegant"
+    | "playful";
 
 /**
  * Colors available in every theme.

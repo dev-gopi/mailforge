@@ -8,8 +8,9 @@ import {
 } from "../src/index.js";
 
 describe("standalone theme registry", () => {
-    it("preserves the three existing preset definitions", () => {
-        expect(listThemePresets()).toEqual(["modern", "minimal", "corporate"]);
+    it("preserves legacy presets and resolves all built-in themes", () => {
+        expect(listThemePresets().slice(0, 3)).toEqual(["modern", "minimal", "corporate"]);
+        expect(listThemePresets()).toHaveLength(10);
         for (const id of listThemePresets()) {
             expect(getThemePreset(id)).toEqual(resolveEmailTheme(id));
         }

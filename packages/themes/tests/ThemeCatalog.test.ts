@@ -5,7 +5,9 @@ import { getThemePreset } from "../src/presets/ThemePresets.js";
 describe("theme catalog", () => {
     it("exposes a unique entry for every real built-in theme", () => {
         const items = listThemeCatalog();
-        expect(items.map(item => item.name).sort()).toEqual(["corporate", "minimal", "modern"]);
+        expect(items).toHaveLength(10);
+        expect(new Set(items.map(item => item.name)).size).toBe(10);
+        expect(items.map(item => item.name)).toContain("modern");
         expect(items.every(item => /^#[0-9a-f]{6}$/i.test(item.primary))).toBe(true);
     });
     it("computes standards-based black and white contrast", () => {

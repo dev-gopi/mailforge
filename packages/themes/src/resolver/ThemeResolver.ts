@@ -463,7 +463,7 @@ export function resolveEmailTheme(
     ) {
         throw new EmailThemeError(
             "theme.preset",
-            "must be modern, minimal, or corporate",
+            `must be one of: ${THEME_PRESET_NAMES.join(", ")}`,
         );
     }
 

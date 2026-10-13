@@ -22,6 +22,13 @@ const DETAILS: Record<ThemePreset, { label: string; description: string }> = {
     modern: { label: "Modern", description: "Balanced transactional email styling" },
     corporate: { label: "Corporate", description: "Professional business correspondence" },
     minimal: { label: "Minimal", description: "Typographic, understated content" },
+    dark: { label: "Dark", description: "Deep charcoal and violet for sophisticated notifications" },
+    premium: { label: "Premium", description: "Warm ivory and bronze for luxury correspondence" },
+    ocean: { label: "Ocean", description: "Crisp azure and teal for modern digital services" },
+    forest: { label: "Forest", description: "Natural emerald and mint for sustainability brands" },
+    sunset: { label: "Sunset", description: "Warm amber and terracotta for inviting campaigns" },
+    elegant: { label: "Elegant", description: "Soft plum and blush for refined announcements" },
+    playful: { label: "Playful", description: "Bright lilac and violet for friendly product news" },
 };
 
 /** Metadata is derived from the actual presets, never duplicated theme definitions. */

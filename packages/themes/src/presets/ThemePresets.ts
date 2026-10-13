@@ -2,12 +2,14 @@ import type { ResolvedEmailTheme, ThemePreset } from "../contracts/Theme.types.j
 import { modernTheme } from "../default/modern.js";
 import { minimalTheme } from "../minimal/minimal.js";
 import { corporateTheme } from "../corporate/corporate.js";
+import { PROFESSIONAL_THEMES } from "./ProfessionalThemes.js";
 
-export const THEME_PRESET_NAMES = ["modern", "minimal", "corporate"] as const;
+export const THEME_PRESET_NAMES = ["modern", "minimal", "corporate", "dark", "premium", "ocean", "forest", "sunset", "elegant", "playful"] as const;
 const PRESETS: Record<ThemePreset, ResolvedEmailTheme> = {
     modern: modernTheme,
     minimal: minimalTheme,
     corporate: corporateTheme,
+    ...PROFESSIONAL_THEMES,
 };
 
 export function getThemePreset(
