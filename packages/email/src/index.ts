@@ -246,3 +246,13 @@ export type {
     TemplateVersionSelection,
     TemplateVersionStatus,
 } from "@mailforge/templates";
+
+// Task 7.8.4: existing template variant registry, now connected to render().
+export {
+    TemplateVariantRegistry,
+    TemplateVariantError,
+} from "./registry/TemplateVariantRegistry.js";
+export type {
+    TemplateVariantDefinition,
+    ResolvedTemplateVariant,
+} from "./registry/TemplateVariantRegistry.js";

@@ -78,6 +78,12 @@ import {
     mergeThemeOverrides,
     mergeLayoutOverrides,
 } from "./presets/PresetMerge.js";
+import {
+    TemplateVariantRegistry,
+    TemplateVariantError,
+    type TemplateVariantDefinition,
+    type ResolvedTemplateVariant,
+} from "./registry/TemplateVariantRegistry.js";
 
 import {
     resolveEmailConfig,
@@ -145,6 +151,8 @@ export interface TemplateRenderOptions
 
     /** Select a published version only when explicitly requested. */
     templateVersion?: TemplateVersionSelection;
+    /** Select a reusable visual/content variant without changing its data contract. */
+    variant?: string;
 
     /**
      * Optional name of a reusable theme profile.
@@ -169,6 +177,10 @@ export class MailForgeEmail {
 
     private readonly themeProfiles =
         new ThemeProfileRegistry();
+
+    // Reuse the existing variant registry; never share it between engines.
+    private readonly templateVariants =
+        new TemplateVariantRegistry();
 
     private readonly config: ResolvedEmailConfig;
 
@@ -366,6 +378,113 @@ export class MailForgeEmail {
         return getBuiltinTemplateInfo(name);
     }
 
+
+    // ---------------------------------------------------
+    // TASK 7.8.4: REUSABLE TEMPLATE VARIANTS
+    // ---------------------------------------------------
+    /** Seed four built-in variants lazily for a known template. */
+    private ensureTemplateVariants(templateId: string): void {
+        // A published version is also a valid source, even if that template
+        // was never installed as the current custom template.
+        if (this.templateVersions.list(templateId).length === 0) {
+            this.getTemplate(templateId);
+        }
+        const known = new Set(
+            this.templateVariants.list(templateId).map(item => item.id),
+        );
+        const presets: readonly Omit<TemplateVariantDefinition, "templateId">[] = [
+            { id: "default" },
+            {
+                id: "compact",
+                theme: {
+                    appearance: { contentPadding: 20, cardRadius: 8, buttonRadius: 6 },
+                    spacing: { xs: 4, sm: 8, md: 12, lg: 16, xl: 24 },
+                },
+            },
+            {
+                id: "premium",
+                theme: {
+                    appearance: { contentPadding: 40, cardRadius: 16, buttonRadius: 12 },
+                    typography: { headingSize: 30 },
+                    spacing: { xs: 6, sm: 12, md: 18, lg: 26, xl: 36 },
+                },
+            },
+            {
+                id: "branded",
+                theme: { appearance: { contentPadding: 32, cardRadius: 12, buttonRadius: 8 } },
+            },
+        ];
+        for (const preset of presets) {
+            if (!known.has(preset.id)) {
+                this.templateVariants.register({ templateId, ...preset });
+            }
+        }
+    }
+
+    /** Register an isolated, validated variation of an existing template. */
+    public registerTemplateVariant(definition: TemplateVariantDefinition): this {
+        this.ensureTemplateVariants(definition.templateId);
+        if (definition.themeProfile !== undefined &&
+            this.themeProfiles.get(definition.themeProfile) === undefined) {
+            throw new TemplateVariantError(
+                `Unknown theme profile: ${definition.themeProfile}`,
+            );
+        }
+        if (definition.theme !== undefined) this.resolveTheme(definition.theme);
+        if (definition.layout !== undefined) this.resolveLayout(definition.layout);
+        // Resolve parents before registration so combined overrides can be checked.
+        if (definition.extends !== undefined) {
+            const parent = this.templateVariants.resolve(
+                definition.templateId, definition.extends,
+            );
+            this.resolveTheme(mergeThemeOverrides(parent.theme, definition.theme));
+            this.resolveLayout(mergeLayoutOverrides(parent.layout, definition.layout));
+        }
+        this.templateVariants.register(definition);
+        return this;
+    }
+
+    public listTemplateVariants(templateId?: string): TemplateVariantDefinition[] {
+        if (templateId !== undefined) this.ensureTemplateVariants(templateId);
+        return this.templateVariants.list(templateId);
+    }
+
+    public resolveTemplateVariant(
+        templateId: string,
+        variantId: string,
+    ): ResolvedTemplateVariant {
+        this.ensureTemplateVariants(templateId);
+        return this.templateVariants.resolve(templateId, variantId);
+    }
+
+    /** Export the existing registry's portable, data-only JSON format. */
+    public exportTemplateVariants(): string {
+        return this.templateVariants.exportJSON();
+    }
+
+    /** Import only validated, portable JSON. No partial changes on failure. */
+    public importTemplateVariants(json: string): this {
+        // Parse/inheritance-check in a temporary registry first.
+        const candidate = new TemplateVariantRegistry();
+        candidate.importJSON(json);
+        for (const item of candidate.list()) {
+            if (this.templateVersions.list(item.templateId).length === 0) {
+                this.getTemplate(item.templateId);
+            }
+            const resolved = candidate.resolve(item.templateId, item.id);
+            if (resolved.themeProfile !== undefined &&
+                this.themeProfiles.get(resolved.themeProfile) === undefined) {
+                throw new TemplateVariantError(
+                    `Unknown theme profile: ${resolved.themeProfile}`,
+                );
+            }
+            this.resolveTheme(resolved.theme);
+            this.resolveLayout(resolved.layout);
+        }
+        // Original registry import checks conflicts and is all-or-nothing.
+        this.templateVariants.importJSON(json);
+        return this;
+    }
 
     // ---------------------------------------
     // CUSTOM TEMPLATE REGISTRATION
@@ -845,26 +964,33 @@ export class MailForgeEmail {
         options: TemplateRenderOptions,
         prepared: boolean,
     ): Promise<RenderResult> {
+        // Variants apply in the shared pipeline, including all render entry points.
+        const variant = options.variant === undefined
+            ? undefined
+            : this.resolveTemplateVariant(document.id, options.variant);
         const layout = this.resolveLayout(
-            options.layout ?? {},
+            variant === undefined
+                ? options.layout ?? {}
+                : mergeLayoutOverrides(variant.layout, options.layout),
         );
 
-        const profile = options.themeProfile === undefined
+        const profileId = options.themeProfile ?? variant?.themeProfile;
+        const profile = profileId === undefined
             ? undefined
-            : this.themeProfiles.get(options.themeProfile);
+            : this.themeProfiles.get(profileId);
 
         if (
-            options.themeProfile !== undefined &&
+            profileId !== undefined &&
             profile === undefined
         ) {
             throw new TemplatePresetError(
                 "themeProfile",
-                `Unknown theme profile: ${options.themeProfile}`,
+                `Unknown theme profile: ${profileId}`,
             );
         }
 
         const theme = this.resolveTheme(
-            mergeThemeOverrides(profile, options.theme),
+            mergeThemeOverrides(profile, variant?.theme, options.theme),
         );
 
         const data = options.data === undefined
@@ -888,8 +1014,11 @@ export class MailForgeEmail {
             );
 
         // 3. Patch placeholders still use the supplied data.
+        // Inherited variant patches run first. Call-specific patches run last.
         const patches = interpolateDocumentPatches(
-            options.patches ?? [],
+            variant === undefined
+                ? options.patches ?? []
+                : [...(variant.patches ?? []), ...(options.patches ?? [])],
             data,
         );
 
