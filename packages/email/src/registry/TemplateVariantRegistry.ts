@@ -134,10 +134,17 @@ export class TemplateVariantRegistry {
             assertDefinition(definition);
             return definition;
         });
+        for (const [key, value] of this.items) {
+            temporary.items.set(key, structuredClone(value));
+        }
         while (pending.length > 0) {
             let progressed = false;
             for (let i = pending.length - 1; i >= 0; i--) {
                 const item = pending[i]!;
+                const key = this.key(item.templateId, item.id);
+                if (this.items.has(key)) {
+                    throw new TemplateVariantError(`Variant already exists: ${key}`);
+                }
                 if (item.extends !== undefined && !temporary.items.has(this.key(item.templateId, item.extends))) continue;
                 temporary.register(item);
                 pending.splice(i, 1);
@@ -146,11 +153,14 @@ export class TemplateVariantRegistry {
             if (!progressed) throw new TemplateVariantError("Missing parent or cyclic variants in import");
         }
         // Existing versions never silently overwrite.
-        for (const key of temporary.items.keys()) {
-            if (this.items.has(key)) throw new TemplateVariantError(`Variant already exists: ${key}`);
+        if (this.items.size + rows.length > MAX_VARIANTS) {
+            throw new TemplateVariantError("Variant limit exceeded");
         }
-        if (this.items.size + temporary.items.size > MAX_VARIANTS) throw new TemplateVariantError("Variant limit exceeded");
-        for (const [key, value] of temporary.items) this.items.set(key, structuredClone(value));
+        for (const row of rows) {
+            const definition = row as TemplateVariantDefinition;
+            const key = this.key(definition.templateId, definition.id);
+            this.items.set(key, structuredClone(temporary.items.get(key)!));
+        }
         return this;
     }
 }

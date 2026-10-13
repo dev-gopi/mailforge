@@ -153,6 +153,8 @@ export interface TemplateRenderOptions
     templateVersion?: TemplateVersionSelection;
     /** Select a reusable visual/content variant without changing its data contract. */
     variant?: string;
+    /** Trusted tenant ID. Scoped variants never access another tenant's designs. */
+    organizationId?: string;
 
     /**
      * Optional name of a reusable theme profile.
@@ -171,6 +173,17 @@ function isDomainTemplateName(
     ).includes(name);
 }
 
+/** Tenant IDs must come from your trusted backend authorization context. */
+function assertOrganizationId(organizationId: string): void {
+    if (typeof organizationId !== "string" ||
+        !/^[a-z0-9][a-z0-9._-]{0,79}$/.test(organizationId)) {
+        throw new TemplateVariantError("Invalid organization ID");
+    }
+}
+
+const BUILTIN_VARIANT_IDS = new Set(["default", "compact", "premium", "branded"]);
+const MAX_ORGANIZATIONS_PER_ENGINE = 250;
+
 export class MailForgeEmail {
     private readonly templatePresets =
         new TemplatePresetRegistry();
@@ -181,6 +194,9 @@ export class MailForgeEmail {
     // Reuse the existing variant registry; never share it between engines.
     private readonly templateVariants =
         new TemplateVariantRegistry();
+    // Organization variants have separate registries on each email engine.
+    private readonly organizationVariants =
+        new Map<string, TemplateVariantRegistry>();
 
     private readonly config: ResolvedEmailConfig;
 
@@ -483,6 +499,145 @@ export class MailForgeEmail {
         }
         // Original registry import checks conflicts and is all-or-nothing.
         this.templateVariants.importJSON(json);
+        return this;
+    }
+
+    // ---------------------------------------------------
+    // TASK 7.8.4.6–7.8.4.7: ORGANIZATION VARIANTS
+    // ---------------------------------------------------
+    /** Each organization owns a separate registry; global custom variants are not inherited. */
+    private organizationVariantRegistry(organizationId: string): TemplateVariantRegistry {
+        assertOrganizationId(organizationId);
+        const existing = this.organizationVariants.get(organizationId);
+        if (existing !== undefined) return existing;
+        if (this.organizationVariants.size >= MAX_ORGANIZATIONS_PER_ENGINE) {
+            throw new TemplateVariantError("Organization registry limit exceeded");
+        }
+        const created = new TemplateVariantRegistry();
+        this.organizationVariants.set(organizationId, created);
+        return created;
+    }
+
+    /** Seed only MailForge's four built-in variants, never global custom variants. */
+    private ensureOrganizationVariants(
+        organizationId: string,
+        templateId: string,
+    ): TemplateVariantRegistry {
+        this.ensureTemplateVariants(templateId); // Also checks that the template exists.
+        const registry = this.organizationVariantRegistry(organizationId);
+        const existing = new Set(registry.list(templateId).map(item => item.id));
+        for (const preset of this.templateVariants.list(templateId)) {
+            if (BUILTIN_VARIANT_IDS.has(preset.id) && !existing.has(preset.id)) {
+                registry.register(preset);
+            }
+        }
+        return registry;
+    }
+
+    /** Register a design visible only inside the named organization. */
+    public registerOrganizationTemplateVariant(
+        organizationId: string,
+        definition: TemplateVariantDefinition,
+    ): this {
+        assertOrganizationId(organizationId);
+        const registry = this.ensureOrganizationVariants(organizationId, definition.templateId);
+        if (definition.themeProfile !== undefined &&
+            this.themeProfiles.get(definition.themeProfile) === undefined) {
+            throw new TemplateVariantError(`Unknown theme profile: ${definition.themeProfile}`);
+        }
+        const inherited = definition.extends === undefined
+            ? undefined
+            : registry.resolve(definition.templateId, definition.extends);
+        this.resolveTheme(mergeThemeOverrides(inherited?.theme, definition.theme));
+        this.resolveLayout(mergeLayoutOverrides(inherited?.layout, definition.layout));
+        registry.register(definition);
+        return this;
+    }
+
+    public resolveOrganizationTemplateVariant(
+        organizationId: string,
+        templateId: string,
+        variantId: string,
+    ): ResolvedTemplateVariant {
+        return this.ensureOrganizationVariants(organizationId, templateId)
+            .resolve(templateId, variantId);
+    }
+
+    public listOrganizationTemplateVariants(
+        organizationId: string,
+        templateId: string,
+    ): TemplateVariantDefinition[] {
+        return this.ensureOrganizationVariants(organizationId, templateId)
+            .list(templateId);
+    }
+
+    /** Serializable data to save in the caller's DB/file; built-in presets are omitted. */
+    public exportOrganizationTemplateVariants(organizationId: string): string {
+        assertOrganizationId(organizationId);
+        const variants = (this.organizationVariants.get(organizationId)?.list() ?? [])
+            .filter(item => !BUILTIN_VARIANT_IDS.has(item.id));
+        return JSON.stringify({ schemaVersion: 1, organizationId, variants }, null, 2);
+    }
+
+    /** Atomic import. Rejects exports intended for a different organization. */
+    public importOrganizationTemplateVariants(
+        organizationId: string,
+        json: string,
+    ): this {
+        assertOrganizationId(organizationId);
+        if (typeof json !== "string" || json.length > 2_000_000) {
+            throw new TemplateVariantError("Invalid organization variant JSON size");
+        }
+        let parsed: unknown;
+        try {
+            parsed = JSON.parse(json) as unknown;
+        } catch {
+            throw new TemplateVariantError("Invalid organization variant JSON");
+        }
+        if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+            throw new TemplateVariantError("Invalid organization variant export");
+        }
+        const record = parsed as Record<string, unknown>;
+        if (record.schemaVersion !== 1 || record.organizationId !== organizationId ||
+            !Array.isArray(record.variants)) {
+            throw new TemplateVariantError("Organization or schema mismatch in variant export");
+        }
+        const rows = record.variants as unknown[];
+        const candidate = new TemplateVariantRegistry();
+        const existing = this.organizationVariants.get(organizationId);
+        if (existing !== undefined) candidate.importJSON(existing.exportJSON());
+
+        // Seed built-in parents in a detached registry; do not mutate tenant state.
+        for (const raw of rows) {
+            if (raw === null || typeof raw !== "object" || Array.isArray(raw) ||
+                typeof (raw as Record<string, unknown>).templateId !== "string") {
+                throw new TemplateVariantError("Invalid organization variant entry");
+            }
+            const templateId = (raw as { templateId: string }).templateId;
+            this.ensureTemplateVariants(templateId);
+            const already = new Set(candidate.list(templateId).map(item => item.id));
+            for (const preset of this.templateVariants.list(templateId)) {
+                if (BUILTIN_VARIANT_IDS.has(preset.id) && !already.has(preset.id)) {
+                    candidate.register(preset);
+                }
+            }
+        }
+        candidate.importJSON(JSON.stringify({ schemaVersion: 1, variants: rows }));
+        // Validate inherited tokens/profile names before committing anything.
+        for (const raw of rows) {
+            const entry = raw as TemplateVariantDefinition;
+            const resolved = candidate.resolve(entry.templateId, entry.id);
+            if (resolved.themeProfile !== undefined &&
+                this.themeProfiles.get(resolved.themeProfile) === undefined) {
+                throw new TemplateVariantError(`Unknown theme profile: ${resolved.themeProfile}`);
+            }
+            this.resolveTheme(resolved.theme);
+            this.resolveLayout(resolved.layout);
+        }
+        if (existing === undefined && this.organizationVariants.size >= MAX_ORGANIZATIONS_PER_ENGINE) {
+            throw new TemplateVariantError("Organization registry limit exceeded");
+        }
+        this.organizationVariants.set(organizationId, candidate);
         return this;
     }
 
@@ -965,9 +1120,16 @@ export class MailForgeEmail {
         prepared: boolean,
     ): Promise<RenderResult> {
         // Variants apply in the shared pipeline, including all render entry points.
+        if (options.organizationId !== undefined) {
+            assertOrganizationId(options.organizationId);
+        }
         const variant = options.variant === undefined
             ? undefined
-            : this.resolveTemplateVariant(document.id, options.variant);
+            : options.organizationId === undefined
+                ? this.resolveTemplateVariant(document.id, options.variant)
+                : this.resolveOrganizationTemplateVariant(
+                    options.organizationId, document.id, options.variant,
+                );
         const layout = this.resolveLayout(
             variant === undefined
                 ? options.layout ?? {}
