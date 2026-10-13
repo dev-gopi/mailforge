@@ -118,6 +118,12 @@ import {
 } from "./layout/LayoutResolver.js";
 
 import {
+    getLayoutPreset,
+    listLayoutPresets,
+    type LayoutPresetName,
+} from "./layout/LayoutPresets.js";
+
+import {
     prepareTemplateForValidation,
     interpolateEmailDocument,
     interpolateDocumentPatches,
@@ -153,6 +159,8 @@ export interface TemplateRenderOptions
     data?: TemplateData;
     patches?: readonly DocumentPatch[];
     layout?: EmailLayoutOptions;
+    /** Optional visual layout. Omit to preserve existing rendering. */
+    layoutPreset?: LayoutPresetName;
     theme?: ThemeOverrides;
 
     /** Select a published version only when explicitly requested. */
@@ -347,6 +355,11 @@ export class MailForgeEmail {
             this.config.theme,
             overrides,
         );
+    }
+
+    /** Names of optional email-safe page layout styles. */
+    public listLayoutPresets(): LayoutPresetName[] {
+        return listLayoutPresets();
     }
 
     public resolveLayout(
@@ -1187,10 +1200,16 @@ export class MailForgeEmail {
                 : this.resolveOrganizationTemplateVariant(
                     options.organizationId, document.id, options.variant,
                 );
+        // Layout presets are opt-in. Explicit caller overrides always win.
+        const layoutPreset = options.layoutPreset === undefined
+            ? undefined
+            : getLayoutPreset(options.layoutPreset);
         const layout = this.resolveLayout(
-            variant === undefined
-                ? options.layout ?? {}
-                : mergeLayoutOverrides(variant.layout, options.layout),
+            mergeLayoutOverrides(
+                layoutPreset?.layout,
+                variant?.layout,
+                options.layout,
+            ),
         );
 
         const profileId = options.themeProfile ?? variant?.themeProfile;
@@ -1209,7 +1228,7 @@ export class MailForgeEmail {
         }
 
         const theme = this.resolveTheme(
-            mergeThemeOverrides(profile, variant?.theme, options.theme),
+            mergeThemeOverrides(layoutPreset?.theme, profile, variant?.theme, options.theme),
         );
 
         const data = options.data === undefined

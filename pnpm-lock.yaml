@@ -68,6 +68,9 @@ importers:
       '@mailforge/templates':
         specifier: workspace:*
         version: link:../template
+      '@mailforge/themes':
+        specifier: workspace:*
+        version: link:../themes
     devDependencies:
       '@types/node':
         specifier: ^26.6.5
@@ -149,6 +152,8 @@ importers:
       zod:
         specifier: ^4.6.6
         version: 4.6.6
+
+  packages/themes: {}
 
 packages:
 

@@ -65,6 +65,17 @@ export {
     applyDefaultLayout,
 } from "./layout/DefaultLayout.js";
 
+// Optional, email-safe visual layout presets (Tasks 8.0.5–8.0.6).
+export {
+    getLayoutPreset,
+    listLayoutPresets,
+    EmailLayoutPresetError,
+} from "./layout/LayoutPresets.js";
+export type {
+    LayoutPresetName,
+    LayoutPresetDefinition,
+} from "./layout/LayoutPresets.js";
+
 export {
     applyEmailTheme,
 } from "./layout/ThemeApplicator.js";

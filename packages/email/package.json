@@ -26,6 +26,7 @@
         "@mailforge/renderer-html": "workspace:*",
         "@mailforge/renderer-mjml": "workspace:*",
         "@mailforge/templates": "workspace:*",
+        "@mailforge/themes": "workspace:*",
         "@mailforge/plugin-sdk": "workspace:*"
     },
     "devDependencies": {

@@ -7,7 +7,10 @@
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { createEmail } from "../packages/email/dist/index.js";
+import {
+  createEmail,
+  listThemePresets,
+} from "../packages/email/dist/index.js";
 
 const outputDir = path.resolve("generated/template-audit");
 const assetsDir = path.join(outputDir, "previews");
@@ -65,7 +68,7 @@ const categorySamples = {
   saas: { saas: { workspaceName: "Northstar Team", planName: "Pro", usagePercent: 82 } },
   support: { support: { ticketId: "TICKET-2026-103", status: "open", agentName: "Support Team" } },
 };
-const themes = ["modern", "corporate", "minimal"];
+const themes = listThemePresets();
 const h = (value) => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
   .replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
