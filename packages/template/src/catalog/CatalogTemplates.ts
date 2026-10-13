@@ -125,9 +125,19 @@ export const billingCatalogTemplateDataSchema = catalogTemplateDataSchema.extend
         amount: z.string().regex(/^(0|[1-9]\d{0,10})(\.\d{1,2})?$/, "Invalid decimal amount").optional(),
         currency: z.string().regex(/^[A-Z]{3}$/, "Currency must use a 3-letter uppercase code").optional(),
         billingDate: z.iso.date().optional(),
+        // Prices and line totals are supplied by the caller, never calculated.
+        lineItems: z.array(z.object({
+            description: textValue,
+            quantity: z.number().int().min(1).max(99999),
+            unitPrice: z.string().regex(/^(0|[1-9]\d{0,10})(\.\d{1,2})?$/),
+            lineTotal: z.string().regex(/^(0|[1-9]\d{0,10})(\.\d{1,2})?$/),
+        }).strict()).min(1).max(20).optional(),
     }).strict().refine(
         value => (value.amount === undefined) === (value.currency === undefined),
         "Specify amount and currency together",
+    ).refine(
+        value => value.lineItems === undefined || value.amount !== undefined,
+        "Invoice lines require an explicitly supplied total and currency",
     ).optional(),
 }).strict();
 export type BillingCatalogTemplateData = z.input<typeof billingCatalogTemplateDataSchema>;
@@ -152,6 +162,17 @@ export const marketingCatalogTemplateDataSchema = catalogTemplateDataSchema.exte
         promotionCode: z.string().trim().min(1).max(48)
             .regex(/^[A-Za-z0-9_-]+$/, "Invalid promotion code").optional(),
         endsOn: z.iso.date().optional(),
+        // A price label is display-only; MailForge never invents prices.
+        products: z.array(z.object({
+            name: textValue,
+            priceLabel: textValue,
+            description: textValue.optional(),
+            imageUrl: httpLink.optional(),
+            imageAlt: textValue.optional(),
+        }).strict().refine(
+            value => value.imageUrl === undefined || value.imageAlt !== undefined,
+            "Product images require alternative text",
+        )).min(1).max(4).optional(),
     }).strict().optional(),
 }).strict();
 export type MarketingCatalogTemplateData = z.input<typeof marketingCatalogTemplateDataSchema>;
@@ -176,10 +197,15 @@ export const eventCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
         endsAt: z.iso.datetime({ offset: true }).optional(),
         venue: textValue.optional(),
         meetingUrl: httpLink.optional(),
+        ticketCode: z.string().trim().min(1).max(80).regex(/^[A-Za-z0-9._-]+$/).optional(),
+        admission: textValue.optional(),
     }).strict().refine(value =>
         value.startsAt === undefined || value.endsAt === undefined ||
         Date.parse(value.endsAt) >= Date.parse(value.startsAt),
-    { message: "Event end must not be before start", path: ["endsAt"] }).optional(),
+    { message: "Event end must not be before start", path: ["endsAt"] }).refine(value =>
+        (value.ticketCode === undefined && value.admission === undefined) ||
+        (value.ticketCode !== undefined && value.name !== undefined),
+    { message: "A ticket requires the supplied event name and ticket code", path: ["ticketCode"] }).optional(),
 }).strict();
 export type EventCatalogTemplateData = z.input<typeof eventCatalogTemplateDataSchema>;
 
@@ -190,6 +216,8 @@ export const saasCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
         memberName: textValue.optional(),
         planName: textValue.optional(),
         usagePercent: z.number().finite().min(0).max(100).optional(),
+        metrics: z.array(z.object({ label: textValue, value: textValue }).strict())
+            .min(1).max(12).optional(),
     }).strict().optional(),
 }).strict();
 export type SaasCatalogTemplateData = z.input<typeof saasCatalogTemplateDataSchema>;
@@ -371,6 +399,21 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
             details.push(mutedParagraph(`${id}-billing-date`, `Billing date: ${billingDetails.billingDate}`));
         }
         if (details.length > 0) body.push(panel(`${id}-billing-details`, details));
+        if (billingDetails.lineItems?.length) {
+            body.push({
+                id: `${id}-invoice-lines`, type: "table",
+                props: {
+                    headers: ["Item", "Qty", "Unit price", "Line total"],
+                    rows: billingDetails.lineItems.map(item => [
+                        item.description, String(item.quantity),
+                        `${billingDetails.currency} ${item.unitPrice}`,
+                        `${billingDetails.currency} ${item.lineTotal}`,
+                    ]),
+                    alignments: ["left", "right", "right", "right"],
+                    caption: "Invoice line items",
+                },
+            });
+        }
     }
     if (category === "ecommerce" && ecommerceDetails) {
         const details: EmailNode[] = [];
@@ -402,6 +445,21 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
             details.push(mutedParagraph(`${id}-campaign-ends`, `Offer ends: ${marketingDetails.endsOn}`));
         }
         if (details.length > 0) body.push(panel(`${id}-marketing-details`, details));
+        for (const [index, product] of (marketingDetails.products ?? []).entries()) {
+            const productId = `${id}-product-${index}`;
+            const productNodes: EmailNode[] = [
+                ...(product.imageUrl !== undefined ? [{
+                    id: `${productId}-image`, type: "image",
+                    props: { src: product.imageUrl, alt: product.imageAlt! },
+                } satisfies EmailNode] : []),
+                contentHeading(`${productId}-name`, product.name),
+                contentParagraph(`${productId}-price`, product.priceLabel),
+                ...(product.description !== undefined ? [
+                    mutedParagraph(`${productId}-description`, product.description),
+                ] : []),
+            ];
+            body.push(panel(productId, productNodes));
+        }
     }
     if (category === "notifications" && notificationDetails) {
         const details: EmailNode[] = [];
@@ -429,6 +487,23 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
         if (eventDetails.venue !== undefined) details.push(mutedParagraph(`${id}-event-venue`, `Venue: ${eventDetails.venue}`));
         if (eventDetails.meetingUrl !== undefined) details.push(quietAction(`${id}-event-meeting`, "Join event", eventDetails.meetingUrl));
         if (details.length > 0) body.push(panel(`${id}-event-details`, details));
+        if (eventDetails.ticketCode !== undefined) {
+            body.push({
+                id: `${id}-event-ticket`, type: "table",
+                props: {
+                    headers: ["Ticket field", "Details"],
+                    rows: [
+                        ["Event", eventDetails.name!],
+                        ["Attendee", recipient],
+                        ["Ticket", eventDetails.ticketCode],
+                        ...(eventDetails.admission !== undefined ? [
+                            ["Admission", eventDetails.admission],
+                        ] : []),
+                    ],
+                    caption: "Event ticket",
+                },
+            });
+        }
     }
     if (category === "saas" && saasDetails) {
         const details: EmailNode[] = [];
@@ -437,6 +512,16 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
         if (saasDetails.planName !== undefined) details.push(mutedParagraph(`${id}-saas-plan`, `Plan: ${saasDetails.planName}`));
         if (saasDetails.usagePercent !== undefined) details.push(mutedParagraph(`${id}-saas-usage`, `Usage: ${saasDetails.usagePercent}%`));
         if (details.length > 0) body.push(panel(`${id}-saas-details`, details));
+        if (saasDetails.metrics?.length) {
+            body.push({
+                id: `${id}-saas-metrics`, type: "table",
+                props: {
+                    headers: ["Metric", "Value"],
+                    rows: saasDetails.metrics.map(metric => [metric.label, metric.value]),
+                    caption: "Workspace metrics",
+                },
+            });
+        }
     }
     if (category === "support" && supportDetails) {
         const details: EmailNode[] = [];
