@@ -136,6 +136,29 @@ export const ecommerceCatalogTemplateDataSchema = catalogTemplateDataSchema.exte
 }).strict();
 export type EcommerceCatalogTemplateData = z.input<typeof ecommerceCatalogTemplateDataSchema>;
 
+/** Optional campaign details. The existing unsubscribe URL remains mandatory for marketing. */
+export const marketingCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
+    marketing: z.object({
+        campaignName: textValue.optional(),
+        promotionCode: z.string().trim().min(1).max(48)
+            .regex(/^[A-Za-z0-9_-]+$/, "Invalid promotion code").optional(),
+        endsOn: z.iso.date().optional(),
+    }).strict().optional(),
+}).strict();
+export type MarketingCatalogTemplateData = z.input<typeof marketingCatalogTemplateDataSchema>;
+
+/** Optional operational context for notification catalog templates. */
+export const notificationCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
+    notification: z.object({
+        serviceName: textValue.optional(),
+        referenceId: z.string().trim().min(1).max(80)
+            .regex(/^[A-Za-z0-9._-]+$/, "Invalid notification reference").optional(),
+        severity: z.enum(["info", "warning", "critical"]).optional(),
+        eventAt: z.iso.datetime({ offset: true }).optional(),
+    }).strict().optional(),
+}).strict();
+export type NotificationCatalogTemplateData = z.input<typeof notificationCatalogTemplateDataSchema>;
+
 const definitions = new Map<string, typeof CATALOG_TEMPLATE_DEFINITIONS[number]>(
     CATALOG_TEMPLATE_DEFINITIONS.map(row => [row[0], row] as const),
 );
@@ -161,6 +184,8 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
     let securityDetails: z.output<typeof authenticationCatalogTemplateDataSchema>["security"] = undefined;
     let billingDetails: z.output<typeof billingCatalogTemplateDataSchema>["billing"] = undefined;
     let ecommerceDetails: z.output<typeof ecommerceCatalogTemplateDataSchema>["ecommerce"] = undefined;
+    let marketingDetails: z.output<typeof marketingCatalogTemplateDataSchema>["marketing"] = undefined;
+    let notificationDetails: z.output<typeof notificationCatalogTemplateDataSchema>["notification"] = undefined;
 
     if (input !== undefined) {
         if (category === "account") {
@@ -179,6 +204,14 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
             const parsed = ecommerceCatalogTemplateDataSchema.parse(input);
             data = parsed;
             ecommerceDetails = parsed.ecommerce;
+        } else if (category === "marketing") {
+            const parsed = marketingCatalogTemplateDataSchema.parse(input);
+            data = parsed;
+            marketingDetails = parsed.marketing;
+        } else if (category === "notifications") {
+            const parsed = notificationCatalogTemplateDataSchema.parse(input);
+            data = parsed;
+            notificationDetails = parsed.notification;
         } else {
             data = catalogTemplateDataSchema.parse(input);
         }
@@ -280,6 +313,38 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
             details.push(mutedParagraph(`${id}-order-delivery`, `Estimated delivery: ${ecommerceDetails.estimatedDelivery}`));
         }
         if (details.length > 0) body.push(panel(`${id}-ecommerce-details`, details));
+    }
+    // Optional marketing and notification panels use semantic MailForge styles.
+    // No colors or layout constants are hardcoded in the templates.
+    if (category === "marketing" && marketingDetails) {
+        const details: EmailNode[] = [];
+        if (marketingDetails.campaignName !== undefined) {
+            details.push(mutedParagraph(`${id}-campaign-name`, `Campaign: ${marketingDetails.campaignName}`));
+        }
+        if (marketingDetails.promotionCode !== undefined) {
+            details.push(mutedParagraph(`${id}-promotion-code`, `Promotion code: ${marketingDetails.promotionCode}`));
+        }
+        if (marketingDetails.endsOn !== undefined) {
+            details.push(mutedParagraph(`${id}-campaign-ends`, `Offer ends: ${marketingDetails.endsOn}`));
+        }
+        if (details.length > 0) body.push(panel(`${id}-marketing-details`, details));
+    }
+    if (category === "notifications" && notificationDetails) {
+        const details: EmailNode[] = [];
+        if (notificationDetails.serviceName !== undefined) {
+            details.push(mutedParagraph(`${id}-notification-service`, `Service: ${notificationDetails.serviceName}`));
+        }
+        if (notificationDetails.referenceId !== undefined) {
+            details.push(mutedParagraph(`${id}-notification-reference`, `Reference: ${notificationDetails.referenceId}`));
+        }
+        if (notificationDetails.severity !== undefined) {
+            details.push(mutedParagraph(`${id}-notification-severity`, `Severity: ${notificationDetails.severity}`));
+        }
+        if (notificationDetails.eventAt !== undefined) {
+            const timestamp = new Date(notificationDetails.eventAt).toUTCString();
+            details.push(mutedParagraph(`${id}-notification-time`, `Event time (UTC): ${timestamp}`));
+        }
+        if (details.length > 0) body.push(panel(`${id}-notification-details`, details));
     }
     if (category === "billing" || category === "ecommerce" || category === "events" || category === "support") {
         body.push(divider(`${id}-divider`));

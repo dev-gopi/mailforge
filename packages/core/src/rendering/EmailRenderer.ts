@@ -11,6 +11,8 @@ export interface RenderOptions {
     bodyBackgroundColor?: string;
     /** Validated theme-driven email shell; defaults for direct renderer callers. */
     surfaceColor?: string;
+    /** Validated theme-driven content section background. */
+    sectionColor?: string;
     borderColor?: string;
     containerWidth?: number;
     containerRadius?: number;

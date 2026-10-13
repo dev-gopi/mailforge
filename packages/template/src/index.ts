@@ -186,3 +186,13 @@ export type {
     BillingCatalogTemplateData,
     EcommerceCatalogTemplateData,
 } from "./catalog/CatalogTemplates.js";
+
+// Task 7.8.5.6–7.8.5.7: marketing and notification catalog contracts.
+export {
+    marketingCatalogTemplateDataSchema,
+    notificationCatalogTemplateDataSchema,
+} from "./catalog/CatalogTemplates.js";
+export type {
+    MarketingCatalogTemplateData,
+    NotificationCatalogTemplateData,
+} from "./catalog/CatalogTemplates.js";

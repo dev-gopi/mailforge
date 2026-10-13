@@ -16,6 +16,7 @@ type Trust = "safe" | "trusted";
 interface State {
     sequence: number;
     selectors: string[];
+    sectionColor: string;
 }
 
 const CUSTOM_ATTRIBUTE = /^(data-[a-z0-9_-]+|aria-[a-z0-9_-]+|id|class|title)$/i;
@@ -107,7 +108,18 @@ export class MjmlRenderer implements EmailRenderer {
             throw new Error("Email document is too large");
         }
 
-        const state: State = { sequence: 0, selectors: [] };
+        const surface = options.surfaceColor ?? "#ffffff";
+        const section = options.sectionColor ?? surface;
+        const border = options.borderColor ?? "#e5e7eb";
+        if (![surface, section, border].every(color => /^#[0-9a-fA-F]{6}$/.test(color))) {
+            throw new Error("Invalid email surface or border color");
+        }
+
+        const state: State = {
+            sequence: 0,
+            selectors: [],
+            sectionColor: options.sectionColor ?? surface,
+        };
         const nodes: EmailNode[] = [
             ...(document.header ? [document.header] : []),
             ...document.body,
@@ -137,13 +149,8 @@ export class MjmlRenderer implements EmailRenderer {
             ? ` background-color="${background}"`
             : "";
 
-        const surface = options.surfaceColor ?? "#ffffff";
-        const border = options.borderColor ?? "#e5e7eb";
         const width = options.containerWidth ?? 600;
         const radius = options.containerRadius ?? 12;
-        if (![surface, border].every(color => /^#[0-9a-fA-F]{6}$/.test(color))) {
-            throw new Error("Invalid email surface or border color");
-        }
         if (!Number.isInteger(width) || width < 480 || width > 720 ||
             !Number.isInteger(radius) || radius < 0 || radius > 24) {
             throw new Error("Invalid email container dimensions");
@@ -259,7 +266,7 @@ export class MjmlRenderer implements EmailRenderer {
                 : `<mj-column>${children.map(child => this.leaf(child, state, trust)).join("\n")}</mj-column>`;
             return `<mj-section ${sectionAttributes}>${columns}</mj-section>`;
         }
-        return `<mj-section padding="0"><mj-column>${this.leaf(node, state, trust)}</mj-column></mj-section>`;
+        return `<mj-section background-color="${state.sectionColor}" padding="0"><mj-column>${this.leaf(node, state, trust)}</mj-column></mj-section>`;
     }
 
     private column(node: EmailNode, state: State, trust: Trust): string {

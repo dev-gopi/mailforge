@@ -1221,6 +1221,7 @@ export class MailForgeEmail {
                 trust: options.trust ?? "safe",
                 bodyBackgroundColor: theme.colors.background,
                 surfaceColor: theme.colors.surface,
+                sectionColor: theme.colors.section,
                 borderColor: theme.colors.border,
                 containerWidth: theme.appearance.containerWidth,
                 containerRadius: theme.appearance.cardRadius,
