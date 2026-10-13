@@ -23,6 +23,8 @@ const CONFIG_KEYS = new Set([
     "header",
     "footer",
     "copyright",
+    "locale",
+    "fallbackLocale",
 ]);
 
 const BRAND_KEYS = new Set([

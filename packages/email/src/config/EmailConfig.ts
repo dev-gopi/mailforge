@@ -24,6 +24,10 @@ export interface EmailConfigOptions
   extends EmailLayoutOptions {
   brand?: EmailBrandOptions;
   theme?: EmailThemeOptions;
+  /** Default email locale. Leave unset for English. */
+  locale?: string;
+  /** Locale used for missing translation entries. */
+  fallbackLocale?: string;
 }
 
 /**

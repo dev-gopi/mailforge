@@ -69,6 +69,13 @@ import {
 } from "@mailforge/templates";
 
 import {
+    EmailLocalizationRegistry,
+    normalizeEmailLocale,
+    localizeEmailDocument,
+    type EmailTranslation,
+} from "./localization/EmailLocalization.js";
+
+import {
     TemplatePresetRegistry,
     ThemeProfileRegistry,
 } from "./presets/PresetRegistry.js";
@@ -160,6 +167,12 @@ export interface TemplateRenderOptions
     extends RenderOptions {
     data?: TemplateData;
     patches?: readonly DocumentPatch[];
+    /** BCP-47 language tag; omitted means the engine's default locale. */
+    locale?: string;
+    /** Translation fallback when a regional language does not contain a phrase. */
+    fallbackLocale?: string;
+    /** Override automatic RTL detection for the selected locale. */
+    direction?: "ltr" | "rtl";
     layout?: EmailLayoutOptions;
     /** Optional visual layout. Omit to preserve existing rendering. */
     layoutPreset?: LayoutPresetName;
@@ -206,6 +219,9 @@ const BUILTIN_VARIANT_IDS = new Set(["default", "compact", "premium", "branded"]
 const MAX_ORGANIZATIONS_PER_ENGINE = 250;
 
 export class MailForgeEmail {
+    private readonly localizations = new EmailLocalizationRegistry();
+    private readonly defaultLocale: string;
+    private readonly fallbackLocale: string;
     private readonly themes = new ThemeRegistry();
     private readonly themeVersions = new ThemeVersionRegistry();
     private readonly organizationThemes = new Map<string, ThemeRegistry>();
@@ -268,6 +284,8 @@ export class MailForgeEmail {
 
     constructor(options: EmailConfigOptions = {}) {
         this.config = resolveEmailConfig(options);
+        this.defaultLocale = normalizeEmailLocale(options.locale ?? "en");
+        this.fallbackLocale = normalizeEmailLocale(options.fallbackLocale ?? "en");
 
         // Register six standard reusable components
         // in this engine's existing component catalog.
@@ -329,6 +347,21 @@ export class MailForgeEmail {
 
     public listPlugins(): ReadonlyArray<{ name: string; version: string }> {
         return this.plugins.list();
+    }
+
+    // ---------------------------------------
+    // LOCALIZED EMAIL CONTENT (TASK 8.1)
+    // ---------------------------------------
+    /** Application-owned, per-engine translations keyed by stable node ID. */
+    public registerTranslations(locale: string, templateId: string, translation: EmailTranslation): this {
+        this.localizations.register(locale, templateId, translation);
+        return this;
+    }
+    public listTranslations(locale?: string): Array<{locale: string; templateId: string}> {
+        return this.localizations.list(locale);
+    }
+    public resolveTranslations(locale: string, templateId: string, fallbackLocale?: string): EmailTranslation {
+        return this.localizations.resolve(locale, templateId, fallbackLocale ?? this.fallbackLocale);
     }
 
     // ---------------------------------------
@@ -1271,12 +1304,25 @@ export class MailForgeEmail {
             layout,
         );
 
+        // Translate before interpolation, so localized {{variables}} use the
+        // existing safe variable resolver rather than a new interpolation path.
+        const targetLocale = normalizeEmailLocale(options.locale ?? document.locale ?? this.defaultLocale);
+        const localized = localizeEmailDocument(
+            withDefaults,
+            targetLocale,
+            this.localizations.resolve(targetLocale, document.id, options.fallbackLocale ?? this.fallbackLocale),
+            {
+                ...(options.direction !== undefined ? {direction: options.direction} : {}),
+                allowVariables: !prepared,
+            },
+        );
+
         // 2. Only ordinary templates require another
         // interpolation pass. Domain data is complete.
         const interpolated = prepared
-            ? withDefaults
+            ? localized
             : interpolateEmailDocument(
-                withDefaults,
+                localized,
                 data,
             );
 

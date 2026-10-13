@@ -321,3 +321,14 @@ export type { MailForgePlugin, MailForgePluginHost } from "@mailforge/plugin-sdk
 // Standalone registered theme definitions and immutable theme versions.
 export { ThemeRegistry, ThemeVersionRegistry } from "@mailforge/themes";
 export type { ThemeDefinition, ThemeImportOptions, ThemeVersionInfo } from "@mailforge/themes";
+
+// Stage 8.1: localization, translations and Intl formatters.
+export {
+    EmailLocalizationError, EmailLocalizationRegistry,
+    normalizeEmailLocale, resolveEmailDirection,
+    localizeEmailDocument, formatEmailDate,
+    formatEmailCurrency, formatEmailNumber,
+} from "./localization/EmailLocalization.js";
+export type {
+    EmailTranslation, EmailLocalizationOptions,
+} from "./localization/EmailLocalization.js";
