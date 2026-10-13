@@ -1,91 +1,128 @@
 # MailForge
 
-MailForge is a TypeScript monorepo for defining, validating, customizing, and rendering transactional email documents. It provides a structured email document model, built-in component validation, and HTML and MJML renderers.
+MailForge is a TypeScript monorepo for building transactional email. It turns typed, validated email documents and templates into email-safe HTML, MJML, and plain text. The primary application API is `@mailforge/email`.
 
-## Packages
+## Current capabilities
+
+- Typed template data, document validation, reusable components, and safe document customization.
+- A built-in transactional template catalog covering account, authentication, billing, ecommerce, marketing, notifications, events, SaaS, and support use cases, plus specialized and expanded templates.
+- Dynamic variables, localization (including RTL support), template versions, named presets, and organization-scoped template variants.
+- Theme tokens, theme profiles, versioned theme registries, layout presets, and contrast diagnostics.
+- Built-in standard, composite, extended, professional, and business components.
+- HTML and MJML rendering with sanitization, CSS inlining, plain-text fallbacks, and render/output budgets.
+- Trusted, application-owned plugins with setup, `beforeRender`, and `afterRender` lifecycle hooks.
+- A local CLI for inspecting, validating, auditing, and rendering templates.
+- Optional provider adapters for delivering rendered messages through Nodemailer/SMTP, Resend, SendGrid, or AWS SES v2.
+
+## Workspace packages
 
 | Package | Purpose |
 | --- | --- |
-| `@mailforge/core` | Document types, validation, component registry, document customization, and renderer contracts. |
-| `@mailforge/renderer-html` | Safe or trusted HTML email rendering, CSS inlining, and plain-text generation. |
-| `@mailforge/renderer-mjml` | MJML rendering with HTML sanitization and plain-text output. |
+| `@mailforge/core` | Email document contracts, validation, customization, and renderer interfaces. |
+| `@mailforge/components` | Reusable standard, composite, professional, and business email components. |
+| `@mailforge/templates` | Typed built-in, domain, specialized, and catalog email templates. |
+| `@mailforge/themes` | Theme presets, registries, versioning, and accessibility diagnostics. |
+| `@mailforge/email` | High-level engine that composes templates, components, themes, layouts, variables, plugins, and rendering. |
+| `@mailforge/renderer-html` | Sanitized HTML rendering, CSS inlining, and plain-text generation. |
+| `@mailforge/renderer-mjml` | MJML compilation with sanitization and plain-text output. |
+| `@mailforge/plugin-sdk` | Contracts and lifecycle support for trusted application plugins. |
+| `@mailforge/transport` | Optional adapters for delivering rendered email through application-owned providers. |
+| `@mailforge/cli` | Local template inspection, validation, audit, and rendering commands. |
 
-## Requirements
+## Requirements and setup
 
 - Node.js 20.19 or later
 - pnpm 10 or later
 
-## Setup
-
 ```bash
 pnpm install
+pnpm build
 pnpm typecheck
 pnpm test
 ```
 
-Build all workspace packages with:
+Run the linter with `pnpm lint`.
 
-```bash
-pnpm build
-```
+## How MailForge renders an email
 
-## Core document example
+`@mailforge/email` is the facade most applications use. A render request moves
+through a predictable pipeline:
 
-```ts
-import {
-    DocumentValidator,
-    type EmailDocument,
-} from "@mailforge/core";
+1. Resolve a packaged, catalog, or application-registered template.
+2. Validate template data and interpolate dynamic variables.
+3. Apply patches, presets, localization, display settings, variants, theme, and
+   layout options.
+4. Expand reusable components and validate the resulting document.
+5. Run trusted plugin hooks, enforce render budgets, compile MJML, then return
+   HTML and a plain-text fallback.
 
-const document: EmailDocument = {
-    schemaVersion: "1.0",
-    id: "welcome-email",
-    version: "1.0.0",
-    subject: "Welcome to MailForge",
-    body: [
-        {
-            id: "welcome-title",
-            type: "heading",
-            props: {
-                text: "Welcome!",
-            },
-        },
-    ],
-};
+The returned result is `{ subject, html, text }`. Rendering is separate from
+delivery, so an application can preview, store, queue, or send the result using
+its own provider and policies.
 
-new DocumentValidator().validateOrThrow(document);
-```
-
-## HTML rendering example
+## Render a built-in template
 
 ```ts
-import { HtmlRenderer } from "@mailforge/renderer-html";
+import { createEmail } from "@mailforge/email";
 
-const result = await new HtmlRenderer().render({
-    subject: "Welcome",
-    html: "<h1>Welcome to MailForge</h1>",
+const email = createEmail();
+const message = await email.render("welcome", {
+    data: {
+        user: { firstName: "Sam" },
+        actionUrl: "https://example.com/dashboard",
+    },
+    layoutPreset: "transactional",
 });
 
-console.log(result.html);
-console.log(result.text);
+console.log(message.subject);
+console.log(message.html);
+console.log(message.text);
 ```
 
-`HtmlRenderer` sanitizes untrusted HTML. Supplying custom CSS requires `{ trust: "trusted" }`; use trusted rendering only for content you control.
+Use `listBuiltinTemplates()` or `listTemplateCatalog()` to discover available templates and their data contracts. Template data is validated before rendering.
 
-## Extending templates and components
+## Templates, components, and visual configuration
 
-`createEmail()` provides isolated registries per engine. Built-in templates and
-components are never mutated: registration, overrides, and extensions are cloned
-before storage.
+The template library includes concise built-in templates and a larger catalog.
+Catalog entries provide an ID, category, title, and typed data contract. Query
+them from the engine when building a template picker or admin UI:
 
 ```ts
-import { z } from "zod";
+import { createEmail } from "@mailforge/email";
+
+const email = createEmail();
+const marketingTemplates = email.listTemplateCatalog("marketing");
+const themes = email.listThemes();
+const layouts = email.listLayoutPresets();
+```
+
+Render options can tailor a message without changing its source template:
+
+| Option | Use |
+| --- | --- |
+| `data` | Template values and dynamic variables. |
+| `locale`, `fallbackLocale`, `direction` | Translate content and control left-to-right or right-to-left output. |
+| `theme`, `themeName`, `themeProfile` | Apply token overrides, a registered theme, or a reusable profile. |
+| `layout`, `layoutPreset` | Configure mail chrome or select an email-safe layout preset. |
+| `display` | Adjust the subject, preheader, heading, buttons, or visible sections for one render. |
+| `variant`, `organizationId` | Select a shared or tenant-scoped template variant. Tenant IDs must come from trusted authorization context. |
+| `templateVersion`, `themeVersion` | Select explicitly published immutable versions. |
+| `patches` | Make non-persistent document changes for a single render. |
+
+Register components for reusable application-specific sections. Standard,
+composite, extended, professional, and business components are available from
+`@mailforge/components`; application registrations stay local to each email
+engine.
+
+## Customize safely
+
+Each `createEmail()` call has isolated registries. Built-in templates and components are cloned before extension, so application customizations do not mutate the packaged defaults.
+
+```ts
 import { createEmail } from "@mailforge/email";
 
 const email = createEmail();
 
-// Persistently derive a packaged template. The callback may add, remove,
-// replace, or reorder document nodes.
 email.extendTemplate("welcome", draft => {
     draft.body.unshift({
         id: "announcement",
@@ -94,33 +131,58 @@ email.extendTemplate("welcome", draft => {
     });
 });
 
-// Reuse the default template name with the derived version.
-await email.render("welcome", { data: {
-    user: { firstName: "Sam" },
-    actionUrl: "https://example.com/dashboard",
-} });
-
-// Register a new component, then use it in any registered template.
-email.registerComponent({
-    name: "notice",
-    version: "1.0.0",
-    allowChildren: false,
-    schema: z.object({ message: z.string().min(1) }),
-    render: (props, context) => ({
-        id: context.nodeId,
-        type: "text",
-        props: { text: String(props.message) },
-    }),
+const message = await email.render("welcome", {
+    data: {
+        user: { firstName: "Sam" },
+        actionUrl: "https://example.com/dashboard",
+    },
+    variant: "branded",
 });
 ```
 
-Use `overrideTemplate()` to replace a registered or packaged template,
-`unregisterTemplate()` to remove a custom override, and `overrideComponent()` or
-`unregisterComponent()` for registered reusable components. One-off changes can
-also use `render(..., { patches })`, while `renderCustomizedBuiltin()` and
-template presets keep customizations non-persistent.
+For one-off changes, pass `patches` to `render()`. Use template presets, theme profiles, layout options, display options, and variants for reusable changes.
 
-## Development commands
+## Plugins and delivery
+
+Plugins are trusted application code. A plugin can register templates and
+components during setup, transform a cloned structured document in
+`beforeRender`, and observe a cloned render result in `afterRender`. There is no
+plugin sandbox, remote loading, or permission model; never load plugins from
+template data, user input, or an untrusted database record.
+
+`@mailforge/transport` is optional and only accepts a rendered message. It
+provides adapters for Nodemailer/SMTP, Resend, SendGrid, and AWS SES v2, while
+credentials, sender authorization, queues, retries, webhooks, unsubscribe
+handling, and delivery monitoring remain application responsibilities.
+
+## CLI
+
+After building the workspace, run the CLI from the repository root:
+
+```bash
+node packages/cli/dist/cli.js help
+node packages/cli/dist/cli.js list
+node packages/cli/dist/cli.js inspect welcome
+node packages/cli/dist/cli.js audit
+node packages/cli/dist/cli.js init --dir ./mailforge-example
+node packages/cli/dist/cli.js render welcome --data ./mailforge-example/welcome.data.json --out ./generated/welcome
+```
+
+Useful CLI commands include `themes`, `layouts`, `variants <template-id>`,
+`versions <template-id>`, and `validate <template-id> --data <file>`. Use
+`--json` with discovery and audit commands for machine-readable output. Render
+commands also support `--theme`, `--layout`, `--variant`, `--locale`,
+`--template-version`, `--config`, `--themes-file`, and `--variants-file`.
+
+The CLI reads local JSON up to 1 MiB, always uses safe rendering, and writes
+HTML and text files. It will not overwrite output unless `--force` is supplied;
+it never sends email or loads remote code.
+
+## Security model
+
+MailForge sanitizes untrusted HTML and produces a plain-text fallback. Trusted rendering and plugins are for application-controlled code only. Keep provider credentials out of template data, and use `@mailforge/transport` only from an application that owns its delivery credentials, authorization, consent, retry, and monitoring policies.
+
+## Development
 
 | Command | Description |
 | --- | --- |
