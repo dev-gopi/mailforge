@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { tablePropsSchema } from "./TableSchema.js";
 
 import type {
     ComponentDefinition,
@@ -160,6 +161,9 @@ export const BUILTIN_COMPONENTS: readonly ComponentDefinition[] = [
         version: "1.0.0",
         schema: emptySchema,
         allowChildren: false,
+    },
+    {
+        name: "table", version: "1.0.0", schema: tablePropsSchema, allowChildren: false,
     },
     {
         name: "raw-html",

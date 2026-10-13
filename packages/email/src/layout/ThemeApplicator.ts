@@ -116,6 +116,7 @@ function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
       borderRadius: `${appearance.buttonRadius}px`, innerPadding: `${appearance.buttonPaddingY}px ${appearance.buttonPaddingX}px`,
       textAlign: "center", padding: `${spacing.sm}px ${spacing.md}px`,
     };
+    case "table": return { color: colors.text, fontFamily: typography.fontFamily, fontSize: typography.baseSize, padding: `${spacing.sm}px ${appearance.contentPadding}px` };
     case "image": return { width: 140, padding: `${spacing.xs}px 0` };
     case "divider": return { color: colors.border, padding: `${spacing.sm}px` };
     case "spacer": return { height: `${spacing.md}px` };
@@ -130,6 +131,17 @@ function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
 export function applyEmailTheme(source: EmailDocument, theme: ResolvedEmailTheme): EmailDocument {
   const document = structuredClone(source);
   const walk = (node: EmailNode, inPanel = false): void => {
+    // Table-specific design tokens. Explicit cell colors always take precedence.
+    if (node.type === "table") {
+      node.props = {
+        headerBackground: theme.colors.background,
+        headerTextColor: theme.colors.text,
+        textColor: theme.colors.text,
+        stripeColor: theme.colors.surface,
+        borderColor: theme.colors.border,
+        ...node.props,
+      };
+    }
     const role = node.attrs?.["data-mf-style"];
     const semantic: Styles = typeof role === "string" ? roleStyles(role, theme) : {};
     const defaults = defaultStyles(node, theme);

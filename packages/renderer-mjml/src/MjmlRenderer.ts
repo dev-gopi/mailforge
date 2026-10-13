@@ -1,4 +1,5 @@
 import mjml2html from "mjml";
+import { renderTableMarkup } from "./TableRenderer.js";
 import { convert } from "html-to-text";
 import { Buffer } from "node:buffer";
 import {
@@ -374,6 +375,10 @@ export class MjmlRenderer implements EmailRenderer {
                     throw new Error(`Invalid spacer height on '${node.id}'`);
                 }
                 return `<mj-spacer ${attrs}${xmlAttribute("height", height)} />`;
+            }
+            case "table": {
+                const attrs = targetAttributes(node, "mj-table", state);
+                return `<mj-table ${attrs}>${renderTableMarkup(props)}</mj-table>`;
             }
             case "raw-html": {
                 // Raw HTML is not a real MJML component and has no reliable css-class target.

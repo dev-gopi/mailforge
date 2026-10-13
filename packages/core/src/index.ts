@@ -36,6 +36,9 @@ export {
     BUILTIN_COMPONENTS,
 } from "./components/BuiltinComponents.js";
 
+export { tablePropsSchema } from "./components/TableSchema.js";
+export type { TableProps } from "./components/TableSchema.js";
+
 export type {
     ComponentDefinition,
     ComponentInfo,

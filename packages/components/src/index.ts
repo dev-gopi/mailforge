@@ -127,3 +127,5 @@ export {
     PROFESSIONAL_COMPONENT_NAMES, getProfessionalComponentDefinitions,
     registerProfessionalComponents,
 } from "./professional/ProfessionalComponents.js";
+
+export { BUSINESS_COMPONENT_NAMES, getBusinessComponentDefinitions, registerBusinessComponents } from "./business/BusinessComponents.js";

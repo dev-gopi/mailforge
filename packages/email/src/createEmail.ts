@@ -29,6 +29,7 @@ import {
     ComponentExpander,
     registerStandardComponents,
     registerCompositeComponents,
+    registerBusinessComponents,
     type ReusableComponentDefinition,
 } from "@mailforge/components";
 
@@ -297,6 +298,9 @@ export class MailForgeEmail {
         registerCompositeComponents(
             this.componentCatalog,
         );
+
+        // Stage 8.5.13: validated business and table components.
+        registerBusinessComponents(this.componentCatalog);
     }
 
     // ---------------------------------------
