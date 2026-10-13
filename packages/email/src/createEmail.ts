@@ -1022,7 +1022,7 @@ export class MailForgeEmail {
         }
 
         // Keep the original core API intact while allowing discovery of
-        // all 49 packaged documents. An unmaterialized document is intended
+        // all packaged documents. An unmaterialized document is intended
         // for inspection; render() validates its corresponding data contract.
         const match = listBuiltinTemplateCatalog().find(item => item.id === templateId);
         if (match) return getBuiltinCatalogTemplate(match.id);

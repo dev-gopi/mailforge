@@ -16,7 +16,7 @@ describe("Professional email design system", () => {
   it("audits all registered catalog documents individually", () => {
     const validator = new DocumentValidator();
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(49);
+    expect(catalog).toHaveLength(100);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       expect(validator.validate(original).valid, id).toBe(true);
@@ -63,7 +63,7 @@ describe("Professional email design system", () => {
       theme: { preset: "corporate", colors: { primary: "#9333ea" },
         appearance: { containerWidth: 640, contentPadding: 40 } },
     });
-    expect(email.listBuiltinCatalog()).toHaveLength(49);
+    expect(email.listBuiltinCatalog()).toHaveLength(100);
     const result = await email.render("payment-failed", {
       data: { recipientName: "Gopi", actionUrl: "https://example.com/pay", detail: "Invoice 123" },
     });

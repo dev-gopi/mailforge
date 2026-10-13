@@ -211,3 +211,17 @@ export type {
 
 export { auditTemplateCatalog } from "./registry/TemplateCatalogAudit.js";
 export type { CatalogAudit, CatalogIssue } from "./registry/TemplateCatalogAudit.js";
+
+// Task 8.5.16–17: 51 additional typed catalog templates.
+export {
+    EXPANDED_CATALOG_TEMPLATE_NAMES,
+    EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
+    EXPANDED_TEMPLATE_STORIES,
+    isExpandedCatalogTemplateName,
+    expandedTemplatePresentationSchema,
+} from "./catalog/ExpandedCatalogTemplates.js";
+export type {
+    ExpandedCatalogTemplateName,
+    ExpandedTemplatePresentation,
+    ExpandedTemplateStory,
+} from "./catalog/ExpandedCatalogTemplates.js";

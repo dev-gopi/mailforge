@@ -1,4 +1,11 @@
 import { z } from "zod";
+import {
+    EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
+    isExpandedCatalogTemplateName,
+    buildExpandedTemplateContent,
+    extractExpandedTemplatePresentation,
+    type ExpandedTemplatePresentation,
+} from "./ExpandedCatalogTemplates.js";
 import { DocumentValidator, type EmailDocument, type EmailNode } from "@mailforge/core";
 
 import {
@@ -53,6 +60,7 @@ export const CATALOG_TEMPLATE_DEFINITIONS = [
     ["support-ticket-updated", "support", "Support ticket updated", "Your support request has an update", "View ticket"],
     ["support-ticket-resolved", "support", "Support ticket resolved", "Your support request has been resolved", "View resolution"],
     ["feedback-request", "support", "Share your feedback", "Tell us how we did", "Give feedback"],
+    ...EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
 ] as const;
 
 export type CatalogTemplateName = typeof CATALOG_TEMPLATE_DEFINITIONS[number][0];
@@ -214,6 +222,12 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
     const entry = definitions.get(id);
     if (!entry) throw new Error(`Unknown catalog template: ${id}`);
     const [, category, title, description, actionLabel] = entry;
+    let presentation: ExpandedTemplatePresentation | undefined;
+    if (isExpandedCatalogTemplateName(id) && input !== undefined) {
+        const extracted = extractExpandedTemplatePresentation(input);
+        input = extracted.baseInput;
+        presentation = extracted.presentation;
+    }
     // Keep the shared fields separate from category-specific details.
     // This avoids an ambiguous union of Zod schema outputs.
     let data: z.output<typeof catalogTemplateDataSchema> | undefined = undefined;
@@ -301,6 +315,9 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
         contentParagraph(`${id}-greeting`, `Hello ${recipient},`),
         contentParagraph(`${id}-message`, `${description}. ${contextMessages[category]}`),
     ];
+    if (isExpandedCatalogTemplateName(id)) {
+        body.push(...buildExpandedTemplateContent(id, presentation));
+    }
     if (data?.detail) {
         body.push(panel(`${id}-detail`, [
             mutedParagraph(`${id}-detail-text`, data.detail),

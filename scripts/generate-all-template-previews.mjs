@@ -24,8 +24,8 @@ const entries = [];
 const errors = [];
 const catalogEngine = createEmail({ brand: { name: "Acme", supportEmail: "support@example.com" } });
 const catalog = catalogEngine.listBuiltinCatalog();
-if (catalog.length !== 49) {
-  throw new Error(`Unexpected catalog size ${catalog.length} (expected 49); inspect new template additions before regenerating.`);
+if (catalog.length !== 100) {
+  throw new Error(`Unexpected catalog size ${catalog.length} (expected 100); inspect new template additions before regenerating.`);
 }
 
 for (const template of catalog) {
@@ -73,5 +73,5 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta n
 await writeFile(path.join(outputDir, "index.html"), html);
 await writeFile(path.join(outputDir, "report.json"), JSON.stringify({ generatedAt: new Date().toISOString(), catalogCount: catalog.length, successful: entries.length, failed: errors.length, entries, errors }, null, 2));
 console.log(`\nGallery: ${path.join(outputDir, "index.html")}`);
-console.log(`Finished ${entries.length}/${catalog.length * 4} previews; ${errors.length} failures`);
+console.log(`Finished ${entries.length}/${catalog.length * (themes.length + (themes.includes("modern") ? 1 : 0))} previews; ${errors.length} failures`);
 if (errors.length) process.exitCode = 1;
