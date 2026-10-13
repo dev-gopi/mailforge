@@ -33,6 +33,8 @@ importers:
         specifier: ^4.6.6
         version: 4.6.6
 
+  apps/playground: {}
+
   packages/components:
     dependencies:
       '@mailforge/core':

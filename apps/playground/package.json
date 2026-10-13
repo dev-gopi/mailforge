@@ -1,0 +1,12 @@
+{
+  "name": "@mailforge/playground",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local visual playground for MailForge templates",
+  "scripts": {
+    "dev": "node server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": { "node": ">=20.19.0" }
+}
