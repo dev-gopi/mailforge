@@ -47,12 +47,12 @@ describe("Task 8.0.5–8.0.6: professional layout presets", () => {
     });
 
     it("renders all four layouts through the existing MJML pipeline", async () => {
-        const email = createEmail({ brand: { name: "Northstar" } });
+        const email = createEmail({ brand: { name: "Acme" } });
         for (const name of listLayoutPresets()) {
             const rendered = await email.renderDocument(source, { layoutPreset: name });
             expect(rendered.html).toContain("Hello from MailForge");
             expect(rendered.text).toContain("Hello from MailForge");
-            expect(rendered.html).toContain("Northstar");
+            expect(rendered.html).toContain("Acme");
         }
     });
 
@@ -80,7 +80,7 @@ describe("Task 8.0.5–8.0.6: professional layout presets", () => {
     });
 
     it("keeps existing default rendering unchanged after using a preset", async () => {
-        const email = createEmail({ brand: { name: "Northstar" } });
+        const email = createEmail({ brand: { name: "Acme" } });
         const before = await email.renderDocument(source);
         await email.renderDocument(source, { layoutPreset: "billing" });
         const after = await email.renderDocument(source);
