@@ -153,7 +153,11 @@ importers:
         specifier: ^4.6.6
         version: 4.6.6
 
-  packages/themes: {}
+  packages/themes:
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.5
+        version: 26.6.5
 
 packages:
 
