@@ -35,6 +35,16 @@ importers:
 
   apps/playground: {}
 
+  packages/cli:
+    dependencies:
+      '@mailforge/email':
+        specifier: workspace:*
+        version: link:../email
+    devDependencies:
+      '@types/node':
+        specifier: ^26.6.5
+        version: 26.6.5
+
   packages/components:
     dependencies:
       '@mailforge/core':
