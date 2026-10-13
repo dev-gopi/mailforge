@@ -26,8 +26,10 @@ const PRESETS: Record<
         colors: {
             primary: "#2563eb",
             secondary: "#475569",
+            accent: "#dbeafe",
             background: "#f5f6f8",
             surface: "#ffffff",
+            section: "#eff6ff",
             text: "#0f172a",
             muted: "#64748b",
             border: "#e5e7eb",
@@ -59,8 +61,10 @@ const PRESETS: Record<
         colors: {
             primary: "#111827",
             secondary: "#4b5563",
+            accent: "#e5e7eb",
             background: "#ffffff",
             surface: "#ffffff",
+            section: "#f9fafb",
             text: "#111827",
             muted: "#6b7280",
             border: "#e5e7eb",
@@ -90,8 +94,10 @@ const PRESETS: Record<
         colors: {
             primary: "#0f4c81",
             secondary: "#334155",
+            accent: "#dbeafe",
             background: "#f8fafc",
             surface: "#ffffff",
+            section: "#f1f5f9",
             text: "#0f172a",
             muted: "#64748b",
             border: "#cbd5e1",

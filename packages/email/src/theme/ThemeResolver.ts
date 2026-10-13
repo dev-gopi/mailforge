@@ -35,8 +35,10 @@ const APPEARANCE_KEYS = new Set(["containerWidth", "contentPadding", "cardRadius
 const COLOR_KEYS = [
     "primary",
     "secondary",
+    "accent",
     "background",
     "surface",
+    "section",
     "text",
     "muted",
     "border",

@@ -176,3 +176,13 @@ export type {
     AccountCatalogTemplateData,
     AuthenticationCatalogTemplateData,
 } from "./catalog/CatalogTemplates.js";
+
+// Task 7.8.5.4–7.8.5.5: billing and ecommerce catalog contracts.
+export {
+    billingCatalogTemplateDataSchema,
+    ecommerceCatalogTemplateDataSchema,
+} from "./catalog/CatalogTemplates.js";
+export type {
+    BillingCatalogTemplateData,
+    EcommerceCatalogTemplateData,
+} from "./catalog/CatalogTemplates.js";

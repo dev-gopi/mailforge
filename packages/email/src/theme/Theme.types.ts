@@ -13,8 +13,10 @@ export type ThemePreset =
 export interface ThemeColors {
     primary: string;
     secondary: string;
+    accent: string;
     background: string;
     surface: string;
+    section: string;
     text: string;
     muted: string;
     border: string;

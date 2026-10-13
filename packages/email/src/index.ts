@@ -266,3 +266,13 @@ export type {
     AccountCatalogTemplateData,
     AuthenticationCatalogTemplateData,
 } from "@mailforge/templates";
+
+// Billing and ecommerce catalog data contracts.
+export {
+    billingCatalogTemplateDataSchema,
+    ecommerceCatalogTemplateDataSchema,
+} from "@mailforge/templates";
+export type {
+    BillingCatalogTemplateData,
+    EcommerceCatalogTemplateData,
+} from "@mailforge/templates";

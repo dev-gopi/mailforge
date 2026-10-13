@@ -107,6 +107,35 @@ export const authenticationCatalogTemplateDataSchema = catalogTemplateDataSchema
 }).strict();
 export type AuthenticationCatalogTemplateData = z.input<typeof authenticationCatalogTemplateDataSchema>;
 
+/** Optional financial references for catalog notifications; no payment math. */
+export const billingCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
+    billing: z.object({
+        referenceId: z.string().trim().min(1).max(80)
+            .regex(/^[A-Za-z0-9._-]+$/, "Invalid billing reference").optional(),
+        planName: textValue.optional(),
+        amount: z.string().regex(/^(0|[1-9]\d{0,10})(\.\d{1,2})?$/, "Invalid decimal amount").optional(),
+        currency: z.string().regex(/^[A-Z]{3}$/, "Currency must use a 3-letter uppercase code").optional(),
+        billingDate: z.iso.date().optional(),
+    }).strict().refine(
+        value => (value.amount === undefined) === (value.currency === undefined),
+        "Specify amount and currency together",
+    ).optional(),
+}).strict();
+export type BillingCatalogTemplateData = z.input<typeof billingCatalogTemplateDataSchema>;
+
+/** Optional order/shipment details for catalog notifications. */
+export const ecommerceCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
+    ecommerce: z.object({
+        orderId: z.string().trim().min(1).max(80)
+            .regex(/^[A-Za-z0-9._-]+$/, "Invalid order ID").optional(),
+        trackingNumber: z.string().trim().min(1).max(100)
+            .regex(/^[A-Za-z0-9._-]+$/, "Invalid tracking number").optional(),
+        carrier: textValue.optional(),
+        estimatedDelivery: z.iso.date().optional(),
+    }).strict().optional(),
+}).strict();
+export type EcommerceCatalogTemplateData = z.input<typeof ecommerceCatalogTemplateDataSchema>;
+
 const definitions = new Map<string, typeof CATALOG_TEMPLATE_DEFINITIONS[number]>(
     CATALOG_TEMPLATE_DEFINITIONS.map(row => [row[0], row] as const),
 );
@@ -130,6 +159,8 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
     let data: z.output<typeof catalogTemplateDataSchema> | undefined = undefined;
     let accountDetails: z.output<typeof accountCatalogTemplateDataSchema>["account"] = undefined;
     let securityDetails: z.output<typeof authenticationCatalogTemplateDataSchema>["security"] = undefined;
+    let billingDetails: z.output<typeof billingCatalogTemplateDataSchema>["billing"] = undefined;
+    let ecommerceDetails: z.output<typeof ecommerceCatalogTemplateDataSchema>["ecommerce"] = undefined;
 
     if (input !== undefined) {
         if (category === "account") {
@@ -140,6 +171,14 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
             const parsed = authenticationCatalogTemplateDataSchema.parse(input);
             data = parsed;
             securityDetails = parsed.security;
+        } else if (category === "billing") {
+            const parsed = billingCatalogTemplateDataSchema.parse(input);
+            data = parsed;
+            billingDetails = parsed.billing;
+        } else if (category === "ecommerce") {
+            const parsed = ecommerceCatalogTemplateDataSchema.parse(input);
+            data = parsed;
+            ecommerceDetails = parsed.ecommerce;
         } else {
             data = catalogTemplateDataSchema.parse(input);
         }
@@ -207,6 +246,40 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
             details.push(mutedParagraph(`${id}-security-time`, `Time (UTC): ${timestamp}`));
         }
         if (details.length > 0) body.push(panel(`${id}-security-details`, details));
+    }
+    // Billing and order panels reuse semantic nodes for theme consistency.
+    // Display values are not calculated or converted by the template engine.
+    if (category === "billing" && billingDetails) {
+        const details: EmailNode[] = [];
+        if (billingDetails.referenceId !== undefined) {
+            details.push(mutedParagraph(`${id}-billing-reference`, `Reference: ${billingDetails.referenceId}`));
+        }
+        if (billingDetails.planName !== undefined) {
+            details.push(mutedParagraph(`${id}-billing-plan`, `Plan: ${billingDetails.planName}`));
+        }
+        if (billingDetails.amount !== undefined && billingDetails.currency !== undefined) {
+            details.push(mutedParagraph(`${id}-billing-amount`, `Amount: ${billingDetails.currency} ${billingDetails.amount}`));
+        }
+        if (billingDetails.billingDate !== undefined) {
+            details.push(mutedParagraph(`${id}-billing-date`, `Billing date: ${billingDetails.billingDate}`));
+        }
+        if (details.length > 0) body.push(panel(`${id}-billing-details`, details));
+    }
+    if (category === "ecommerce" && ecommerceDetails) {
+        const details: EmailNode[] = [];
+        if (ecommerceDetails.orderId !== undefined) {
+            details.push(mutedParagraph(`${id}-order-id`, `Order: ${ecommerceDetails.orderId}`));
+        }
+        if (ecommerceDetails.trackingNumber !== undefined) {
+            details.push(mutedParagraph(`${id}-order-tracking`, `Tracking: ${ecommerceDetails.trackingNumber}`));
+        }
+        if (ecommerceDetails.carrier !== undefined) {
+            details.push(mutedParagraph(`${id}-order-carrier`, `Carrier: ${ecommerceDetails.carrier}`));
+        }
+        if (ecommerceDetails.estimatedDelivery !== undefined) {
+            details.push(mutedParagraph(`${id}-order-delivery`, `Estimated delivery: ${ecommerceDetails.estimatedDelivery}`));
+        }
+        if (details.length > 0) body.push(panel(`${id}-ecommerce-details`, details));
     }
     if (category === "billing" || category === "ecommerce" || category === "events" || category === "support") {
         body.push(divider(`${id}-divider`));

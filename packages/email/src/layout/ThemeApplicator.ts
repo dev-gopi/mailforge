@@ -44,7 +44,7 @@ function roleStyles(role: string | undefined, theme: ResolvedEmailTheme): Styles
       textDecoration: "underline", textAlign: "center", borderRadius: "0px",
       innerPadding: "6px 8px", padding: `0 ${inset}px ${spacing.md}px`,
     };
-    case "divider": return { color: colors.border, padding: `${spacing.sm}px ${inset}px` };
+    case "divider": return { color: colors.accent, padding: `${spacing.sm}px ${inset}px` };
     case "panel-outer": return { padding: `${spacing.xs}px ${inset}px ${spacing.lg}px` };
     case "panel-inner": return {
       backgroundColor: colors.background,
@@ -53,7 +53,7 @@ function roleStyles(role: string | undefined, theme: ResolvedEmailTheme): Styles
       padding: `${spacing.lg}px`,
     };
     case "status-icon": return {
-      backgroundColor: colors.background, color: colors.primary,
+      backgroundColor: colors.accent, color: colors.primary,
       fontSize: 26, fontWeight: "bold", textAlign: "center",
       padding: `${spacing.lg}px ${inset}px ${spacing.sm}px`,
     };
@@ -95,7 +95,7 @@ function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
           : `${spacing.lg}px ${appearance.contentPadding}px ${spacing.sm}px`,
       };
     case "section":
-    case "row": return { backgroundColor: colors.surface, padding: `0 ${spacing.md}px` };
+    case "row": return { backgroundColor: colors.section, padding: `0 ${spacing.md}px` };
     case "heading": return {
       color: colors.text, fontFamily: typography.headingFontFamily,
       fontSize: Math.min(typography.headingSize, 26), fontWeight: "bold",
