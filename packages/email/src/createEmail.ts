@@ -142,6 +142,9 @@ export interface TemplateRenderOptions
     layout?: EmailLayoutOptions;
     theme?: ThemeOverrides;
 
+    /** Select a published version only when explicitly requested. */
+    templateVersion?: TemplateVersionSelection;
+
     /**
      * Optional name of a reusable theme profile.
      */
@@ -520,6 +523,15 @@ export class MailForgeEmail {
         templateId: string,
         options: TemplateRenderOptions = {},
     ): Promise<RenderResult> {
+        // Opt-in: existing calls keep using the original resolution path.
+        if (options.templateVersion !== undefined) {
+            const document = this.resolveTemplateVersion(
+                templateId,
+                options.templateVersion,
+            );
+            return this.renderDocument(document, options);
+        }
+
         if (this.templates.has(templateId)) {
             return this.renderDocument(
                 this.getTemplate(templateId),
