@@ -92,7 +92,7 @@ describe("ComponentRegistry", () => {
 
         const components = registry.list();
 
-        expect(components.length).toBe(14);
+        expect(components.length).toBe(15);
         expect(
             components.some(
                 (component) => component.name === "header",

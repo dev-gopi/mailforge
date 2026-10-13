@@ -9,7 +9,10 @@ import type { EmailDocument, EmailNode } from "@mailforge/core";
 export type TemplateRole =
   | "title" | "body" | "muted" | "eyebrow" | "primary-action"
   | "quiet-action" | "divider" | "panel-outer" | "panel-inner"
-  | "status-icon" | "promotional-code";
+  | "status-icon" | "promotional-code"
+  | "hero-title" | "hero-subtitle" | "section-title"
+  | "brand-title" | "brand-rule" | "footer-note"
+  | "success-note" | "warning-note" | "danger-note";
 
 export function withRole(node: EmailNode, role: TemplateRole): EmailNode {
   return { ...node, attrs: { ...node.attrs, "data-mf-style": role } };

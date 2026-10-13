@@ -57,8 +57,11 @@ function nodeAttributes(node: EmailNode, state: State): string {
     }
     const responsive = ["heading", "text", "copyright"].includes(node.type)
         ? "mf-responsive-copy" : node.type === "button" ? "mf-responsive-action" : "";
-    const muted = node.attrs?.["data-mf-style"] === "muted" ? "mf-muted-copy" : "";
-    const suffix = [extraClasses, responsive, muted].filter(Boolean).join(" ");
+    const role = node.attrs?.["data-mf-style"];
+    const roleClass = typeof role === "string" && /^[a-z][a-z0-9-]{0,60}$/.test(role)
+        ? `mf-role-${role}` : "";
+    const muted = role === "muted" || role === "footer-note" ? "mf-muted-copy" : "";
+    const suffix = [extraClasses, responsive, muted, roleClass].filter(Boolean).join(" ");
     return `css-class="${className}${suffix ? ` ${escapeHtml(suffix)}` : ""}"`;
 }
 

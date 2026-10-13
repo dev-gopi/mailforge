@@ -27,6 +27,13 @@ describe("MailForge Theme Management", () => {
             "modern",
             "minimal",
             "corporate",
+            "dark",
+            "premium",
+            "ocean",
+            "forest",
+            "sunset",
+            "elegant",
+            "playful",
         ]);
     });
 

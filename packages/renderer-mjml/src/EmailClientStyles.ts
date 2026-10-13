@@ -56,6 +56,9 @@ export function emailClientHead(options: EmailClientStyleOptions = {}): string {
     if (config.responsive) {
         css.push(`@media only screen and (max-width: 480px) {
   .mf-responsive-copy > div { line-height: 1.55 !important; }
+  .mf-role-title > div, .mf-role-hero-title > div { font-size: 26px !important; line-height: 1.3 !important; }
+  .mf-role-section-title > div { font-size: 19px !important; line-height: 1.35 !important; }
+  .mf-role-panel-outer { padding-left: 12px !important; padding-right: 12px !important; }
   .mf-responsive-action table { width: 100% !important; }
   .mf-responsive-action td { text-align: center !important; }
 }`);
@@ -67,6 +70,8 @@ export function emailClientHead(options: EmailClientStyleOptions = {}): string {
   .mf-email-body { background-color: ${background} !important; }
   .mf-responsive-copy, .mf-responsive-copy > div { color: ${text} !important; }
   .mf-muted-copy, .mf-muted-copy > div { color: ${muted} !important; }
+  .mf-role-brand-title, .mf-role-brand-title > div { color: ${text} !important; }
+  .mf-role-panel-inner { border-color: ${border} !important; }
 }`);
     }
     if (css.length === 0) return "";

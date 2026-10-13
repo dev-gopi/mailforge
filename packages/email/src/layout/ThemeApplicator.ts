@@ -36,29 +36,64 @@ function roleStyles(role: string | undefined, theme: ResolvedEmailTheme): Styles
       backgroundColor: colors.primary, color: buttonTextColor(colors.primary), fontFamily: typography.fontFamily,
       fontSize: Math.max(14, typography.baseSize), fontWeight: "bold",
       borderRadius: `${appearance.buttonRadius}px`, textAlign: "center",
-      innerPadding: `${appearance.buttonPaddingY}px ${appearance.buttonPaddingX}px`, padding: `${spacing.sm}px ${inset}px ${spacing.lg}px`,
+      innerPadding: `${appearance.buttonPaddingY}px ${appearance.buttonPaddingX}px`, padding: `${spacing.md}px ${inset}px ${spacing.xl}px`,
     };
     case "quiet-action": return {
       backgroundColor: colors.surface, color: colors.muted,
       fontFamily: typography.fontFamily, fontSize: Math.max(12, typography.baseSize - 1),
       textDecoration: "underline", textAlign: "center", borderRadius: "0px",
-      innerPadding: "6px 8px", padding: `0 ${inset}px ${spacing.md}px`,
+      innerPadding: `${Math.max(6, spacing.sm)}px ${Math.max(8, spacing.md)}px`, padding: `0 ${inset}px ${spacing.lg}px`,
     };
-    case "divider": return { color: colors.accent, padding: `${spacing.sm}px ${inset}px` };
+    case "hero-title": return {
+      ...text, fontFamily: typography.headingFontFamily,
+      fontWeight: "bold", fontSize: typography.headingSize,
+      lineHeight: `${Math.round(typography.headingSize * 1.24)}px`,
+      textAlign: "center", padding: `${spacing.xl}px ${inset}px ${spacing.sm}px`,
+    };
+    case "hero-subtitle": return {
+      ...text, color: colors.muted, fontSize: Math.max(15, typography.baseSize),
+      lineHeight: `${Math.round(typography.baseSize * typography.lineHeight)}px`,
+      textAlign: "center", padding: `0 ${inset}px ${spacing.lg}px`,
+    };
+    case "section-title": return {
+      ...text, fontFamily: typography.headingFontFamily,
+      fontSize: Math.max(18, typography.baseSize + 3), fontWeight: "bold",
+      lineHeight: "1.35", padding: `${spacing.lg}px ${inset}px ${spacing.sm}px`,
+    };
+    case "brand-title": return {
+      ...text, fontFamily: typography.headingFontFamily,
+      fontSize: Math.max(17, Math.min(22, typography.headingSize - 5)),
+      fontWeight: "bold", textAlign: "center",
+      padding: `${spacing.sm}px 0 ${spacing.sm}px`,
+    };
+    case "brand-rule": return { color: colors.primary, padding: `${spacing.sm}px 0 0` };
+    case "footer-note": return {
+      ...text, color: colors.muted, fontSize: Math.max(12, typography.baseSize - 2),
+      lineHeight: "1.6", textAlign: "center", padding: `0 0 ${spacing.sm}px`,
+    };
+    case "success-note":
+    case "warning-note":
+    case "danger-note": return {
+      ...text,
+      color: role === "success-note" ? colors.success : role === "warning-note" ? colors.warning : colors.danger,
+      fontWeight: "bold", fontSize: Math.max(13, typography.baseSize - 1),
+      lineHeight: "1.5", padding: `${spacing.sm}px ${inset}px`,
+    };
+    case "divider": return { color: colors.border, padding: `${spacing.sm}px ${inset}px` };
     case "panel-outer": return { padding: `${spacing.xs}px ${inset}px ${spacing.lg}px` };
     case "panel-inner": return {
-      backgroundColor: colors.background,
+      backgroundColor: colors.section,
       border: `1px solid ${colors.border}`,
       borderRadius: `${appearance.cardRadius}px`,
       padding: `${appearance.cardPadding}px`,
     };
     case "status-icon": return {
-      backgroundColor: colors.accent, color: colors.primary,
+      backgroundColor: colors.section, color: colors.primary,
       fontSize: 26, fontWeight: "bold", textAlign: "center",
       padding: `${spacing.lg}px ${inset}px ${spacing.sm}px`,
     };
     case "promotional-code": return {
-      backgroundColor: colors.background, color: colors.primary,
+      backgroundColor: colors.section, color: colors.primary,
       fontWeight: "bold", fontSize: 28, textAlign: "center",
       lineHeight: "36px", padding: `${spacing.md}px ${inset}px`,
     };
@@ -98,12 +133,12 @@ function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
     case "row": return { backgroundColor: colors.section, padding: `0 ${spacing.md}px` };
     case "heading": return {
       color: colors.text, fontFamily: typography.headingFontFamily,
-      fontSize: Math.min(typography.headingSize, 26), fontWeight: "bold",
+      fontSize: Math.min(typography.headingSize, 32), fontWeight: "bold",
       lineHeight: "1.25", padding: `0 0 ${spacing.sm}px`,
     };
     case "text": return {
       color: colors.text, fontFamily: typography.fontFamily,
-      fontSize: typography.baseSize, lineHeight, padding: `0 0 ${spacing.sm}px`,
+      fontSize: Math.max(14, typography.baseSize), lineHeight, padding: `0 0 ${spacing.md}px`,
     };
     case "copyright": return {
       color: colors.muted, fontFamily: typography.fontFamily,
@@ -113,10 +148,11 @@ function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
     case "button": return {
       backgroundColor: colors.primary, color: buttonTextColor(colors.primary), fontFamily: typography.fontFamily,
       fontSize: Math.max(13, typography.baseSize - 1), fontWeight: "bold",
-      borderRadius: `${appearance.buttonRadius}px`, innerPadding: `${appearance.buttonPaddingY}px ${appearance.buttonPaddingX}px`,
+      borderRadius: `${appearance.buttonRadius}px`,
+      innerPadding: `${appearance.buttonPaddingY}px ${appearance.buttonPaddingX}px`,
       textAlign: "center", padding: `${spacing.sm}px ${spacing.md}px`,
     };
-    case "table": return { color: colors.text, fontFamily: typography.fontFamily, fontSize: typography.baseSize, padding: `${spacing.sm}px ${appearance.contentPadding}px` };
+    case "table": return { color: colors.text, fontFamily: typography.fontFamily, fontSize: Math.max(13, typography.baseSize - 1), padding: `${spacing.md}px ${appearance.contentPadding}px` };
     case "image": return { width: 140, padding: `${spacing.xs}px 0` };
     case "divider": return { color: colors.border, padding: `${spacing.sm}px` };
     case "spacer": return { height: `${spacing.md}px` };
@@ -134,10 +170,10 @@ export function applyEmailTheme(source: EmailDocument, theme: ResolvedEmailTheme
     // Table-specific design tokens. Explicit cell colors always take precedence.
     if (node.type === "table") {
       node.props = {
-        headerBackground: theme.colors.background,
+        headerBackground: theme.colors.section,
         headerTextColor: theme.colors.text,
         textColor: theme.colors.text,
-        stripeColor: theme.colors.surface,
+        stripeColor: theme.colors.background,
         borderColor: theme.colors.border,
         ...node.props,
       };
@@ -146,7 +182,7 @@ export function applyEmailTheme(source: EmailDocument, theme: ResolvedEmailTheme
     const semantic: Styles = typeof role === "string" ? roleStyles(role, theme) : {};
     const defaults = defaultStyles(node, theme);
     if (inPanel && role !== "panel-inner" &&
-        ["title", "body", "muted", "eyebrow", "primary-action", "quiet-action"].includes(String(role))) {
+        ["title", "body", "muted", "eyebrow", "primary-action", "quiet-action", "hero-title", "hero-subtitle", "section-title", "success-note", "warning-note", "danger-note"].includes(String(role))) {
       semantic.padding = `0 0 ${theme.spacing.sm}px`;
     }
     if (Object.keys(defaults).length || Object.keys(semantic).length) {

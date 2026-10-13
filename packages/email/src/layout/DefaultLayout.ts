@@ -89,6 +89,7 @@ export function applyDefaultLayout(
                     src: logo,
                     alt: `${brand.name} logo`,
                 },
+                styles: { textAlign: "center", padding: "4px 0 12px" },
             });
         }
 
@@ -99,9 +100,14 @@ export function applyDefaultLayout(
                 text: layout.header.title ?? brand.name,
                 level: 2,
             },
-            styles: {
-                textAlign: "center",
-            },
+            attrs: { "data-mf-style": "brand-title" },
+            styles: { textAlign: "center" },
+        });
+
+        children.push({
+            id: createId(ids, "mf-auto-header-rule"),
+            type: "divider",
+            attrs: { "data-mf-style": "brand-rule" },
         });
 
         document.header = {
@@ -130,6 +136,7 @@ export function applyDefaultLayout(
         children.push({
             id: createId(ids, "mf-auto-footer-message"),
             type: "text",
+            attrs: { "data-mf-style": "footer-note" },
             props: {
                 text: layout.footer.message ??
                     `Sent by ${brand.name}`,
@@ -146,6 +153,7 @@ export function applyDefaultLayout(
             children.push({
                 id: createId(ids, "mf-auto-footer-support"),
                 type: "text",
+                attrs: { "data-mf-style": "footer-note" },
                 props: {
                     text: `Support: ${email}`,
                 },
