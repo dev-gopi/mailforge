@@ -1,4 +1,5 @@
 import type { EmailNode } from "@mailforge/core";
+import { getCatalogDesignFamily } from "./CatalogDesignFamilies.js";
 import { z } from "zod";
 import { contentParagraph, mutedParagraph, panel, quietAction, paragraph, withRole } from "../shared/TemplateNodes.js";
 
@@ -165,6 +166,16 @@ export function extractExpandedTemplatePresentation(input: unknown): {
     return { baseInput, presentation };
 }
 
+/**
+ * Purpose-first story treatments. These keep every old node ID and preserve
+ * semantic highlight text; only the outer grouping changes. Plain editorial,
+ * campaign, ticket and conversation copy should not look like a second card.
+ * Use the existing design-family resolver rather than a parallel registry.
+ */
+const UNBOXED_STORY_FAMILIES = new Set([
+    "editorial", "spotlight", "showcase", "ticket", "invitation",
+    "conversation", "minimal",
+]);
 /** Email-client-safe nodes: layout, colors, spacing and buttons inherit active theme. */
 export function buildExpandedTemplateContent(
     id: ExpandedCatalogTemplateName, presentation?: ExpandedTemplatePresentation,
@@ -175,10 +186,33 @@ export function buildExpandedTemplateContent(
     const body: EmailNode[] = [
         withRole(paragraph(`${id}-intro`, presentation?.summary ?? story.intro), introRole),
     ];
-    body.push(panel(`${id}-highlights`, [
+    const category = EXPANDED_CATALOG_TEMPLATE_DEFINITIONS.find(row => row[0] === id)?.[1];
+    if (!category) throw new Error(`Unknown expanded catalog category for ${id}`);
+    const family = getCatalogDesignFamily(id, category);
+    const highlights: EmailNode[] = [
         contentParagraph(`${id}-highlight-1`, story.highlights[0]),
-        contentParagraph(`${id}-highlight-2`, story.highlights[1]),
-    ]));
+        // A quieter follow-up suits conversational and minimal notifications.
+        family === "conversation" || family === "minimal"
+            ? mutedParagraph(`${id}-highlight-2`, story.highlights[1])
+            : contentParagraph(`${id}-highlight-2`, story.highlights[1]),
+    ];
+    if (UNBOXED_STORY_FAMILIES.has(family)) {
+        // Keep the existing highlights and highlights-column IDs so user patches
+        // can still target them, while removing the repetitive nested card.
+        body.push({
+            id: `${id}-highlights`,
+            type: "section",
+            children: [{
+                id: `${id}-highlights-column`,
+                type: "column",
+                children: highlights,
+            }],
+        });
+    } else {
+        // Structured finance, operational, delivery and security messages
+        // benefit from the original, theme-controlled record/alert panel.
+        body.push(panel(`${id}-highlights`, highlights));
+    }
     if (presentation?.facts?.length) {
         body.push(panel(`${id}-facts`, [
             ...presentation.facts.map((fact, i) => mutedParagraph(`${id}-fact-${i}`, `${fact.label}: ${fact.value}`)),
