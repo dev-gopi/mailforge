@@ -59,6 +59,12 @@ const byId = {
     shipment: { carrier: "BlueExpress", trackingNumber: "TRK-2026101301", trackingUrl: url("tracking/TRK-2026101301"),
       status: "shipped", estimatedDelivery: "2026-10-19", destinationCity: "Kolkata" } },
 };
+// Rich, valid fixtures for the three final catalog categories.
+const categorySamples = {
+  events: { event: { name: "Northstar Summit", startsAt: "2026-11-05T10:00:00+05:30", endsAt: "2026-11-05T12:00:00+05:30", venue: "Online" } },
+  saas: { saas: { workspaceName: "Northstar Team", planName: "Pro", usagePercent: 82 } },
+  support: { support: { ticketId: "TICKET-2026-103", status: "open", agentName: "Support Team" } },
+};
 const themes = ["modern", "corporate", "minimal"];
 const h = (value) => String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
   .replaceAll(">", "&gt;").replaceAll('"', "&quot;");
@@ -73,7 +79,7 @@ if (catalog.length !== 49) {
 }
 
 for (const template of catalog) {
-  const data = Object.hasOwn(byId, template.id) ? byId[template.id] : catalogData;
+  const data = Object.hasOwn(byId, template.id) ? byId[template.id] : { ...catalogData, ...(categorySamples[template.category] ?? {}) };
   for (const theme of themes) {
     const engine = createEmail({
       brand: { name: "Northstar", primaryColor: theme === "corporate" ? "#173b70" : theme === "minimal" ? "#222222" : "#2563eb", supportEmail: "support@example.com" },

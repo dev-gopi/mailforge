@@ -286,3 +286,24 @@ export type {
     MarketingCatalogTemplateData,
     NotificationCatalogTemplateData,
 } from "@mailforge/templates";
+
+// Task 7.8.5.8–7.8.5.10: events, SaaS and support contracts.
+export {
+    eventCatalogTemplateDataSchema,
+    saasCatalogTemplateDataSchema,
+    supportCatalogTemplateDataSchema,
+} from "@mailforge/templates";
+export type {
+    EventCatalogTemplateData,
+    SaasCatalogTemplateData,
+    SupportCatalogTemplateData,
+} from "@mailforge/templates";
+
+export { auditTemplateCatalog } from "@mailforge/templates";
+export type { CatalogAudit, CatalogIssue } from "@mailforge/templates";
+export { generatePreviewFixtures } from "./preview/CatalogPreview.js";
+export type { TemplatePreviewFixture } from "./preview/CatalogPreview.js";
+
+// Trusted application plugins (Task 7.9).
+export { PluginRegistry, MailForgePluginError } from "@mailforge/plugin-sdk";
+export type { MailForgePlugin, MailForgePluginHost } from "@mailforge/plugin-sdk";

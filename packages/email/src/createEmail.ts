@@ -14,6 +14,12 @@ import {
 } from "@mailforge/renderer-mjml";
 
 import {
+    PluginRegistry,
+    MailForgePluginError,
+    type MailForgePlugin,
+} from "@mailforge/plugin-sdk";
+
+import {
     HtmlRenderer,
     type HtmlRenderInput,
 } from "@mailforge/renderer-html";
@@ -185,6 +191,7 @@ const BUILTIN_VARIANT_IDS = new Set(["default", "compact", "premium", "branded"]
 const MAX_ORGANIZATIONS_PER_ENGINE = 250;
 
 export class MailForgeEmail {
+    private readonly plugins = new PluginRegistry();
     private readonly templatePresets =
         new TemplatePresetRegistry();
 
@@ -253,6 +260,56 @@ export class MailForgeEmail {
         registerCompositeComponents(
             this.componentCatalog,
         );
+    }
+
+    // ---------------------------------------
+    // TRUSTED PLUGIN SDK (TASK 7.9)
+    // ---------------------------------------
+    /**
+     * Plugins are trusted executable application code, not user-provided JSON.
+     * Setup collects registrations first, then applies them; failures roll back
+     * registrations made during this call, rather than leaving partial state.
+     */
+    public usePlugin(plugin: MailForgePlugin): this {
+        const staged: Array<
+            | { kind: "template"; document: EmailDocument }
+            | { kind: "component"; definition: ReusableComponentDefinition }
+        > = [];
+        this.plugins.use(plugin, {
+            registerTemplate: document => {
+                staged.push({ kind: "template", document: structuredClone(document) });
+            },
+            registerComponent: definition => {
+                staged.push({ kind: "component", definition });
+            },
+        });
+        const applied: Array<{ kind: "template" | "component"; id: string }> = [];
+        try {
+            for (const registration of staged) {
+                if (registration.kind === "template") {
+                    this.registerTemplate(registration.document);
+                    applied.push({ kind: "template", id: registration.document.id });
+                } else {
+                    this.registerComponent(registration.definition);
+                    applied.push({ kind: "component", id: registration.definition.name });
+                }
+            }
+        } catch (error) {
+            // Only remove registrations successfully added by this plugin.
+            for (const item of applied.reverse()) {
+                if (item.kind === "template") this.unregisterTemplate(item.id);
+                else this.unregisterComponent(item.id);
+            }
+            this.plugins.unuse(plugin.name);
+            throw new MailForgePluginError(
+                `Plugin registration failed (${plugin.name}): ${String(error)}`,
+            );
+        }
+        return this;
+    }
+
+    public listPlugins(): ReadonlyArray<{ name: string; version: string }> {
+        return this.plugins.list();
     }
 
     // ---------------------------------------
@@ -1203,8 +1260,11 @@ export class MailForgeEmail {
         );
 
         // 6. Apply brand/theme design tokens.
+        // Trusted plugins may transform a cloned document, but cannot bypass
+        // subsequent document validation, resource budgets or safe MJML rendering.
+        const pluginDocument = this.plugins.beforeRender(visible);
         const themed = applyEmailTheme(
-            visible,
+            pluginDocument,
             theme,
         );
 
@@ -1215,7 +1275,7 @@ export class MailForgeEmail {
         assertRenderBudget(themed);
 
         // 9. Produce responsive HTML and plain text.
-        return this.mjmlRenderer.render(
+        const rendered = await this.mjmlRenderer.render(
             themed,
             {
                 trust: options.trust ?? "safe",
@@ -1231,6 +1291,8 @@ export class MailForgeEmail {
                     : {}),
             },
         );
+        this.plugins.afterRender(rendered);
+        return rendered;
     }
 
     /**

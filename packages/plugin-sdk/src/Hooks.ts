@@ -8,7 +8,9 @@ export class PluginRegistry {
     private readonly plugins = new Map<string, MailForgePlugin>();
 
     public use(plugin: MailForgePlugin, host: MailForgePluginHost): this {
-        if (!PLUGIN_NAME.test(plugin.name) || !/^\d+\.\d+\.\d+$/.test(plugin.version)) {
+        if (plugin === null || typeof plugin !== "object" ||
+            typeof plugin.name !== "string" || typeof plugin.version !== "string" ||
+            !PLUGIN_NAME.test(plugin.name) || !/^\d+\.\d+\.\d+$/.test(plugin.version)) {
             throw new MailForgePluginError("Plugin name or version is invalid");
         }
         if (this.plugins.has(plugin.name)) {
@@ -25,6 +27,11 @@ export class PluginRegistry {
         }
         this.plugins.set(plugin.name, plugin);
         return this;
+    }
+
+    /** Remove a plugin after a failed, rolled-back host registration. */
+    public unuse(name: string): boolean {
+        return this.plugins.delete(name);
     }
 
     public list(): ReadonlyArray<{ name: string; version: string }> {

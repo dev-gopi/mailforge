@@ -159,6 +159,43 @@ export const notificationCatalogTemplateDataSchema = catalogTemplateDataSchema.e
 }).strict();
 export type NotificationCatalogTemplateData = z.input<typeof notificationCatalogTemplateDataSchema>;
 
+/** Structured event details; timestamps must contain an explicit UTC offset. */
+export const eventCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
+    event: z.object({
+        name: textValue.optional(),
+        startsAt: z.iso.datetime({ offset: true }).optional(),
+        endsAt: z.iso.datetime({ offset: true }).optional(),
+        venue: textValue.optional(),
+        meetingUrl: httpLink.optional(),
+    }).strict().refine(value =>
+        value.startsAt === undefined || value.endsAt === undefined ||
+        Date.parse(value.endsAt) >= Date.parse(value.startsAt),
+    { message: "Event end must not be before start", path: ["endsAt"] }).optional(),
+}).strict();
+export type EventCatalogTemplateData = z.input<typeof eventCatalogTemplateDataSchema>;
+
+/** Metadata only: usage is a percentage, not a billable quantity. */
+export const saasCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
+    saas: z.object({
+        workspaceName: textValue.optional(),
+        memberName: textValue.optional(),
+        planName: textValue.optional(),
+        usagePercent: z.number().finite().min(0).max(100).optional(),
+    }).strict().optional(),
+}).strict();
+export type SaasCatalogTemplateData = z.input<typeof saasCatalogTemplateDataSchema>;
+
+/** Support ticket references; never store passwords or access tokens in metadata. */
+export const supportCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
+    support: z.object({
+        ticketId: z.string().trim().min(1).max(80)
+            .regex(/^[A-Za-z0-9._-]+$/, "Invalid ticket ID").optional(),
+        status: z.enum(["open", "pending", "resolved", "closed"]).optional(),
+        agentName: textValue.optional(),
+    }).strict().optional(),
+}).strict();
+export type SupportCatalogTemplateData = z.input<typeof supportCatalogTemplateDataSchema>;
+
 const definitions = new Map<string, typeof CATALOG_TEMPLATE_DEFINITIONS[number]>(
     CATALOG_TEMPLATE_DEFINITIONS.map(row => [row[0], row] as const),
 );
@@ -186,6 +223,9 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
     let ecommerceDetails: z.output<typeof ecommerceCatalogTemplateDataSchema>["ecommerce"] = undefined;
     let marketingDetails: z.output<typeof marketingCatalogTemplateDataSchema>["marketing"] = undefined;
     let notificationDetails: z.output<typeof notificationCatalogTemplateDataSchema>["notification"] = undefined;
+    let eventDetails: z.output<typeof eventCatalogTemplateDataSchema>["event"] = undefined;
+    let saasDetails: z.output<typeof saasCatalogTemplateDataSchema>["saas"] = undefined;
+    let supportDetails: z.output<typeof supportCatalogTemplateDataSchema>["support"] = undefined;
 
     if (input !== undefined) {
         if (category === "account") {
@@ -212,6 +252,18 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
             const parsed = notificationCatalogTemplateDataSchema.parse(input);
             data = parsed;
             notificationDetails = parsed.notification;
+        } else if (category === "events") {
+            const parsed = eventCatalogTemplateDataSchema.parse(input);
+            data = parsed;
+            eventDetails = parsed.event;
+        } else if (category === "saas") {
+            const parsed = saasCatalogTemplateDataSchema.parse(input);
+            data = parsed;
+            saasDetails = parsed.saas;
+        } else if (category === "support") {
+            const parsed = supportCatalogTemplateDataSchema.parse(input);
+            data = parsed;
+            supportDetails = parsed.support;
         } else {
             data = catalogTemplateDataSchema.parse(input);
         }
@@ -345,6 +397,31 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
             details.push(mutedParagraph(`${id}-notification-time`, `Event time (UTC): ${timestamp}`));
         }
         if (details.length > 0) body.push(panel(`${id}-notification-details`, details));
+    }
+    // Theme-aware panels. Stable node IDs make display.hideIds effective.
+    if (category === "events" && eventDetails) {
+        const details: EmailNode[] = [];
+        if (eventDetails.name !== undefined) details.push(mutedParagraph(`${id}-event-name`, `Event: ${eventDetails.name}`));
+        if (eventDetails.startsAt !== undefined) details.push(mutedParagraph(`${id}-event-start`, `Starts (UTC): ${new Date(eventDetails.startsAt).toUTCString()}`));
+        if (eventDetails.endsAt !== undefined) details.push(mutedParagraph(`${id}-event-end`, `Ends (UTC): ${new Date(eventDetails.endsAt).toUTCString()}`));
+        if (eventDetails.venue !== undefined) details.push(mutedParagraph(`${id}-event-venue`, `Venue: ${eventDetails.venue}`));
+        if (eventDetails.meetingUrl !== undefined) details.push(quietAction(`${id}-event-meeting`, "Join event", eventDetails.meetingUrl));
+        if (details.length > 0) body.push(panel(`${id}-event-details`, details));
+    }
+    if (category === "saas" && saasDetails) {
+        const details: EmailNode[] = [];
+        if (saasDetails.workspaceName !== undefined) details.push(mutedParagraph(`${id}-saas-workspace`, `Workspace: ${saasDetails.workspaceName}`));
+        if (saasDetails.memberName !== undefined) details.push(mutedParagraph(`${id}-saas-member`, `Member: ${saasDetails.memberName}`));
+        if (saasDetails.planName !== undefined) details.push(mutedParagraph(`${id}-saas-plan`, `Plan: ${saasDetails.planName}`));
+        if (saasDetails.usagePercent !== undefined) details.push(mutedParagraph(`${id}-saas-usage`, `Usage: ${saasDetails.usagePercent}%`));
+        if (details.length > 0) body.push(panel(`${id}-saas-details`, details));
+    }
+    if (category === "support" && supportDetails) {
+        const details: EmailNode[] = [];
+        if (supportDetails.ticketId !== undefined) details.push(mutedParagraph(`${id}-ticket-id`, `Ticket: ${supportDetails.ticketId}`));
+        if (supportDetails.status !== undefined) details.push(mutedParagraph(`${id}-ticket-status`, `Status: ${supportDetails.status}`));
+        if (supportDetails.agentName !== undefined) details.push(mutedParagraph(`${id}-ticket-agent`, `Support agent: ${supportDetails.agentName}`));
+        if (details.length > 0) body.push(panel(`${id}-support-details`, details));
     }
     if (category === "billing" || category === "ecommerce" || category === "events" || category === "support") {
         body.push(divider(`${id}-divider`));

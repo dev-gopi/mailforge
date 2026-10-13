@@ -196,3 +196,18 @@ export type {
     MarketingCatalogTemplateData,
     NotificationCatalogTemplateData,
 } from "./catalog/CatalogTemplates.js";
+
+// Task 7.8.5.8–7.8.5.10: events, SaaS and support contracts.
+export {
+    eventCatalogTemplateDataSchema,
+    saasCatalogTemplateDataSchema,
+    supportCatalogTemplateDataSchema,
+} from "./catalog/CatalogTemplates.js";
+export type {
+    EventCatalogTemplateData,
+    SaasCatalogTemplateData,
+    SupportCatalogTemplateData,
+} from "./catalog/CatalogTemplates.js";
+
+export { auditTemplateCatalog } from "./registry/TemplateCatalogAudit.js";
+export type { CatalogAudit, CatalogIssue } from "./registry/TemplateCatalogAudit.js";

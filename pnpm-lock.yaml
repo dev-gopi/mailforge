@@ -56,6 +56,9 @@ importers:
       '@mailforge/core':
         specifier: workspace:*
         version: link:../core
+      '@mailforge/plugin-sdk':
+        specifier: workspace:*
+        version: link:../plugin-sdk
       '@mailforge/renderer-html':
         specifier: workspace:*
         version: link:../renderer-html
