@@ -53,5 +53,16 @@
 - `mf-transaction-summary`
 - `mf-verification-panel`
 
+## Marketing
+
+- `mf-brand-header`
+- `mf-full-width-button`
+- `mf-legal-footer`
+- `mf-status-card`
+
+Marketing components are registered automatically by `createEmail()`. They can
+also be imported from `@mailforge/email` or `@mailforge/components` and
+registered on a custom component catalog.
+
 Use `createEmail().registerComponent()` to add project-specific reusable components.
 Business components only render values provided and validated by the application.

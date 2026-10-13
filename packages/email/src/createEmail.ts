@@ -30,6 +30,7 @@ import {
     registerStandardComponents,
     registerCompositeComponents,
     registerBusinessComponents,
+    registerMarketingComponents,
     type ReusableComponentDefinition,
 } from "@mailforge/components";
 
@@ -300,6 +301,7 @@ export class MailForgeEmail {
 
         // Register validated business and table components.
         registerBusinessComponents(this.componentCatalog);
+        registerMarketingComponents(this.componentCatalog);
     }
 
     // ---------------------------------------

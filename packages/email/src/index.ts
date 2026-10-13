@@ -207,6 +207,13 @@ export {
     createKeyValueListDefinition,
     createDividerWithTextDefinition,
     createSocialLinksDefinition,
+    createBrandHeaderDefinition,
+    createStatusCardDefinition,
+    createFullWidthButtonDefinition,
+    createLegalFooterDefinition,
+    MARKETING_COMPONENT_NAMES,
+    getMarketingComponentDefinitions,
+    registerMarketingComponents,
 } from "@mailforge/components";
 
 // Extended domain templates

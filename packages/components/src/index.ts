@@ -113,6 +113,19 @@ export {
 } from "./actions/SocialLinks.js";
 
 export {
+    createBrandHeaderDefinition,
+    createStatusCardDefinition,
+    createFullWidthButtonDefinition,
+    createLegalFooterDefinition,
+} from "./marketing/WelcomeComponents.js";
+
+export {
+    MARKETING_COMPONENT_NAMES,
+    getMarketingComponentDefinitions,
+    registerMarketingComponents,
+} from "./registry/MarketingComponents.js";
+
+export {
     EXTENDED_COMPONENT_NAMES,
     getExtendedComponentDefinitions,
     registerExtendedComponents,
