@@ -10,7 +10,12 @@ function unpackHtmlEntities(value) {
 
 function isUnsafeUrl(value) {
   const normalized = unpackHtmlEntities(value)
-    .replace(/[\u0000-\u0020\u007f]+/g, '')
+    .split('')
+    .filter((character) => {
+      const code = character.charCodeAt(0);
+      return code > 32 && code !== 127;
+    })
+    .join('')
     .toLowerCase();
   return /^(?:javascript|vbscript|data|file):/.test(normalized);
 }
