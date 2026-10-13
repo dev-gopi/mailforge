@@ -49,7 +49,7 @@ describe("Stage 8.2 Playground — HTTP routes", () => {
     createEmail: () => ({
       listBuiltinCatalog: () => [{ id: "welcome", category: "core", title: "Welcome", version: "1.0.0" }],
       listThemes: () => themes,
-      async render(id, options) {
+      async render(id) {
         assert.equal(id, "welcome");
         return { subject: "Welcome", preheader: "", html: "<html><body>Welcome</body></html>", text: "Welcome", warnings: [] };
       },

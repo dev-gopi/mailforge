@@ -7,7 +7,10 @@ const TEXT_LIMIT = 200;
 const isObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 
 function text(value, label, max = TEXT_LIMIT) {
-  if (typeof value !== "string" || value.length > max || /[\u0000-\u001f\u007f]/.test(value)) {
+  if (typeof value !== "string" || value.length > max || value.split("").some((character) => {
+    const code = character.charCodeAt(0);
+    return code <= 31 || code === 127;
+  })) {
     throw new Error(`${label} must be a short, printable string`);
   }
   return value;

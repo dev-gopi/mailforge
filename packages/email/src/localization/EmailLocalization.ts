@@ -56,7 +56,10 @@ export function resolveEmailDirection(locale: string, direction?: "ltr" | "rtl")
 }
 
 function checkedText(value: unknown, field: string, max: number): string {
-    if (typeof value !== "string" || !value.trim() || value.length > max || /[\u0000-\u001f\u007f]/.test(value)) {
+    if (typeof value !== "string" || !value.trim() || value.length > max || value.split("").some((character) => {
+        const code = character.charCodeAt(0);
+        return code <= 31 || code === 127;
+    })) {
         throw new EmailLocalizationError(field, `must be nonempty text, at most ${max} characters, without control characters`);
     }
     return value;

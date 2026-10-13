@@ -52,7 +52,7 @@ function parseOptionalJSON(id, expected) {
   const input = $(id).value.trim();
   if (!input) return undefined;
   let value;
-  try { value = JSON.parse(input); } catch (error) { throw new Error(`Invalid ${id} JSON: ${error.message}`); }
+  try { value = JSON.parse(input); } catch (error) { throw new Error(`Invalid ${id} JSON: ${error.message}`, { cause: error }); }
   const valid = expected === "array" ? Array.isArray(value) : value !== null && typeof value === "object" && !Array.isArray(value);
   if (!valid) throw new Error(`${id} must contain a JSON ${expected}`);
   return value;
@@ -61,7 +61,7 @@ function collect() {
   if (!state.selected) throw new Error("Select a template first");
   let data;
   try { data = JSON.parse($("data").value); }
-  catch (e) { throw new Error(`Invalid JSON: ${e.message}`); }
+  catch (e) { throw new Error(`Invalid JSON: ${e.message}`, { cause: e }); }
   return {
     templateId: state.selected.id, data,
     theme: $("theme").value, layoutPreset: $("layout").value, variant: $("variant").value,
