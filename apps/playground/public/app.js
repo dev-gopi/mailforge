@@ -97,7 +97,7 @@ function showTab(tab) {
   const frame = $("emailFrame"), source = $("source");
   frame.hidden = tab !== "preview"; source.hidden = tab === "preview";
   if (!state.last) return;
-  if (tab === "preview") frame.srcdoc = state.last.html;
+  if (tab === "preview") frame.src = state.last.previewUrl;
   else text(source, state.last[tab]);
 }
 function device(mode) {

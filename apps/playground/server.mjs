@@ -1,5 +1,6 @@
 /* global process, console, Buffer, URL */
 import { createServer } from "node:http";
+import { randomBytes } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
@@ -21,6 +22,17 @@ const COMMON_HEADERS = {
   "cache-control": "no-store",
   "content-security-policy": "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'",
 };
+// The main editor keeps a strict CSP. The separately navigated, sandboxed
+// preview needs inline CSS because compiled MJML relies on <style> tags and
+// style="..." attributes. Never enable inline scripts in the preview.
+const PREVIEW_HEADERS = {
+  ...COMMON_HEADERS,
+  "content-type": "text/html; charset=utf-8",
+  "content-security-policy": "default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src https: data:; font-src https: data:; connect-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+};
+const PREVIEW_TTL_MS = 5 * 60_000;
+const MAX_PREVIEWS = 24;
+const MAX_PREVIEW_BYTES = 2_000_000;
 function json(res, status, body) {
   res.writeHead(status, { ...COMMON_HEADERS, "content-type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(body));
@@ -48,6 +60,8 @@ async function loadMailForge() {
 export function createPlaygroundServer(dependencies = {}) {
   const load = dependencies.loadMailForge ?? loadMailForge;
   const fixtures = dependencies.getTemplatePreviewData ?? getTemplatePreviewData;
+  // Local-only, bounded, short-lived HTML snapshots. URLs contain random IDs.
+  const previews = new Map();
   return createServer(async (req, res) => {
     try {
       const host = req.headers.host;
@@ -79,6 +93,18 @@ export function createPlaygroundServer(dependencies = {}) {
         json(res, 200, { data: fixtures(match) });
         return;
       }
+      if (req.method === "GET" && pathname.startsWith("/api/preview/")) {
+        const token = pathname.slice("/api/preview/".length);
+        const item = /^[a-f0-9]{32}$/.test(token) ? previews.get(token) : undefined;
+        if (!item || item.expiresAt <= Date.now()) {
+          previews.delete(token);
+          json(res, 404, { error: "Preview not found or expired" });
+          return;
+        }
+        res.writeHead(200, PREVIEW_HEADERS);
+        res.end(item.html);
+        return;
+      }
       if (req.method === "POST" && pathname === "/api/render") {
         const body = await readJson(req);
         const { createEmail } = await load();
@@ -86,7 +112,19 @@ export function createPlaygroundServer(dependencies = {}) {
         const catalog = engine.listBuiltinCatalog();
         const normalized = normalizePreviewRequest(body, new Set(catalog.map(entry => entry.id)), engine.listThemes());
         const result = await createEmail(normalized.engineConfig).render(normalized.templateId, normalized.options);
-        json(res, 200, { subject: result.subject, preheader: result.preheader ?? "", html: result.html, text: result.text, warnings: result.warnings ?? [] });
+        if (typeof result.html !== "string" || Buffer.byteLength(result.html, "utf8") > MAX_PREVIEW_BYTES) {
+          throw new Error("Rendered email HTML exceeds preview limits");
+        }
+        const now = Date.now();
+        for (const [id, item] of previews) {
+          if (item.expiresAt <= now) previews.delete(id);
+        }
+        while (previews.size >= MAX_PREVIEWS) {
+          previews.delete(previews.keys().next().value);
+        }
+        const token = randomBytes(16).toString("hex");
+        previews.set(token, { html: result.html, expiresAt: now + PREVIEW_TTL_MS });
+        json(res, 200, { subject: result.subject, preheader: result.preheader ?? "", html: result.html, text: result.text, warnings: result.warnings ?? [], previewUrl: `/api/preview/${token}` });
         return;
       }
       json(res, 404, { error: "Not found" });
