@@ -10,3 +10,5 @@ export {
 export {
     resolveEmailTheme, mergeEmailTheme, defineThemeOverrides,
 } from "./resolver/ThemeResolver.js";
+export { ThemeRegistry } from "./registry/ThemeRegistry.js";
+export type { ThemeDefinition, ThemeImportOptions } from "./registry/ThemeRegistry.js";
