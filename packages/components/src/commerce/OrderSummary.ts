@@ -64,6 +64,7 @@ export function createOrderSummaryDefinition():
                 output.push({
                     id: `${context.nodeId}-item-${index}`,
                     type: "text",
+                    attrs: { "data-mf-style": "body" },
                     props: {
                         text:
                             `${item.name} × ${item.quantity} — ` +
@@ -81,6 +82,7 @@ export function createOrderSummaryDefinition():
             output.push({
                 id: `${context.nodeId}-shipping`,
                 type: "text",
+                attrs: { "data-mf-style": "body" },
                 props: {
                     text:
                         `Shipping — ` +
@@ -95,6 +97,7 @@ export function createOrderSummaryDefinition():
                 output.push({
                     id: `${context.nodeId}-discount`,
                     type: "text",
+                    attrs: { "data-mf-style": "body" },
                     props: {
                         text:
                             `Discount — ` +
@@ -109,11 +112,13 @@ export function createOrderSummaryDefinition():
             output.push({
                 id: `${context.nodeId}-divider`,
                 type: "divider",
+                attrs: { "data-mf-style": "divider" },
             });
 
             output.push({
                 id: `${context.nodeId}-total`,
                 type: "text",
+                attrs: { "data-mf-style": "body" },
                 props: {
                     text:
                         `Total — ${formatMoney(

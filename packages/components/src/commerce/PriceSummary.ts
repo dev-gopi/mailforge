@@ -47,6 +47,7 @@ export function createPriceSummaryDefinition():
                 {
                     id: `${context.nodeId}-subtotal`,
                     type: "text",
+                    attrs: { "data-mf-style": "body" },
                     props: {
                         text:
                             `Subtotal — ` +
@@ -59,6 +60,7 @@ export function createPriceSummaryDefinition():
                 {
                     id: `${context.nodeId}-shipping`,
                     type: "text",
+                    attrs: { "data-mf-style": "body" },
                     props: {
                         text:
                             `Shipping — ` +
@@ -74,6 +76,7 @@ export function createPriceSummaryDefinition():
                 lines.push({
                     id: `${context.nodeId}-discount`,
                     type: "text",
+                    attrs: { "data-mf-style": "body" },
                     props: {
                         text:
                             `Discount — ` +
@@ -90,10 +93,12 @@ export function createPriceSummaryDefinition():
                 {
                     id: `${context.nodeId}-divider`,
                     type: "divider",
+                    attrs: { "data-mf-style": "divider" },
                 },
                 {
                     id: `${context.nodeId}-total`,
                     type: "text",
+                    attrs: { "data-mf-style": "body" },
                     props: {
                         text:
                             `Total — ${formatMoney(
