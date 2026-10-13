@@ -30,6 +30,7 @@ import {
 import {
     getBuiltinTemplate,
     TemplateVersionRegistry,
+    TemplateVersionError,
     type TemplateVersionInfo,
     type TemplateVersionSelection,
     getBuiltinCatalogTemplate,
@@ -399,6 +400,68 @@ export class MailForgeEmail {
         reason?: string,
     ): this {
         this.templateVersions.deprecate(templateId, version, reason);
+        return this;
+    }
+
+    /**
+     * Save a reusable immutable snapshot of a custom template or a
+     * non-data-driven core built-in template. Current rendering is unaffected.
+     *
+     * Do not save materialized invoice/order/security customer data in a
+     * shared registry: those templates need data at render time.
+     */
+    public publishTemplateVersion(
+        templateId: string,
+        version?: string,
+    ): this {
+        const custom = this.templates.get(templateId);
+        if (custom) {
+            return this.registerTemplateVersion({
+                ...structuredClone(custom),
+                version: version ?? custom.version,
+            });
+        }
+        if (isBuiltinTemplateName(templateId)) {
+            if (isDomainTemplateName(templateId)) {
+                throw new TemplateVersionError(
+                    `Data-driven template requires explicit safe version design: ${templateId}`,
+                );
+            }
+            const document = getBuiltinTemplate(templateId);
+            return this.registerTemplateVersion({
+                ...document,
+                version: version ?? document.version,
+            });
+        }
+        if (listBuiltinTemplateCatalog().some(item => item.id === templateId)) {
+            throw new TemplateVersionError(
+                `Catalog template requires an explicit data-safe version document: ${templateId}`,
+            );
+        }
+        throw new TemplateVersionError(`Template not found: ${templateId}`);
+    }
+
+    /**
+     * Publish a newer immutable version by customizing a detached snapshot.
+     * Optionally deprecate the old version after successful publication.
+     */
+    public migrateTemplateVersion(
+        templateId: string,
+        fromVersion: string,
+        toVersion: string,
+        customize: TemplateCustomizer,
+        options: {
+            readonly deprecateSource?: boolean;
+            readonly reason?: string;
+        } = {},
+    ): this {
+        this.templateVersions.migrate(
+            templateId,
+            fromVersion,
+            toVersion,
+            customize,
+            options,
+        );
         return this;
     }
 

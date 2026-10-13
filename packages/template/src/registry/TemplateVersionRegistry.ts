@@ -194,6 +194,52 @@ export class TemplateVersionRegistry {
       }));
   }
 
+  /**
+   * Create an immutable new version from an existing published version.
+   * The source remains unchanged. Deprecation happens only after
+   * the new version has been validated and registered successfully.
+   */
+  public migrate(
+    id: string,
+    fromVersion: string,
+    toVersion: string,
+    customize: (draft: EmailDocument) => EmailDocument | void,
+    options: {
+      readonly deprecateSource?: boolean;
+      readonly reason?: string;
+    } = {},
+  ): this {
+    if (typeof customize !== "function") {
+      throw new TemplateVersionError("Migration customize must be a function");
+    }
+    if (compareVersions(toVersion, fromVersion) <= 0) {
+      throw new TemplateVersionError(
+        `Migration target must be newer: ${fromVersion} -> ${toVersion}`,
+      );
+    }
+
+    // get() returns a clone; no callback can change the published source.
+    const draft = this.get(id, fromVersion);
+    const modified = customize(draft) ?? draft;
+    if (
+      modified === null ||
+      typeof modified !== "object" ||
+      modified.id !== id ||
+      !Array.isArray(modified.body) ||
+      (modified.version !== fromVersion && modified.version !== toVersion)
+    ) {
+      throw new TemplateVersionError(
+        `Migration must preserve the template id and source version: ${id}`,
+      );
+    }
+
+    this.register({ ...modified, version: toVersion });
+    if (options.deprecateSource === true) {
+      this.deprecate(id, fromVersion, options.reason);
+    }
+    return this;
+  }
+
   public deprecate(
     id: string,
     version: string,
