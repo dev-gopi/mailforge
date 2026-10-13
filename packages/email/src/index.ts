@@ -256,3 +256,13 @@ export type {
     TemplateVariantDefinition,
     ResolvedTemplateVariant,
 } from "./registry/TemplateVariantRegistry.js";
+
+// Category-specific data contracts for business catalog templates.
+export {
+    accountCatalogTemplateDataSchema,
+    authenticationCatalogTemplateDataSchema,
+} from "@mailforge/templates";
+export type {
+    AccountCatalogTemplateData,
+    AuthenticationCatalogTemplateData,
+} from "@mailforge/templates";

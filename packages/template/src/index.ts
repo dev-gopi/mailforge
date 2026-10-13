@@ -166,3 +166,13 @@ export type {
   SpecializedTemplateDataMap as ExtendedTemplateDataMap,
   SpecializedTemplateInfo as ExtendedTemplateInfo,
 } from "./specialized/SpecializedTemplates.js";
+
+// Task 7.8.5.2–7.8.5.3: category-specific catalog data contracts.
+export {
+    accountCatalogTemplateDataSchema,
+    authenticationCatalogTemplateDataSchema,
+} from "./catalog/CatalogTemplates.js";
+export type {
+    AccountCatalogTemplateData,
+    AuthenticationCatalogTemplateData,
+} from "./catalog/CatalogTemplates.js";

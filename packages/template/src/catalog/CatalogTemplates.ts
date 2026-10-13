@@ -87,6 +87,26 @@ export const catalogTemplateDataSchema = z.object({
 }).strict();
 export type CatalogTemplateData = z.input<typeof catalogTemplateDataSchema>;
 
+/** Optional structured details for account events. Base fields remain unchanged. */
+export const accountCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
+    account: z.object({
+        email: z.email().max(254).optional(),
+        referenceId: z.string().trim().min(1).max(80)
+            .regex(/^[A-Za-z0-9._-]+$/, "Invalid account reference").optional(),
+    }).strict().optional(),
+}).strict();
+export type AccountCatalogTemplateData = z.input<typeof accountCatalogTemplateDataSchema>;
+
+/** Optional sign-in context; do not put passwords, OTPs or recovery codes here. */
+export const authenticationCatalogTemplateDataSchema = catalogTemplateDataSchema.extend({
+    security: z.object({
+        device: textValue.optional(),
+        location: textValue.optional(),
+        occurredAt: z.iso.datetime({ offset: true }).optional(),
+    }).strict().optional(),
+}).strict();
+export type AuthenticationCatalogTemplateData = z.input<typeof authenticationCatalogTemplateDataSchema>;
+
 const definitions = new Map<string, typeof CATALOG_TEMPLATE_DEFINITIONS[number]>(
     CATALOG_TEMPLATE_DEFINITIONS.map(row => [row[0], row] as const),
 );
@@ -105,7 +125,25 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
     const entry = definitions.get(id);
     if (!entry) throw new Error(`Unknown catalog template: ${id}`);
     const [, category, title, description, actionLabel] = entry;
-    const data = input === undefined ? undefined : catalogTemplateDataSchema.parse(input);
+    // Keep the shared fields separate from category-specific details.
+    // This avoids an ambiguous union of Zod schema outputs.
+    let data: z.output<typeof catalogTemplateDataSchema> | undefined = undefined;
+    let accountDetails: z.output<typeof accountCatalogTemplateDataSchema>["account"] = undefined;
+    let securityDetails: z.output<typeof authenticationCatalogTemplateDataSchema>["security"] = undefined;
+
+    if (input !== undefined) {
+        if (category === "account") {
+            const parsed = accountCatalogTemplateDataSchema.parse(input);
+            data = parsed;
+            accountDetails = parsed.account;
+        } else if (category === "authentication") {
+            const parsed = authenticationCatalogTemplateDataSchema.parse(input);
+            data = parsed;
+            securityDetails = parsed.security;
+        } else {
+            data = catalogTemplateDataSchema.parse(input);
+        }
+    }
     if (data !== undefined && category === "marketing" && data.unsubscribeUrl === undefined) {
         throw new Error(`Marketing template ${id} requires unsubscribeUrl`);
     }
@@ -143,6 +181,32 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
         body.push(panel(`${id}-detail`, [
             mutedParagraph(`${id}-detail-text`, data.detail),
         ]));
+    }
+    // Use existing semantic panel components so all styling comes from
+    // the selected MailForge theme, not hardcoded per-template CSS.
+    if (category === "account" && accountDetails) {
+        const details: EmailNode[] = [];
+        if (accountDetails.email !== undefined) {
+            details.push(mutedParagraph(`${id}-account-email`, `Account email: ${accountDetails.email}`));
+        }
+        if (accountDetails.referenceId !== undefined) {
+            details.push(mutedParagraph(`${id}-account-reference`, `Reference: ${accountDetails.referenceId}`));
+        }
+        if (details.length > 0) body.push(panel(`${id}-account-details`, details));
+    }
+    if (category === "authentication" && securityDetails) {
+        const details: EmailNode[] = [];
+        if (securityDetails.device !== undefined) {
+            details.push(mutedParagraph(`${id}-security-device`, `Device: ${securityDetails.device}`));
+        }
+        if (securityDetails.location !== undefined) {
+            details.push(mutedParagraph(`${id}-security-location`, `Location: ${securityDetails.location}`));
+        }
+        if (securityDetails.occurredAt !== undefined) {
+            const timestamp = new Date(securityDetails.occurredAt).toUTCString();
+            details.push(mutedParagraph(`${id}-security-time`, `Time (UTC): ${timestamp}`));
+        }
+        if (details.length > 0) body.push(panel(`${id}-security-details`, details));
     }
     if (category === "billing" || category === "ecommerce" || category === "events" || category === "support") {
         body.push(divider(`${id}-divider`));
