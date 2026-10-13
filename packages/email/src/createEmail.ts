@@ -288,7 +288,9 @@ export class MailForgeEmail {
     public listTemplateCatalog(
         category?: TemplateCategory,
     ): TemplateCatalogEntry[] {
-        return listTemplateCatalog(category);
+        return listTemplateCatalog(category).filter(
+            item => item.id !== "login",
+        );
     }
 
     /**

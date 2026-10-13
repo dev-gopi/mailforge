@@ -214,10 +214,6 @@ export function buildFeatureShowcaseTemplate(
             {
                 id: "showcase-actions-card",
                 type: "container",
-                styles: {
-                    backgroundColor: design.surface,
-                    padding: "20px 32px 24px",
-                },
                 children: [
                     {
                         id: "showcase-actions",

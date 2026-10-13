@@ -15,17 +15,16 @@ export function buildWelcomeTemplate(): EmailDocument {
     "Welcome, {{user.firstName}}!",
     "Your account is ready.",
     [
+      contentHeading(
+        "welcome-heading",
+        "Welcome to your new workspace.",
+      ),
       {
         id: "welcome-icon",
         type: "text",
         props: { text: "✓" },
         attrs: { "data-mf-style": "status-icon" },
       },
-
-      contentHeading(
-        "welcome-heading",
-        "Welcome to your new workspace.",
-      ),
       contentParagraph(
         "welcome-greeting",
         "Hi {{user.firstName}},",
