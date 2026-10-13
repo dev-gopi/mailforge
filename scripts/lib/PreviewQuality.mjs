@@ -66,7 +66,7 @@ export function inspectEmailPreview({ html, text, entry, maxHtmlBytes = 1024 * 1
 }
 
 /** Check completeness and duplicate sample identities. */
-export function inspectPreviewManifest(manifest) {
+export function inspectPreviewManifest(manifest, expectedThemes) {
   const errors = [];
   if (!manifest || typeof manifest !== 'object' || !Array.isArray(manifest.entries)) {
     return ['Preview report is missing an entries array'];
@@ -77,19 +77,52 @@ export function inspectPreviewManifest(manifest) {
   if (manifest.failed !== 0 || (manifest.errors?.length ?? 0) !== 0) {
     errors.push('Template preview generation reported rendering failures');
   }
-  const expected = manifest.catalogCount * 4;
+  // The generator renders one default for every theme, plus modern/no-heading.
+  // The release audit supplies the actual theme registry. Keep the original
+  // three-theme baseline for callers of this helper that omit expectedThemes.
+  const themes = expectedThemes ?? ['modern', 'corporate', 'minimal'];
+  const themeSet = new Set(themes);
+  if (!Array.isArray(themes) || themes.length === 0 ||
+      themes.length !== themeSet.size ||
+      themes.some(theme => typeof theme !== 'string' || !theme.trim())) {
+    errors.push('Invalid expected preview theme list');
+  }
+  const expected = manifest.catalogCount * (themeSet.size + Number(themeSet.has('modern')));
   if (manifest.entries.length !== expected) {
     errors.push(`Expected ${expected} template/theme samples but found ${manifest.entries.length}`);
   }
   const seen = new Set();
+  const ids = new Set();
   for (const entry of manifest.entries) {
-    if (!entry || typeof entry.id !== 'string' || typeof entry.theme !== 'string' || typeof entry.variant !== 'string') {
+    if (!entry || typeof entry.id !== 'string' || !entry.id.trim() ||
+        typeof entry.theme !== 'string' || typeof entry.variant !== 'string') {
       errors.push('Invalid preview entry metadata');
       continue;
+    }
+    ids.add(entry.id);
+    if (!themeSet.has(entry.theme)) {
+      errors.push(`Unexpected preview theme: ${entry.theme}`);
+    }
+    if (entry.variant !== 'default' &&
+        !(entry.theme === 'modern' && entry.variant === 'no-heading')) {
+      errors.push(`Unexpected preview variant: ${entry.id}/${entry.theme}/${entry.variant}`);
     }
     const key = `${entry.id}\0${entry.theme}\0${entry.variant}`;
     if (seen.has(key)) errors.push(`Duplicate preview entry: ${entry.id}/${entry.theme}/${entry.variant}`);
     seen.add(key);
+  }
+  if (ids.size !== manifest.catalogCount) {
+    errors.push(`Expected ${manifest.catalogCount} distinct templates but found ${ids.size}`);
+  }
+  for (const id of ids) {
+    for (const theme of themeSet) {
+      if (!seen.has(`${id}\0${theme}\0default`)) {
+        errors.push(`Missing default preview: ${id}/${theme}`);
+      }
+      if (theme === 'modern' && !seen.has(`${id}\0modern\0no-heading`)) {
+        errors.push(`Missing no-heading preview: ${id}/modern`);
+      }
+    }
   }
   return errors;
 }

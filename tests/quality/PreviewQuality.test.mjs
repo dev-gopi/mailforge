@@ -49,3 +49,42 @@ test('rejects incomplete or duplicate manifests', () => {
   assert.ok(messages.some(message => message.includes('Expected')));
   assert.ok(messages.some(message => message.includes('Duplicate')));
 });
+
+// Task 8.5.19: release matrix regression coverage
+const releaseThemes = [
+  'modern', 'minimal', 'corporate', 'dark', 'premium', 'ocean',
+  'forest', 'sunset', 'elegant', 'playful',
+];
+const makeReleaseMatrix = ids => ids.flatMap(id => releaseThemes.flatMap(theme => [
+  { id, theme, variant: 'default' },
+  ...(theme === 'modern' ? [{ id, theme, variant: 'no-heading' }] : []),
+]));
+
+test('accepts 100 templates across 10 themes plus modern/no-heading (1100 previews)', () => {
+  const ids = Array.from({ length: 100 }, (_, i) => `template-${i}`);
+  const entries = makeReleaseMatrix(ids);
+  assert.equal(entries.length, 1100);
+  assert.deepEqual(inspectPreviewManifest({ catalogCount: 100, failed: 0, errors: [], entries }, releaseThemes), []);
+});
+
+test('rejects a missing complete theme instead of trusting the themes found in the manifest', () => {
+  const entries = makeReleaseMatrix(['welcome']).filter(row => row.theme !== 'playful');
+  const result = inspectPreviewManifest({ catalogCount: 1, failed: 0, errors: [], entries }, releaseThemes);
+  assert.ok(result.some(message => message.includes('Expected 11 template/theme samples')));
+  assert.ok(result.some(message => message.includes('Missing default preview: welcome/playful')));
+});
+
+test('rejects missing default/no-heading previews, unexpected variants and template-count mismatch', () => {
+  const entries = makeReleaseMatrix(['welcome']);
+  const missing = inspectPreviewManifest({
+    catalogCount: 1, failed: 0, errors: [],
+    entries: entries.filter(row => !(row.theme === 'modern' && row.variant === 'no-heading')),
+  }, releaseThemes);
+  assert.ok(missing.some(message => message.includes('Missing no-heading preview')));
+  const invalid = inspectPreviewManifest({
+    catalogCount: 2, failed: 0, errors: [],
+    entries: [...entries, { id: 'welcome', theme: 'corporate', variant: 'no-heading' }],
+  }, releaseThemes);
+  assert.ok(invalid.some(message => message.includes('Unexpected preview variant')));
+  assert.ok(invalid.some(message => message.includes('distinct templates')));
+});

@@ -3,10 +3,11 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { inspectEmailPreview, inspectPreviewManifest } from './lib/PreviewQuality.mjs';
+import { listThemePresets } from '../packages/email/dist/index.js';
 
 const root = path.resolve(process.argv[2] ?? 'generated/template-audit');
 const manifest = JSON.parse(await readFile(path.join(root, 'report.json'), 'utf8'));
-const errors = inspectPreviewManifest(manifest).map(message => ({ id: '(catalog)', message }));
+const errors = inspectPreviewManifest(manifest, listThemePresets()).map(message => ({ id: '(catalog)', message }));
 const warnings = [];
 const resolveSafe = relative => {
   if (typeof relative !== 'string' || !relative) throw new Error('Missing preview output path');
