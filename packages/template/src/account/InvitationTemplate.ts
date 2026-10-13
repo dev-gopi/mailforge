@@ -19,13 +19,7 @@ export function buildInvitationTemplate(): EmailDocument {
         id: "invitation-icon",
         type: "text",
         props: { text: "✦" },
-        styles: {
-          backgroundColor: "#eff6ff",
-          color: "#2563eb",
-          fontSize: 26,
-          textAlign: "center",
-          padding: "12px",
-        },
+        attrs: { "data-mf-style": "status-icon" },
       },
       contentHeading("invitation-heading", "You're Invited!"),
 
@@ -49,7 +43,6 @@ export function buildInvitationTemplate(): EmailDocument {
           styles: {
             fontSize: 13,
             lineHeight: "22px",
-            color: "#64748b",
             padding: "0",
           },
         },

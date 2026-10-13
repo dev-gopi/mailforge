@@ -67,15 +67,18 @@ const STYLE_ATTRIBUTES: Record<string, string> = {
     width: "width",
     height: "height",
     borderRadius: "border-radius",
+    border: "border",
+    innerPadding: "inner-padding",
+    textDecoration: "text-decoration",
 };
 
 // MJML validates attributes per element. Do not emit CSS for unsupported targets.
 const TARGET_STYLES: Record<string, readonly string[]> = {
-    "mj-text": ["color", "backgroundColor", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "letterSpacing", "padding", "height"],
-    "mj-button": ["color", "backgroundColor", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "padding", "width", "height", "borderRadius"],
+    "mj-text": ["color", "backgroundColor", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "letterSpacing", "padding", "height", "textDecoration"],
+    "mj-button": ["color", "backgroundColor", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "padding", "innerPadding", "width", "height", "borderRadius", "border", "textDecoration"],
     "mj-image": ["width", "height", "padding", "borderRadius", "textAlign"],
     "mj-section": ["backgroundColor", "padding", "textAlign"],
-    "mj-column": ["backgroundColor", "width", "padding"],
+    "mj-column": ["backgroundColor", "width", "padding", "border", "borderRadius"],
     "mj-divider": ["color", "padding", "width"],
     "mj-spacer": ["height", "padding"],
 };

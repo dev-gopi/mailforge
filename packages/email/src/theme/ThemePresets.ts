@@ -24,11 +24,11 @@ const PRESETS: Record<
         preset: "modern",
 
         colors: {
-            primary: "#111827",
+            primary: "#2563eb",
             secondary: "#475569",
             background: "#f5f6f8",
             surface: "#ffffff",
-            text: "#111827",
+            text: "#0f172a",
             muted: "#64748b",
             border: "#e5e7eb",
         },
@@ -41,6 +41,8 @@ const PRESETS: Record<
             lineHeight: 1.5,
         },
 
+        appearance: { containerWidth: 600, contentPadding: 32, cardRadius: 12, buttonRadius: 8 },
+
         spacing: {
             xs: 4,
             sm: 8,
@@ -52,6 +54,7 @@ const PRESETS: Record<
 
     minimal: {
         preset: "minimal",
+        appearance: { containerWidth: 600, contentPadding: 30, cardRadius: 4, buttonRadius: 4 },
 
         colors: {
             primary: "#111827",
@@ -82,6 +85,7 @@ const PRESETS: Record<
 
     corporate: {
         preset: "corporate",
+        appearance: { containerWidth: 600, contentPadding: 36, cardRadius: 10, buttonRadius: 6 },
 
         colors: {
             primary: "#0f4c81",

@@ -35,6 +35,7 @@ export function createOrderItemDefinition():
             return {
                 id: context.nodeId,
                 type: "text",
+                attrs: { "data-mf-style": "body" },
 
                 props: {
                     text:

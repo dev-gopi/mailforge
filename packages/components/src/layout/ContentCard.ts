@@ -59,6 +59,8 @@ export function createContentCardDefinition():
                     props: {
                         text: value.title,
                     },
+                    attrs: { "data-mf-style": "body" },
+                    styles: { fontWeight: "bold" },
                 },
                 {
                     id: `${context.nodeId}-description`,
@@ -66,6 +68,7 @@ export function createContentCardDefinition():
                     props: {
                         text: value.description,
                     },
+                    attrs: { "data-mf-style": "muted" },
                 },
             ];
 
@@ -77,16 +80,19 @@ export function createContentCardDefinition():
                         text: value.actionLabel,
                         href: value.actionUrl,
                     },
+                    attrs: { "data-mf-style": "primary-action" },
                 });
             }
 
             return {
                 id: context.nodeId,
                 type: "section",
+                attrs: { "data-mf-style": "panel-outer" },
                 children: [
                     {
                         id: `${context.nodeId}-column`,
                         type: "column",
+                        attrs: { "data-mf-style": "panel-inner" },
                         children,
                     },
                 ],

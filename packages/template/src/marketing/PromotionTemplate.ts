@@ -11,6 +11,7 @@ import {
     contentParagraph,
     mutedParagraph,
     actionButton,
+    quietAction,
 } from "../shared/TemplateNodes.js";
 
 const text = (max: number) =>
@@ -48,6 +49,7 @@ export const promotionSchema = z.object({
     discountPercent: z.number().int().min(1).max(100),
     expiresOn: calendarDate,
     actionUrl: httpsUrl,
+    unsubscribeUrl: httpsUrl.optional(),
     terms: text(500).optional(),
 }).strict();
 
@@ -79,13 +81,7 @@ export function buildPromotionTemplate(
                 text: discountCode,
                 level: 2,
             },
-            styles: {
-                textAlign: "center",
-                fontSize: 28,
-                fontWeight: "bold",
-                color: "#1d4ed8",
-                padding: "12px",
-            },
+            attrs: { "data-mf-style": "promotional-code" },
         },
         actionButton(
             "promo-action",
@@ -97,6 +93,13 @@ export function buildPromotionTemplate(
 
     if (data?.terms) {
         body.push(mutedParagraph("promo-terms", `Terms & Conditions: ${data.terms}`));
+    }
+    body.push(mutedParagraph(
+        "promo-subscription-note",
+        "You are receiving this offer because you subscribed to marketing updates.",
+    ));
+    if (data?.unsubscribeUrl) {
+        body.push(quietAction("promo-unsubscribe", "Unsubscribe", data.unsubscribeUrl));
     }
 
     return createTemplateDocument(

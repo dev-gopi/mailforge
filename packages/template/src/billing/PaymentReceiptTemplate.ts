@@ -75,7 +75,6 @@ export function buildPaymentReceiptTemplate(
                     },
                     styles: {
                         fontSize: 13,
-                        color: "#64748b",
                         padding: "0",
                     },
                 }],

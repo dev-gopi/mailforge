@@ -71,7 +71,6 @@ export function buildInvoiceTemplate(
                     },
                     styles: {
                         fontSize: 13,
-                        color: "#64748b",
                         padding: "0",
                     },
                 }],

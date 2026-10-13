@@ -33,14 +33,8 @@ export function buildOtpTemplate(): EmailDocument {
               props: {
                 text: "YOUR VERIFICATION CODE",
               },
-              styles: {
-                textAlign: "center",
-                color: "#64748b",
-                fontSize: 11,
-                fontWeight: "bold",
-                letterSpacing: "1px",
-                padding: "0 0 10px",
-              },
+              attrs: { "data-mf-style": "eyebrow" },
+              styles: { textAlign: "center", padding: "0 0 10px" },
             },
             {
               id: "otp-code",
@@ -55,12 +49,8 @@ export function buildOtpTemplate(): EmailDocument {
               props: {
                 text: "Expires in {{expiresInMinutes}} minutes",
               },
-              styles: {
-                textAlign: "center",
-                color: "#64748b",
-                fontSize: 13,
-                padding: "10px 0 0",
-              },
+              attrs: { "data-mf-style": "muted" },
+              styles: { textAlign: "center", padding: "10px 0 0" },
             },
       ], "#eff6ff"),
 
@@ -87,7 +77,7 @@ export function buildOtpTemplate(): EmailDocument {
     instructionsNode.styles = {
       ...instructionsNode.styles,
       textAlign: "center",
-      color: "#475569",
+
     };
   }
 
@@ -95,7 +85,7 @@ export function buildOtpTemplate(): EmailDocument {
     id: "otp-divider",
     type: "divider",
     styles: {
-      color: "#e2e8f0",
+
       padding: "8px 0",
     },
   });
@@ -108,7 +98,7 @@ export function buildOtpTemplate(): EmailDocument {
     },
     styles: {
       textAlign: "center",
-      color: "#64748b",
+
       fontSize: 13,
       padding: "16px 0 8px",
     },

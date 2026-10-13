@@ -32,7 +32,6 @@ export function buildLoginTemplate(): EmailDocument {
           styles: {
             fontSize: 13,
             lineHeight: "22px",
-            color: "#64748b",
             padding: "0",
           },
         },

@@ -119,7 +119,13 @@ export function applyDefaultLayout(
     if (!layout.footer.enabled) {
         delete document.footer;
     } else if (!document.footer) {
-        const children: EmailNode[] = [];
+        const children: EmailNode[] = [
+            {
+                id: createId(ids, "mf-auto-footer-divider"),
+                type: "divider",
+                attrs: { "data-mf-style": "divider" },
+            },
+        ];
 
         children.push({
             id: createId(ids, "mf-auto-footer-message"),

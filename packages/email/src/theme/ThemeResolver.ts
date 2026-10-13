@@ -8,6 +8,7 @@ import {
     EmailThemeError,
     type ResolvedEmailTheme,
     type ThemeColors,
+    type ThemeAppearance,
     type ThemeOverrides,
     type ThemePreset,
     type ThemeSpacing,
@@ -19,13 +20,17 @@ const ROOT_KEYS = new Set([
     "colors",
     "typography",
     "spacing",
+    "appearance",
 ]);
 
 const OVERRIDE_KEYS = new Set([
     "colors",
     "typography",
     "spacing",
+    "appearance",
 ]);
+
+const APPEARANCE_KEYS = new Set(["containerWidth", "contentPadding", "cardRadius", "buttonRadius"]);
 
 const COLOR_KEYS = [
     "primary",
@@ -303,6 +308,26 @@ function parseSpacing(
     return result;
 }
 
+/** Appearance dimensions are deliberately bounded for email clients. */
+function parseAppearance(input: unknown): Partial<ThemeAppearance> {
+    const raw = asRecord(input, "theme.appearance");
+    allowOnly(raw, APPEARANCE_KEYS, "theme.appearance");
+    const result: Partial<ThemeAppearance> = {};
+    for (const key of APPEARANCE_KEYS) {
+        if (!Object.hasOwn(raw, key)) continue;
+        const limits: Record<keyof ThemeAppearance, [number, number]> = {
+            containerWidth: [480, 720],
+            contentPadding: [16, 56],
+            cardRadius: [0, 24],
+            buttonRadius: [0, 24],
+        };
+        const name = key as keyof ThemeAppearance;
+        const [min, max] = limits[name];
+        result[name] = checkNumber(raw[key], `theme.appearance.${key}`, min, max, true);
+    }
+    return result;
+}
+
 /**
  * Freeze nested theme objects as well.
  */
@@ -318,6 +343,7 @@ function freezeTheme(
         spacing: Object.freeze({
             ...theme.spacing,
         }),
+        appearance: Object.freeze({ ...theme.appearance }),
     });
 }
 
@@ -354,6 +380,10 @@ export function mergeEmailTheme(
 
     const spacing = Object.hasOwn(overrides, "spacing")
         ? parseSpacing(overrides.spacing)
+        : {};
+
+    const appearance = Object.hasOwn(overrides, "appearance")
+        ? parseAppearance(overrides.appearance)
         : {};
 
     const mergedSpacing: ThemeSpacing = {
@@ -393,6 +423,7 @@ export function mergeEmailTheme(
             ...typography,
         },
         spacing: mergedSpacing,
+        appearance: { ...base.appearance, ...appearance },
     });
 }
 

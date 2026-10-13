@@ -49,13 +49,9 @@ export function createActionButtonDefinition():
                     href: String(props.href),
                 },
 
-                ...(secondary
-                    ? {
-                        styles: {
-                            backgroundColor: "#475569",
-                        },
-                    }
-                    : {}),
+                attrs: {
+                    "data-mf-style": secondary ? "quiet-action" : "primary-action",
+                },
             };
         },
     };

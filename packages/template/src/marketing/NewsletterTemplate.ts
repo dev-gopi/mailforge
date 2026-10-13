@@ -11,6 +11,7 @@ import {
     contentParagraph,
     mutedParagraph,
     actionButton,
+    quietAction,
 } from "../shared/TemplateNodes.js";
 
 const text = (max: number) =>
@@ -110,7 +111,7 @@ export function buildNewsletterTemplate(
 
     body.push(
         mutedParagraph("unsubscribe-text", "You received this email because you subscribed to our newsletter."),
-        actionButton("unsubscribe-action", "Unsubscribe", data?.unsubscribeUrl ?? "{{newsletter.unsubscribeUrl}}"),
+        quietAction("unsubscribe-action", "Unsubscribe", data?.unsubscribeUrl ?? "{{newsletter.unsubscribeUrl}}"),
     );
 
     return createTemplateDocument(

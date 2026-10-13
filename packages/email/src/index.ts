@@ -44,6 +44,7 @@ export type {
     ThemeColors,
     ThemeTypography,
     ThemeSpacing,
+    ThemeAppearance,
     ThemeOverrides,
     ThemeConfiguration,
     EmailThemeOptions,
@@ -233,3 +234,7 @@ export type {
     FeatureShowcaseData,
 } from "@mailforge/templates";
 
+
+// Per-render display customization (headers, headings, buttons, IDs and subject)
+export { applyTemplateDisplay, TemplateDisplayError } from "./layout/TemplateDisplay.js";
+export type { TemplateDisplayOptions } from "./layout/TemplateDisplay.js";

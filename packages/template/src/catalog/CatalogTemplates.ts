@@ -7,6 +7,9 @@ import {
     contentParagraph,
     mutedParagraph,
     panel,
+    eyebrow,
+    quietAction,
+    divider,
 } from "../shared/TemplateNodes.js";
 
 export const CATALOG_TEMPLATE_DEFINITIONS = [
@@ -102,27 +105,60 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
     }
     const recipient = data?.recipientName ?? "{{recipientName}}";
     const actionUrl = data?.actionUrl ?? "{{actionUrl}}";
+    const categoryLabels: Record<CatalogTemplateCategory, string> = {
+        account: "ACCOUNT UPDATE",
+        authentication: "SECURITY & ACCESS",
+        billing: "BILLING UPDATE",
+        ecommerce: "ORDER UPDATE",
+        marketing: "NEWS & OFFERS",
+        notifications: "IMPORTANT NOTICE",
+        events: "YOUR EVENTS",
+        saas: "WORKSPACE UPDATE",
+        support: "CUSTOMER SUPPORT",
+    };
+    const contextMessages: Record<CatalogTemplateCategory, string> = {
+        account: "You can review the information below and manage your account whenever you need to.",
+        authentication: "For your protection, only use security links that you were expecting.",
+        billing: "Keep this message for your records. Your billing dashboard has the current details.",
+        ecommerce: "You can track the latest order information from your account.",
+        marketing: "Discover the latest updates and choose what matters to you.",
+        notifications: "Please review this notification for any action you may need to take.",
+        events: "Your event details and the most recent schedule are available through the link below.",
+        saas: "Your workspace is ready to help your team stay informed and productive.",
+        support: "Your support team is here to help; you can always review the status of this request.",
+    };
     const body: EmailNode[] = [
+        eyebrow(`${id}-eyebrow`, categoryLabels[category]),
         contentHeading(`${id}-title`, title),
         contentParagraph(`${id}-greeting`, `Hello ${recipient},`),
-        contentParagraph(`${id}-message`, `${description}.`),
+        contentParagraph(`${id}-message`, `${description}. ${contextMessages[category]}`),
     ];
     if (data?.detail) {
         body.push(panel(`${id}-detail`, [
             mutedParagraph(`${id}-detail-text`, data.detail),
         ]));
     }
+    if (category === "billing" || category === "ecommerce" || category === "events" || category === "support") {
+        body.push(divider(`${id}-divider`));
+    }
     body.push(actionButton(`${id}-action`, actionLabel, actionUrl));
-    if (category === "authentication") {
+    if (category === "authentication" || id === "account-closure" || id === "suspicious-sign-in") {
         body.push(mutedParagraph(
             `${id}-security`,
-            "If you did not request this, review your account security settings.",
+            "If you did not request this, review your account security settings. Never share login links or verification codes.",
+        ));
+    } else if (category !== "marketing") {
+        body.push(mutedParagraph(`${id}-note`,
+            "This is an automated account message. If you need help, contact your support team.",
         ));
     }
     if (category === "marketing") {
-        body.push(actionButton(
+        body.push(mutedParagraph(`${id}-subscription`,
+            "You are receiving this email because you subscribed to these updates.",
+        ));
+        body.push(quietAction(
             `${id}-unsubscribe`,
-            "Unsubscribe",
+            "Unsubscribe from marketing emails",
             data?.unsubscribeUrl ?? "{{unsubscribeUrl}}",
         ));
     }

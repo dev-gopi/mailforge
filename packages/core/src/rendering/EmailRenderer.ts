@@ -9,6 +9,11 @@ export interface RenderOptions {
     trust?: RenderTrust;
     inlineCss?: boolean;
     bodyBackgroundColor?: string;
+    /** Validated theme-driven email shell; defaults for direct renderer callers. */
+    surfaceColor?: string;
+    borderColor?: string;
+    containerWidth?: number;
+    containerRadius?: number;
 }
 
 export interface RenderWarning {

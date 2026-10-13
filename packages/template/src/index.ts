@@ -128,3 +128,41 @@ export type {
   FeatureShowcaseData,
 } from "./specialized/FeatureShowcaseTemplate.js";
 
+
+// Complete catalog exports (kept under the existing singular template package).
+export {
+  CATALOG_TEMPLATE_DEFINITIONS,
+  catalogTemplateDataSchema,
+  listCatalogTemplates,
+  isCatalogTemplateName,
+  buildCatalogTemplate,
+} from "./catalog/CatalogTemplates.js";
+export type {
+  CatalogTemplateName,
+  CatalogTemplateCategory,
+  CatalogTemplateInfo,
+  CatalogTemplateData,
+} from "./catalog/CatalogTemplates.js";
+
+// Existing @mailforge/email API uses these older "extended" names.
+// Alias the actual specialized definitions rather than duplicating them.
+export {
+  SPECIALIZED_TEMPLATE_NAMES,
+  SPECIALIZED_TEMPLATE_NAMES as EXTENDED_TEMPLATE_NAMES,
+  listSpecializedTemplates,
+  listSpecializedTemplates as listExtendedTemplates,
+  getSpecializedTemplateInfo,
+  getSpecializedTemplateInfo as getExtendedTemplateInfo,
+  getSpecializedTemplate,
+  getSpecializedTemplate as getExtendedTemplate,
+  registerSpecializedTemplates,
+  registerSpecializedTemplates as registerExtendedTemplates,
+} from "./specialized/SpecializedTemplates.js";
+export type {
+  SpecializedTemplateName,
+  SpecializedTemplateDataMap,
+  SpecializedTemplateInfo,
+  SpecializedTemplateName as ExtendedTemplateName,
+  SpecializedTemplateDataMap as ExtendedTemplateDataMap,
+  SpecializedTemplateInfo as ExtendedTemplateInfo,
+} from "./specialized/SpecializedTemplates.js";

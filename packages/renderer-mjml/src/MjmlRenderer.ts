@@ -137,11 +137,22 @@ export class MjmlRenderer implements EmailRenderer {
             ? ` background-color="${background}"`
             : "";
 
+        const surface = options.surfaceColor ?? "#ffffff";
+        const border = options.borderColor ?? "#e5e7eb";
+        const width = options.containerWidth ?? 600;
+        const radius = options.containerRadius ?? 12;
+        if (![surface, border].every(color => /^#[0-9a-fA-F]{6}$/.test(color))) {
+            throw new Error("Invalid email surface or border color");
+        }
+        if (!Number.isInteger(width) || width < 480 || width > 720 ||
+            !Number.isInteger(radius) || radius < 0 || radius > 24) {
+            throw new Error("Invalid email container dimensions");
+        }
         const source =
             `<mjml><mj-head>${head}</mj-head>` +
-            `<mj-body width="560px"${bodyAttributes}>` +
-            `<mj-wrapper background-color="#ffffff" ` +
-            `border="1px solid #e5e7eb" border-radius="12px" ` +
+            `<mj-body width="${width}px"${bodyAttributes}>` +
+            `<mj-wrapper background-color="${surface}" ` +
+            `border="1px solid ${border}" border-radius="${radius}px" ` +
             `padding="0">${body}</mj-wrapper>` +
             `</mj-body></mjml>`;        // MJML 5 supports an async compiler; strict mode throws on validation errors.
         const compiled = await mjml2html(source, {

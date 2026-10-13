@@ -1,160 +1,150 @@
+import type { EmailDocument, EmailNode } from "@mailforge/core";
+import type { ResolvedEmailTheme } from "../theme/Theme.types.js";
 
-import type {
-    EmailDocument,
-    EmailNode,
-} from "@mailforge/core";
+type Styles = NonNullable<EmailNode["styles"]>;
+const STRUCTURAL = new Set(["section", "row", "container", "header", "footer"]);
 
-import type {
-    ResolvedEmailTheme,
-} from "../theme/Theme.types.js";
+/** Semantic defaults are deliberately MJML-safe: no margins, flexbox or CSS grid. */
+function roleStyles(role: string | undefined, theme: ResolvedEmailTheme): Styles {
+  const { colors, typography, spacing, appearance } = theme;
+  const inset = appearance.contentPadding;
+  const text = { fontFamily: typography.fontFamily, color: colors.text };
+  switch (role) {
+    case "title": return {
+      ...text, fontFamily: typography.headingFontFamily,
+      fontWeight: "bold", fontSize: typography.headingSize,
+      lineHeight: `${Math.round(typography.headingSize * 1.26)}px`,
+      padding: `${spacing.lg}px ${inset}px ${spacing.sm}px`,
+    };
+    case "body": return {
+      ...text, fontSize: Math.max(15, typography.baseSize),
+      lineHeight: `${Math.round(Math.max(15, typography.baseSize) * typography.lineHeight)}px`,
+      padding: `0 ${inset}px ${spacing.md}px`,
+    };
+    case "muted": return {
+      ...text, color: colors.muted,
+      fontSize: Math.max(12, typography.baseSize - 1),
+      lineHeight: `${Math.round(Math.max(12, typography.baseSize - 1) * 1.6)}px`,
+      padding: `0 ${inset}px ${spacing.md}px`,
+    };
+    case "eyebrow": return {
+      ...text, color: colors.primary, fontSize: 12,
+      fontWeight: "bold", letterSpacing: "1px", lineHeight: "18px",
+      padding: `${spacing.lg}px ${inset}px 0`,
+    };
+    case "primary-action": return {
+      backgroundColor: colors.primary, color: buttonTextColor(colors.primary), fontFamily: typography.fontFamily,
+      fontSize: Math.max(14, typography.baseSize), fontWeight: "bold",
+      borderRadius: `${appearance.buttonRadius}px`, textAlign: "center",
+      innerPadding: "14px 24px", padding: `${spacing.sm}px ${inset}px ${spacing.lg}px`,
+    };
+    case "quiet-action": return {
+      backgroundColor: colors.surface, color: colors.muted,
+      fontFamily: typography.fontFamily, fontSize: Math.max(12, typography.baseSize - 1),
+      textDecoration: "underline", textAlign: "center", borderRadius: "0px",
+      innerPadding: "6px 8px", padding: `0 ${inset}px ${spacing.md}px`,
+    };
+    case "divider": return { color: colors.border, padding: `${spacing.sm}px ${inset}px` };
+    case "panel-outer": return { padding: `${spacing.xs}px ${inset}px ${spacing.lg}px` };
+    case "panel-inner": return {
+      backgroundColor: colors.background,
+      border: `1px solid ${colors.border}`,
+      borderRadius: `${appearance.cardRadius}px`,
+      padding: `${spacing.lg}px`,
+    };
+    case "status-icon": return {
+      backgroundColor: colors.background, color: colors.primary,
+      fontSize: 26, fontWeight: "bold", textAlign: "center",
+      padding: `${spacing.lg}px ${inset}px ${spacing.sm}px`,
+    };
+    case "promotional-code": return {
+      backgroundColor: colors.background, color: colors.primary,
+      fontWeight: "bold", fontSize: 28, textAlign: "center",
+      lineHeight: "36px", padding: `${spacing.md}px ${inset}px`,
+    };
+    default: return {};
+  }
+}
 
-type EmailStyles = NonNullable<EmailNode["styles"]>;
+/** Find a high-contrast text color for arbitrary validated brand colors. */
+function buttonTextColor(background: string): string {
+  const luminance = (hex: string): number => {
+    const channels = [1, 3, 5].map(index => {
+      const value = parseInt(hex.slice(index, index + 2), 16) / 255;
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    });
+    return channels[0]! * 0.2126 + channels[1]! * 0.7152 + channels[2]! * 0.0722;
+  };
+  const backgroundLuminance = luminance(background);
+  const whiteContrast = 1.05 / (backgroundLuminance + 0.05);
+  const darkContrast = (backgroundLuminance + 0.05) / 0.05;
+  return whiteContrast >= darkContrast ? "#ffffff" : "#000000";
+}
 
-const LAYOUT_CHILDREN = new Set([
-    "section",
-    "row",
-    "container",
-    "header",
-    "footer",
-]);
-
-function defaultStyles(
-    node: EmailNode,
-    theme: ResolvedEmailTheme,
-): EmailStyles {
-    const { colors, typography, spacing } = theme;
-
-    const lineHeight =
-        `${Math.round(
-            typography.baseSize * typography.lineHeight,
-        )}px`;
-
-    switch (node.type) {
-        case "header":
-            // MJML containers with nested sections must
-            // not carry their own styles.
-            if (node.children?.some(
-                child => LAYOUT_CHILDREN.has(child.type),
-            )) {
-                return {};
-            }
-
-            return {
-                backgroundColor: colors.surface,
-                padding: `${spacing.md}px ${spacing.md}px`,
-            };
-
-        case "footer":
-            if (node.children?.some(
-                child => LAYOUT_CHILDREN.has(child.type),
-            )) {
-                return {};
-            }
-
-            return {
-                backgroundColor: colors.surface,
-                padding: `${spacing.sm}px ${spacing.md}px`,
-            };
-
-        case "section":
-        case "row":
-            return {
-                backgroundColor: colors.surface,
-                padding: `0 ${spacing.md}px`,
-            };
-
-        case "heading":
-            return {
-                color: colors.text,
-                fontFamily: typography.headingFontFamily,
-                fontSize: Math.min(typography.headingSize, 24),
-                fontWeight: "bold",
-                lineHeight: "1.25",
-                padding: `0 0 ${spacing.sm}px`,
-            };
-
-        case "text":
-            return {
-                color: colors.text,
-                fontFamily: typography.fontFamily,
-                fontSize: typography.baseSize,
-                lineHeight,
-                padding: `0 0 ${spacing.sm}px`,
-            };
-
-        case "copyright":
-            return {
-                color: colors.muted,
-                fontFamily: typography.fontFamily,
-                fontSize: Math.max(
-                    10,
-                    typography.baseSize - 2,
-                ),
-                textAlign: "center",
-                padding: `${spacing.xs}px ${spacing.sm}px`,
-            };
-
-        case "button":
-            return {
-                backgroundColor: colors.primary,
-                color: "#ffffff",
-                fontFamily: typography.fontFamily,
-                fontSize: Math.max(13, typography.baseSize - 1),
-                fontWeight: "bold",
-                borderRadius: "6px",
-                textAlign: "center",
-                padding: `${spacing.sm + 1}px ${spacing.md}px`,
-            };
-
-        case "image":
-            return {
-                width: 140,
-                padding: `${spacing.xs}px 0`,
-            };
-
-        case "divider":
-            return {
-                color: colors.border,
-                padding: `${spacing.sm}px`,
-            };
-
-        case "spacer":
-            return {
-                height: `${spacing.md}px`,
-            };
-
-        default:
-            return {};
-    }
+function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
+  const { colors, typography, spacing, appearance } = theme;
+  const lineHeight = `${Math.round(typography.baseSize * typography.lineHeight)}px`;
+  switch (node.type) {
+    case "header":
+    case "footer":
+      if (node.children?.some(child => STRUCTURAL.has(child.type))) return {};
+      return {
+        backgroundColor: colors.surface,
+        padding: node.type === "header"
+          ? `${spacing.lg}px ${appearance.contentPadding}px ${spacing.md}px`
+          : `${spacing.lg}px ${appearance.contentPadding}px ${spacing.sm}px`,
+      };
+    case "section":
+    case "row": return { backgroundColor: colors.surface, padding: `0 ${spacing.md}px` };
+    case "heading": return {
+      color: colors.text, fontFamily: typography.headingFontFamily,
+      fontSize: Math.min(typography.headingSize, 26), fontWeight: "bold",
+      lineHeight: "1.25", padding: `0 0 ${spacing.sm}px`,
+    };
+    case "text": return {
+      color: colors.text, fontFamily: typography.fontFamily,
+      fontSize: typography.baseSize, lineHeight, padding: `0 0 ${spacing.sm}px`,
+    };
+    case "copyright": return {
+      color: colors.muted, fontFamily: typography.fontFamily,
+      fontSize: Math.max(10, typography.baseSize - 2), textAlign: "center",
+      padding: `${spacing.sm}px ${appearance.contentPadding}px ${spacing.lg}px`,
+    };
+    case "button": return {
+      backgroundColor: colors.primary, color: buttonTextColor(colors.primary), fontFamily: typography.fontFamily,
+      fontSize: Math.max(13, typography.baseSize - 1), fontWeight: "bold",
+      borderRadius: `${appearance.buttonRadius}px`, innerPadding: "12px 22px",
+      textAlign: "center", padding: `${spacing.sm}px ${spacing.md}px`,
+    };
+    case "image": return { width: 140, padding: `${spacing.xs}px 0` };
+    case "divider": return { color: colors.border, padding: `${spacing.sm}px` };
+    case "spacer": return { height: `${spacing.md}px` };
+    default: return {};
+  }
 }
 
 /**
- * Apply theme defaults without overwriting
- * explicitly defined developer styles.
+ * Styles precedence: generic theme < semantic template role < developer node styles.
+ * This applies AFTER user document patches. Never mutate the caller's document.
  */
-export function applyEmailTheme(
-    source: EmailDocument,
-    theme: ResolvedEmailTheme,
-): EmailDocument {
-    const document = structuredClone(source);
-
-    const walk = (node: EmailNode): void => {
-        const defaults = defaultStyles(node, theme);
-
-        if (Object.keys(defaults).length > 0) {
-            node.styles = {
-                ...defaults,
-                ...node.styles,
-            };
-        }
-
-        node.children?.forEach(walk);
-    };
-
-    if (document.header) walk(document.header);
-    document.body.forEach(walk);
-    if (document.footer) walk(document.footer);
-    if (document.copyright) walk(document.copyright);
-
-    return document;
+export function applyEmailTheme(source: EmailDocument, theme: ResolvedEmailTheme): EmailDocument {
+  const document = structuredClone(source);
+  const walk = (node: EmailNode, inPanel = false): void => {
+    const role = node.attrs?.["data-mf-style"];
+    const semantic: Styles = typeof role === "string" ? roleStyles(role, theme) : {};
+    const defaults = defaultStyles(node, theme);
+    if (inPanel && role !== "panel-inner" &&
+        ["title", "body", "muted", "eyebrow", "primary-action", "quiet-action"].includes(String(role))) {
+      semantic.padding = `0 0 ${theme.spacing.sm}px`;
+    }
+    if (Object.keys(defaults).length || Object.keys(semantic).length) {
+      node.styles = { ...defaults, ...semantic, ...node.styles };
+    }
+    node.children?.forEach(child => walk(child, inPanel || role === "panel-inner"));
+  };
+  if (document.header) walk(document.header);
+  document.body.forEach(node => walk(node));
+  if (document.footer) walk(document.footer);
+  if (document.copyright) walk(document.copyright);
+  return document;
 }

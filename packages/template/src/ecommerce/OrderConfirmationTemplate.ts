@@ -75,7 +75,6 @@ export function buildOrderConfirmationTemplate(
                     },
                     styles: {
                         fontSize: 13,
-                        color: "#64748b",
                         padding: "0",
                     },
                 }],

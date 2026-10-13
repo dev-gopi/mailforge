@@ -1,111 +1,72 @@
 import type { EmailDocument, EmailNode } from "@mailforge/core";
 
+/**
+ * Every packaged template uses semantic roles, rather than hardcoding a
+ * particular brand's color, font, margins or border radius. The email layer
+ * resolves these roles against the selected, validated theme AFTER patches.
+ * Node IDs and the document schema remain backward compatible.
+ */
+export type TemplateRole =
+  | "title" | "body" | "muted" | "eyebrow" | "primary-action"
+  | "quiet-action" | "divider" | "panel-outer" | "panel-inner"
+  | "status-icon" | "promotional-code";
+
+export function withRole(node: EmailNode, role: TemplateRole): EmailNode {
+  return { ...node, attrs: { ...node.attrs, "data-mf-style": role } };
+}
+
 export function heading(id: string, text: string): EmailNode {
-  return {
-    id,
-    type: "heading",
-    props: { text },
-  };
+  return { id, type: "heading", props: { text } };
 }
 
 export function contentHeading(id: string, text: string): EmailNode {
-  return {
-    ...heading(id, text),
-    styles: {
-      fontSize: 28,
-      lineHeight: "36px",
-      fontWeight: "bold",
-      color: "#111827",
-      padding: "24px 36px 0",
-    },
-  };
+  return withRole(heading(id, text), "title");
 }
 
 export function paragraph(id: string, text: string): EmailNode {
-  return {
-    id,
-    type: "text",
-    props: { text },
-  };
+  return { id, type: "text", props: { text } };
 }
 
 export function contentParagraph(id: string, text: string): EmailNode {
-  return {
-    ...paragraph(id, text),
-    styles: {
-      fontSize: 15,
-      lineHeight: "25px",
-      color: "#475569",
-      padding: "22px 36px 0",
-    },
-  };
+  return withRole(paragraph(id, text), "body");
 }
 
 export function mutedParagraph(id: string, text: string): EmailNode {
-  return {
-    ...contentParagraph(id, text),
-    styles: {
-      fontSize: 13,
-      lineHeight: "22px",
-      color: "#64748b",
-      padding: "0 36px 24px",
-    },
-  };
+  return withRole(paragraph(id, text), "muted");
 }
 
-export function actionButton(
-  id: string,
-  text: string,
-  href: string,
-): EmailNode {
-  return {
-    id,
-    type: "button",
-    props: { text, href },
-    styles: {
-      backgroundColor: "#111827",
-      color: "#ffffff",
-      fontSize: 14,
-      fontWeight: "bold",
-      borderRadius: "7px",
-      textAlign: "center",
-      padding: "15px 26px",
-    },
-  };
+export function eyebrow(id: string, text: string): EmailNode {
+  return withRole(paragraph(id, text), "eyebrow");
+}
+
+export function actionButton(id: string, text: string, href: string): EmailNode {
+  return withRole({ id, type: "button", props: { text, href } }, "primary-action");
+}
+
+/** A discreet secondary action, suitable for unsubscribe or supporting links. */
+export function quietAction(id: string, text: string, href: string): EmailNode {
+  return withRole({ id, type: "button", props: { text, href } }, "quiet-action");
 }
 
 export function divider(id: string): EmailNode {
-  return {
-    id,
-    type: "divider",
-    styles: {
-      color: "#e5e7eb",
-      padding: "8px 36px",
-    },
-  };
+  return withRole({ id, type: "divider" }, "divider");
 }
 
 export function panel(
   id: string,
   children: EmailNode[],
-  backgroundColor = "#f8fafc",
+  backgroundColor?: string,
 ): EmailNode {
-  return {
+  return withRole({
     id,
     type: "section",
-    styles: {
-      padding: "0 36px 24px",
-    },
-    children: [{
+    children: [withRole({
       id: `${id}-column`,
       type: "column",
-      styles: {
-        backgroundColor,
-        padding: "20px",
-      },
+      ...(backgroundColor ? { styles: { backgroundColor } } : {}),
       children,
-    }],
-  };
+    }, "panel-inner")],
+  }, "panel-outer");
 }
 
 export function createTemplateDocument(
@@ -120,6 +81,7 @@ export function createTemplateDocument(
     version: "1.0.0",
     subject,
     preheader,
+    metadata: { designSystem: "mailforge-1" },
     body,
   };
 }

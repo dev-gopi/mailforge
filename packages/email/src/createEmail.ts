@@ -29,6 +29,17 @@ import {
 
 import {
     getBuiltinTemplate,
+    getBuiltinCatalogTemplate,
+    listBuiltinTemplateCatalog,
+    isCatalogTemplateName,
+    buildCatalogTemplate,
+    listSpecializedTemplates,
+    buildNewsletterTemplate,
+    newsletterSchema,
+    buildPromotionTemplate,
+    promotionSchema,
+    buildShippingUpdateTemplate,
+    shippingUpdateSchema,
     listBuiltinTemplates,
     listTemplateCatalog,
     getBuiltinTemplateInfo,
@@ -84,6 +95,8 @@ import {
     applyEmailTheme,
 } from "./layout/ThemeApplicator.js";
 
+import { applyTemplateDisplay, type TemplateDisplayOptions } from "./layout/TemplateDisplay.js";
+
 import {
     mergeEmailLayout,
 } from "./layout/LayoutResolver.js";
@@ -130,6 +143,9 @@ export interface TemplateRenderOptions
      * Optional name of a reusable theme profile.
      */
     themeProfile?: string;
+
+    /** Per-render show/hide controls and subject/preheader overrides. */
+    display?: TemplateDisplayOptions;
 }
 
 function isDomainTemplateName(
@@ -251,6 +267,11 @@ export class MailForgeEmail {
     public listBuiltinTemplates():
         BuiltinTemplateName[] {
         return listBuiltinTemplates();
+    }
+
+    /** Discover all packaged core, specialized and business catalog templates. */
+    public listBuiltinCatalog() {
+        return listBuiltinTemplateCatalog();
     }
 
     /**
@@ -435,9 +456,13 @@ export class MailForgeEmail {
             return getBuiltinTemplate(templateId);
         }
 
-        throw new Error(
-            `Template not found: ${templateId}`,
-        );
+        // Keep the original core API intact while allowing discovery of
+        // all 49 packaged documents. An unmaterialized document is intended
+        // for inspection; render() validates its corresponding data contract.
+        const match = listBuiltinTemplateCatalog().find(item => item.id === templateId);
+        if (match) return getBuiltinCatalogTemplate(match.id);
+
+        throw new Error(`Template not found: ${templateId}`);
     }
 
     // ---------------------------------------
@@ -454,6 +479,38 @@ export class MailForgeEmail {
                 this.getTemplate(templateId),
                 options,
             );
+        }
+
+        // Catalog templates share a lightweight, strict data contract.
+        if (isCatalogTemplateName(templateId)) {
+            const document = buildCatalogTemplate(templateId, options.data);
+            if (options.data === undefined) {
+                throw new Error(`Template data required: ${templateId}`);
+            }
+            return this.renderPipeline(document, options, true);
+        }
+
+        // Specialized templates use their existing individual Zod schemas.
+        // Materialize them once and do not reinterpret user copy as variables.
+        if ((listSpecializedTemplates().map(item => item.id) as string[]).includes(templateId)) {
+            if (options.data === undefined) {
+                throw new Error(`Template data required: ${templateId}`);
+            }
+            let document: EmailDocument;
+            switch (templateId) {
+                case "newsletter":
+                    document = buildNewsletterTemplate(newsletterSchema.parse(options.data));
+                    break;
+                case "promotion":
+                    document = buildPromotionTemplate(promotionSchema.parse(options.data));
+                    break;
+                case "shipping-update":
+                    document = buildShippingUpdateTemplate(shippingUpdateSchema.parse(options.data));
+                    break;
+                default:
+                    throw new Error(`Unsupported specialized template: ${templateId}`);
+            }
+            return this.renderPipeline(document, options, true);
         }
 
         if (!isBuiltinTemplateName(templateId)) {
@@ -628,9 +685,16 @@ export class MailForgeEmail {
             customized,
         );
 
+        // Apply visibility after component expansion so nested actions,
+        // headings and composite components respect the same controls.
+        const visible = applyTemplateDisplay(
+            expanded,
+            options.display,
+        );
+
         // 6. Apply brand/theme design tokens.
         const themed = applyEmailTheme(
-            expanded,
+            visible,
             theme,
         );
 
@@ -646,6 +710,10 @@ export class MailForgeEmail {
             {
                 trust: options.trust ?? "safe",
                 bodyBackgroundColor: theme.colors.background,
+                surfaceColor: theme.colors.surface,
+                borderColor: theme.colors.border,
+                containerWidth: theme.appearance.containerWidth,
+                containerRadius: theme.appearance.cardRadius,
 
                 ...(options.inlineCss !== undefined
                     ? { inlineCss: options.inlineCss }

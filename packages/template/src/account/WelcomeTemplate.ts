@@ -19,13 +19,7 @@ export function buildWelcomeTemplate(): EmailDocument {
         id: "welcome-icon",
         type: "text",
         props: { text: "✓" },
-        styles: {
-          backgroundColor: "#f0fdf4",
-          color: "#16a34a",
-          fontSize: 28,
-          textAlign: "center",
-          padding: "12px",
-        },
+        attrs: { "data-mf-style": "status-icon" },
       },
 
       contentHeading(
@@ -56,7 +50,6 @@ export function buildWelcomeTemplate(): EmailDocument {
           styles: {
             fontSize: 14,
             fontWeight: "bold",
-            color: "#111827",
             padding: "0 0 8px",
           },
         },
@@ -70,7 +63,6 @@ export function buildWelcomeTemplate(): EmailDocument {
           styles: {
             fontSize: 13,
             lineHeight: "22px",
-            color: "#64748b",
             padding: "0",
           },
         },

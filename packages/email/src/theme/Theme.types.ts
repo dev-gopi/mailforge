@@ -45,6 +45,14 @@ export interface ThemeSpacing {
     xl: number;
 }
 
+/** Email-client-safe size and corner tokens, measured in pixels. */
+export interface ThemeAppearance {
+    containerWidth: number;
+    contentPadding: number;
+    cardRadius: number;
+    buttonRadius: number;
+}
+
 /**
  * Developers can override only the tokens
  * they want to change.
@@ -53,6 +61,7 @@ export interface ThemeOverrides {
     colors?: Partial<ThemeColors>;
     typography?: Partial<ThemeTypography>;
     spacing?: Partial<ThemeSpacing>;
+    appearance?: Partial<ThemeAppearance>;
 }
 
 /**
@@ -76,6 +85,7 @@ export interface ResolvedEmailTheme {
     readonly colors: Readonly<ThemeColors>;
     readonly typography: Readonly<ThemeTypography>;
     readonly spacing: Readonly<ThemeSpacing>;
+    readonly appearance: Readonly<ThemeAppearance>;
 }
 
 /**

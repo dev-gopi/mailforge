@@ -40,6 +40,12 @@ export function mergeThemeOverrides(
                 ...source.spacing,
             };
         }
+        if (source.appearance !== undefined) {
+            result.appearance = {
+                ...result.appearance,
+                ...source.appearance,
+            };
+        }
     }
 
     return result;
