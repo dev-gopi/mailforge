@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createEmail } from "../src/index.js";
 import { createHeroSectionDefinition } from "@mailforge/components";
 
-describe("Stage 8 end-to-end visual contracts", () => {
+describe("end-to-end visual contracts", () => {
     it("renders responsive HTML while preserving MJML's fallback tables", async () => {
         const email = createEmail();
         const result = await email.render("welcome", {

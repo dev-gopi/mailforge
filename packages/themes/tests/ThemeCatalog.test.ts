@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { auditThemeContrast, getContrastRatio, listThemeCatalog } from "../src/catalog/ThemeCatalog.js";
 import { getThemePreset } from "../src/presets/ThemePresets.js";
 
-describe("Stage 8 theme catalog", () => {
+describe("theme catalog", () => {
     it("exposes a unique entry for every real built-in theme", () => {
         const items = listThemeCatalog();
         expect(items.map(item => item.name).sort()).toEqual(["corporate", "minimal", "modern"]);

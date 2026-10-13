@@ -11,7 +11,7 @@ const rendered = {
 };
 const envelope = { from: "alerts@example.com", to: "Gopi@example.com" };
 
-describe("Stage 8.4 — Delivery contracts and safety", () => {
+describe("Delivery contracts and safety", () => {
   it("normalizes a rendered email without altering content", () => {
     const result = prepareDeliveryMessage(rendered, { from: " alerts@example.com ", to: [" Gopi@example.com "] });
     expect(result).toMatchObject({ ...rendered, from: "alerts@example.com", to: ["Gopi@example.com"] });

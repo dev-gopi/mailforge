@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { emailClientHead, resolveEmailClientStyles } from "../src/EmailClientStyles.js";
 
-describe("Stage 8 email-client CSS", () => {
+describe("email-client CSS", () => {
     it("keeps optional CSS off by default for backward compatibility", () => {
         const html = emailClientHead();
         expect(html).toBe("");

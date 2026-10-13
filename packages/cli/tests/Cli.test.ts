@@ -19,7 +19,7 @@ afterEach(async () => {
   for (const dir of directories.splice(0)) await rm(dir, { recursive: true, force: true });
 });
 
-describe("Stage 8.3: MailForge CLI", () => {
+describe("MailForge CLI", () => {
   it("parses arguments without eval and rejects unknown or duplicate options", () => {
     expect(parseCliArgs(["render", "welcome", "--data", "demo.json", "--no-heading"]).flags["no-heading"]).toBe(true);
     expect(() => parseCliArgs(["list", "--not-real"])).toThrow(/Unknown option/);

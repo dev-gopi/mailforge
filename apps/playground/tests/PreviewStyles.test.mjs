@@ -15,7 +15,7 @@ const stub = {
   }),
 };
 
-describe("Stage 8.2 — isolated styled email previews", () => {
+describe("isolated styled email previews", () => {
   const server = createPlaygroundServer({ loadMailForge: async () => stub });
   after(async () => {
     if (server.listening) await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));

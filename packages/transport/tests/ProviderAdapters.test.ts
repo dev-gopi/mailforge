@@ -6,7 +6,7 @@ import {
 const rendered = { subject: "Test", html: "<p>Hello</p>", text: "Hello" };
 const envelope = { from: "system@example.com", to: "user@example.com", replyTo: "help@example.com" };
 
-describe("Stage 8.4 — Provider adapters", () => {
+describe("Provider adapters", () => {
   it("sends both content formats through a Nodemailer-style client", async () => {
     const sendMail = vi.fn().mockResolvedValue({ messageId: "smtp-1", accepted: ["user@example.com"], rejected: [] });
     const result = await sendRenderedEmail(createNodemailerAdapter({ sendMail }), rendered, envelope);

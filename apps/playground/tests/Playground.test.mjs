@@ -9,7 +9,7 @@ const templates = new Set(["welcome", "invoice"]);
 const themes = ["modern", "minimal", "corporate"];
 const valid = { templateId: "welcome", data: { user: { firstName: "Gopi" } }, theme: "modern", brandColor: "#2563eb" };
 
-describe("Stage 8.2 Playground — validation", () => {
+describe("Playground — validation", () => {
   it("accepts valid branding, layout, variant and display settings", () => {
     const result = normalizePreviewRequest({ ...valid, variant: "premium", layoutPreset: "transactional", display: { heading: false }, locale: "bn-IN", subject: "Hello" }, templates, themes);
     assert.equal(result.options.variant, "premium");
@@ -44,7 +44,7 @@ describe("Stage 8.2 Playground — validation", () => {
   });
 });
 
-describe("Stage 8.2 Playground — HTTP routes", () => {
+describe("Playground — HTTP routes", () => {
   const stub = {
     createEmail: () => ({
       listBuiltinCatalog: () => [{ id: "welcome", category: "core", title: "Welcome", version: "1.0.0" }],

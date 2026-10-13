@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { getProfessionalComponentDefinitions, PROFESSIONAL_COMPONENT_NAMES } from "../src/professional/ProfessionalComponents.js";
 
 const ctx = { nodeId: "sample", componentName: "professional" };
-describe("Stage 8 professional components", () => {
+describe("professional components", () => {
     it("offers four distinct reusable components", () => {
         expect(getProfessionalComponentDefinitions().map(d => d.name)).toEqual([...PROFESSIONAL_COMPONENT_NAMES]);
     });
