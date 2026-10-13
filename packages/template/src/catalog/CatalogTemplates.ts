@@ -314,7 +314,11 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
         eyebrow(`${id}-eyebrow`, categoryLabels[category]),
         contentHeading(`${id}-title`, title),
         contentParagraph(`${id}-greeting`, `Hello ${recipient},`),
-        contentParagraph(`${id}-message`, `${description}. ${contextMessages[category]}`),
+        // Expanded IDs already have their own purpose-written introduction.
+        // Avoid repeating the same category-wide sentence in all 51 emails.
+        contentParagraph(`${id}-message`, isExpandedCatalogTemplateName(id)
+            ? `${description}.`
+            : `${description}. ${contextMessages[category]}`),
     ];
     if (isExpandedCatalogTemplateName(id)) {
         body.push(...buildExpandedTemplateContent(id, presentation));

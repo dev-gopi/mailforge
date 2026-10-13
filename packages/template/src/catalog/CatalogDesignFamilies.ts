@@ -32,8 +32,45 @@ const FEATURED: Readonly<Record<string, CatalogDesignFamily>> = {
     "trial-started": "spotlight",
 };
 
+/** Task 8.5.19: curate the semantic exceptions rather than hashing their names. */
+const PURPOSE_FAMILIES: Readonly<Record<string, CatalogDesignFamily>> = {
+    "magic-link": "security",
+    "mfa-enabled": "security",
+    "recovery-codes": "security",
+    "suspicious-sign-in": "security",
+    "password-changed": "security",
+    "mfa-disabled": "security",
+    "new-device-verified": "security",
+    "email-change-request": "security",
+    "account-suspended": "security",
+    "payment-failed": "ledger",
+    "refund-processed": "receipt",
+    "subscription-renewed": "receipt",
+    "order-delivered": "delivery",
+    "order-packed": "delivery",
+    "delivery-failed": "delivery",
+    "cart-reminder": "showcase",
+    "seasonal-sale": "spotlight",
+    "event-promotion": "invitation",
+    "webinar-announcement": "invitation",
+    "event-registration": "ticket",
+    "event-reminder": "invitation",
+    "event-rescheduled": "invitation",
+    "event-starting-soon": "ticket",
+    "workspace-role-changed": "dashboard",
+    "usage-limit-reached": "dashboard",
+    "api-key-created": "security",
+    "integration-disconnected": "security",
+    "support-ticket-opened": "conversation",
+    "support-ticket-resolved": "conversation",
+    "ticket-awaiting-response": "conversation",
+    "service-outage": "security",
+    "incident-resolved": "dashboard",
+    "weekly-digest": "dashboard",
+};
 export function getCatalogDesignFamily(id: string, category: string): CatalogDesignFamily {
     if (FEATURED[id]) return FEATURED[id];
+    if (PURPOSE_FAMILIES[id]) return PURPOSE_FAMILIES[id];
     const choices = CATEGORY_FAMILIES[category];
     if (!choices?.length) throw new Error(`Unsupported catalog category: ${category}`);
     const number = [...id].reduce((hash, char, index) => hash + char.charCodeAt(0) * (index + 1), 0);
