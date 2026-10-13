@@ -19,7 +19,7 @@ function invoice(name = "Rahul") {
     };
 }
 
-describe("Task 7.8.3.7 — data-safe template versions", () => {
+describe("data-safe template versions", () => {
     it("materializes fresh validated invoice content for every render", async () => {
         const email = createEmail();
         const patches = [{
@@ -35,12 +35,12 @@ describe("Task 7.8.3.7 — data-safe template versions", () => {
             templateVersion: { version: "2.0.0" },
         });
         const second = await email.render("invoice", {
-            data: invoice("Priya"),
+            data: invoice("Gopi"),
             templateVersion: { version: "2.0.0" },
         });
         expect(first.subject).toBe("Invoice INV-1001");
         expect(first.text).toContain("Rahul");
-        expect(second.text).toContain("Priya");
+        expect(second.text).toContain("Gopi");
         expect(second.text).not.toContain("Rahul");
         expect(first.text).toContain("Notebook");
         expect(first.text).toContain("USD 40.00");

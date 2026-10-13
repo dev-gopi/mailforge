@@ -21,7 +21,7 @@ function sample(version: string): EmailDocument {
     };
 }
 
-describe("Task 7.8.3.2 — Email engine template versions", () => {
+describe("Email engine template versions", () => {
     it("registers and resolves immutable versions", () => {
         const email = createEmail();
         const v1 = sample("1.0.0");

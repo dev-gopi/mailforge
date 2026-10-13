@@ -7,7 +7,7 @@ import {
     resolveEmailTheme,
 } from "../src/index.js";
 
-describe("8.0.6.2–8.0.6.4: standalone theme registry", () => {
+describe("standalone theme registry", () => {
     it("preserves the three existing preset definitions", () => {
         expect(listThemePresets()).toEqual(["modern", "minimal", "corporate"]);
         for (const id of listThemePresets()) {

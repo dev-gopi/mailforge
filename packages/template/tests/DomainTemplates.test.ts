@@ -24,7 +24,7 @@ const receipt = () => ({
   receiptUrl:"https://example.com/receipts/REC-1001",
 });
 
-describe("Task 7.8.1 domain document builders", () => {
+describe("domain document builders", () => {
   it("01 registers all ten built-ins", () => expect(listBuiltinTemplates()).toHaveLength(10));
   it("02 groups billing templates", () => {
     expect(listTemplateCatalog("billing").map(x=>x.id)).toEqual(["invoice","payment-receipt"]);
@@ -61,7 +61,7 @@ describe("Task 7.8.1 domain document builders", () => {
   });
   it("08 uses security reusable components", () => {
     const doc=buildDomainTemplate("security-alert",{
-      user:{firstName:"Priya"},
+      user:{firstName:"Gopi"},
       alert:{kind:"new-device",occurredAt:"2026-10-12T12:00:00Z",device:"Chrome"},
       reviewUrl:"https://example.com/security",
     });

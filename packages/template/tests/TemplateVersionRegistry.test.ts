@@ -34,7 +34,7 @@ function document(
   };
 }
 
-describe("Task 7.8.3.1 — Template Version Registry", () => {
+describe("Template Version Registry", () => {
   it("stores and resolves multiple versions", () => {
     const registry = new TemplateVersionRegistry();
 

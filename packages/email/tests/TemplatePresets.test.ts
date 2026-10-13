@@ -26,7 +26,7 @@ function invoiceData() {
     };
 }
 
-describe("MailForge Task 7.8.2.2", () => {
+describe("Template presets", () => {
     it("1. validates domain data and applies defaults", () => {
         const email = createEmail();
 
@@ -261,11 +261,11 @@ describe("MailForge Task 7.8.2.2", () => {
 
         const result = await email.render("welcome", {
             data: {
-                user: { firstName: "Priya" },
+                user: { firstName: "Gopi" },
                 actionUrl: "https://example.com/home",
             },
         });
 
-        expect(result.subject).toBe("Welcome, Priya!");
+        expect(result.subject).toBe("Welcome, Gopi!");
     });
 });

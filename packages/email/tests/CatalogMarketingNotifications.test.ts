@@ -8,7 +8,7 @@ import {
 import { createEmail } from "../src/index.js";
 
 const base = {
-    recipientName: "Priya",
+    recipientName: "Gopi",
     actionUrl: "https://example.com/details",
 };
 const marketingBase = {
@@ -16,7 +16,7 @@ const marketingBase = {
     unsubscribeUrl: "https://example.com/unsubscribe",
 };
 
-describe("Task 7.8.5.6–7.8.5.7: marketing and notification catalog", () => {
+describe("marketing and notification catalog", () => {
     it("validates campaign details and uses theme-aware panel nodes", () => {
         const data = {
             ...marketingBase,

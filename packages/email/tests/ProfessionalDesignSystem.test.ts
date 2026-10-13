@@ -65,13 +65,13 @@ describe("Professional email design system", () => {
     });
     expect(email.listBuiltinCatalog()).toHaveLength(49);
     const result = await email.render("payment-failed", {
-      data: { recipientName: "Priya", actionUrl: "https://example.com/pay", detail: "Invoice 123" },
+      data: { recipientName: "Gopi", actionUrl: "https://example.com/pay", detail: "Invoice 123" },
     });
     expect(result.subject).toBe("Payment unsuccessful");
     expect(result.html).toContain("#9333ea");
-    expect(result.html).toContain("Priya");
+    expect(result.html).toContain("Gopi");
     expect(result.html).toContain("640px");
-    expect(result.text).toContain("Priya");
+    expect(result.text).toContain("Gopi");
     expect(result.warnings).toHaveLength(0);
   });
 
@@ -79,14 +79,14 @@ describe("Professional email design system", () => {
     const email = createEmail({ theme: "modern" });
     for (const { id, title } of listCatalogTemplates()) {
       const result = await email.render(id, { data: {
-        recipientName: "Priya",
+        recipientName: "Gopi",
         actionUrl: "https://example.com/action",
         unsubscribeUrl: "https://example.com/unsubscribe",
         detail: "Reference: 12345",
       } });
       expect(result.subject, id).toBe(title);
-      expect(result.html, id).toContain("Priya");
-      expect(result.text, id).toContain("Priya");
+      expect(result.html, id).toContain("Gopi");
+      expect(result.text, id).toContain("Gopi");
       expect(result.html, id).toContain("https://example.com/action");
     }
   });
@@ -97,11 +97,11 @@ describe("Professional email design system", () => {
     expect(all.length).toBeGreaterThan(0);
     for (const { id } of all) {
       const result = await email.render(id, { data: {
-        recipientName: "Priya", actionUrl: "https://example.com/details",
+        recipientName: "Gopi", actionUrl: "https://example.com/details",
         unsubscribeUrl: "https://example.com/unsubscribe",
       } });
       expect(result.html).toContain("Unsubscribe");
-      expect(result.text).toContain("Priya");
+      expect(result.text).toContain("Gopi");
     }
   });
 });

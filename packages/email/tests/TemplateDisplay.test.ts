@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { createEmail, applyTemplateDisplay, TemplateDisplayError } from "../src/index.js";
 import { getBuiltinTemplate, getBuiltinCatalogTemplate, listBuiltinTemplateCatalog } from "@mailforge/templates";
 
-const welcome = { user: { firstName: "Priya" }, actionUrl: "https://example.com/start" };
+const welcome = { user: { firstName: "Gopi" }, actionUrl: "https://example.com/start" };
 const catalogData = {
-  recipientName: "Priya", actionUrl: "https://example.com/action",
+  recipientName: "Gopi", actionUrl: "https://example.com/action",
   unsubscribeUrl: "https://example.com/unsubscribe", detail: "Reference 123",
 };
 
@@ -17,7 +17,7 @@ describe("Professional per-render customization", () => {
     expect(result.html).not.toContain("Welcome to your new workspace.");
     expect(result.html).toContain("Acme");
     expect(result.html).toContain("Open Your Dashboard");
-    expect(result.subject).toBe("Welcome, Priya!");
+    expect(result.subject).toBe("Welcome, Gopi!");
   });
 
   it("allows the company heading to disappear without removing the logo", async () => {

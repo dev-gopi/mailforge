@@ -21,7 +21,7 @@ function announcement(version: string, message: string): EmailDocument {
     };
 }
 
-describe("Task 7.8.3.3 — Version-aware rendering", () => {
+describe("Version-aware rendering", () => {
     it("renders an explicitly selected version", async () => {
         const email = createEmail();
         email.registerTemplateVersion(announcement("1.0.0", "Old content"));
@@ -110,11 +110,11 @@ describe("Task 7.8.3.3 — Version-aware rendering", () => {
 
         const rendered = await email.render("versioned-render-demo", {
             templateVersion: { version: "1.0.0" },
-            data: { name: "Priya" },
+            data: { name: "Gopi" },
             display: { heading: false },
         });
 
-        expect(rendered.text).toContain("Hello Priya!");
+        expect(rendered.text).toContain("Hello Gopi!");
         expect(rendered.html).not.toContain("Optional heading");
         expect(email.getTemplateVersion(
             "versioned-render-demo", "1.0.0",

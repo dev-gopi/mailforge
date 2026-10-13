@@ -98,6 +98,8 @@ import {
 import {
     mergeEmailTheme,
 } from "./theme/ThemeResolver.js";
+import { ThemeRegistry, ThemeVersionRegistry, EmailThemeError } from "@mailforge/themes";
+import type { ThemeDefinition, ThemeVersionInfo } from "@mailforge/themes";
 
 import {
     listThemePresets,
@@ -162,7 +164,12 @@ export interface TemplateRenderOptions
     /** Optional visual layout. Omit to preserve existing rendering. */
     layoutPreset?: LayoutPresetName;
     theme?: ThemeOverrides;
-
+    /** Opt-in named theme from @mailforge/themes; legacy rendering is unchanged if omitted. */
+    themeName?: string;
+    /** Exact immutable theme version. Requires themeName. */
+    themeVersion?: string;
+    /** Historical deprecated versions are opt-in only. */
+    includeDeprecatedTheme?: boolean;
     /** Select a published version only when explicitly requested. */
     templateVersion?: TemplateVersionSelection;
     /** Select a reusable visual/content variant without changing its data contract. */
@@ -199,6 +206,10 @@ const BUILTIN_VARIANT_IDS = new Set(["default", "compact", "premium", "branded"]
 const MAX_ORGANIZATIONS_PER_ENGINE = 250;
 
 export class MailForgeEmail {
+    private readonly themes = new ThemeRegistry();
+    private readonly themeVersions = new ThemeVersionRegistry();
+    private readonly organizationThemes = new Map<string, ThemeRegistry>();
+    private readonly organizationThemeVersions = new Map<string, ThemeVersionRegistry>();
     private readonly plugins = new PluginRegistry();
     private readonly templatePresets =
         new TemplatePresetRegistry();
@@ -1227,7 +1238,25 @@ export class MailForgeEmail {
             );
         }
 
-        const theme = this.resolveTheme(
+        if (options.themeVersion !== undefined && options.themeName === undefined) {
+            throw new EmailThemeError("theme.version", "themeVersion requires themeName");
+        }
+        if (options.includeDeprecatedTheme !== undefined &&
+            options.themeVersion === undefined) {
+            throw new EmailThemeError("theme.version", "includeDeprecatedTheme requires themeVersion");
+        }
+        const baseTheme = options.themeName === undefined
+            ? this.config.theme
+            : options.themeVersion === undefined
+                ? options.organizationId === undefined
+                    ? this.resolveRegisteredTheme(options.themeName)
+                    : this.resolveOrganizationTheme(options.organizationId, options.themeName)
+                : this.resolvePublishedTheme(
+                    options.themeName, options.themeVersion,
+                    options.includeDeprecatedTheme === true, options.organizationId,
+                );
+        const theme = mergeEmailTheme(
+            baseTheme,
             mergeThemeOverrides(layoutPreset?.theme, profile, variant?.theme, options.theme),
         );
 
@@ -1329,6 +1358,151 @@ export class MailForgeEmail {
                 trust: options.trust ?? "safe",
             },
         );
+    }
+
+    // ---------------------------------------------------
+    // REUSABLE REGISTERED THEMES (8.0.6.5-8.0.6.7)
+    // ---------------------------------------------------
+    public registerTheme(definition: ThemeDefinition): this {
+        this.themes.register(definition);
+        return this;
+    }
+
+    public listRegisteredThemes(): string[] {
+        return this.themes.list();
+    }
+
+    public resolveRegisteredTheme(name: string, overrides: ThemeOverrides = {}): ResolvedEmailTheme {
+        return this.themes.resolve(name, overrides);
+    }
+
+    public exportRegisteredThemes(): string {
+        return this.themes.exportJSON();
+    }
+
+    public importRegisteredThemes(json: string): this {
+        this.themes.importJSON(json);
+        return this;
+    }
+
+    private scopedThemes(organizationId: string): ThemeRegistry {
+        assertOrganizationId(organizationId);
+        const existing = this.organizationThemes.get(organizationId);
+        if (existing) return existing;
+        if (this.organizationThemes.size >= MAX_ORGANIZATIONS_PER_ENGINE) {
+            throw new EmailThemeError("theme.organizationId", "organization theme registry limit exceeded");
+        }
+        const next = new ThemeRegistry();
+        this.organizationThemes.set(organizationId, next);
+        return next;
+    }
+
+    private scopedThemeVersions(organizationId: string): ThemeVersionRegistry {
+        assertOrganizationId(organizationId);
+        const existing = this.organizationThemeVersions.get(organizationId);
+        if (existing) return existing;
+        if (this.organizationThemeVersions.size >= MAX_ORGANIZATIONS_PER_ENGINE) {
+            throw new EmailThemeError("theme.organizationId", "organization theme version limit exceeded");
+        }
+        const next = new ThemeVersionRegistry();
+        this.organizationThemeVersions.set(organizationId, next);
+        return next;
+    }
+
+    public registerOrganizationTheme(organizationId: string, definition: ThemeDefinition): this {
+        this.scopedThemes(organizationId).register(definition);
+        return this;
+    }
+
+    public resolveOrganizationTheme(
+        organizationId: string,
+        name: string,
+        overrides: ThemeOverrides = {},
+    ): ResolvedEmailTheme {
+        assertOrganizationId(organizationId);
+        // Do not fall back to global custom themes for organization-scoped requests.
+        return this.scopedThemes(organizationId).resolve(name, overrides);
+    }
+
+    public exportOrganizationThemes(organizationId: string): string {
+        assertOrganizationId(organizationId);
+        return JSON.stringify({
+            schemaVersion: 1,
+            organizationId,
+            themes: JSON.parse(this.scopedThemes(organizationId).exportJSON()) as unknown,
+        });
+    }
+
+    public importOrganizationThemes(organizationId: string, json: string): this {
+        assertOrganizationId(organizationId);
+        if (typeof json !== "string" || json.length > 1_000_000) {
+            throw new EmailThemeError("theme.import", "invalid or oversized JSON");
+        }
+        let input: unknown;
+        try { input = JSON.parse(json) as unknown; }
+        catch { throw new EmailThemeError("theme.import", "invalid JSON"); }
+        if (typeof input !== "object" || input === null || Array.isArray(input)) {
+            throw new EmailThemeError("theme.import", "expected a JSON object");
+        }
+        const root = input as Record<string, unknown>;
+        if (Object.keys(root).some(key => !["schemaVersion", "organizationId", "themes"].includes(key)) ||
+            root.schemaVersion !== 1 || root.organizationId !== organizationId) {
+            throw new EmailThemeError("theme.import", "organization mismatch or unsupported schema");
+        }
+        const candidate = new ThemeRegistry();
+        candidate.importJSON(JSON.stringify(root.themes));
+        // Update only after the entire import passes validation.
+        this.organizationThemes.set(organizationId, candidate);
+        return this;
+    }
+
+    private selectedVersions(organizationId?: string): ThemeVersionRegistry {
+        return organizationId === undefined
+            ? this.themeVersions
+            : this.scopedThemeVersions(organizationId);
+    }
+
+    public publishThemeVersion(name: string, version: string, organizationId?: string): this {
+        const theme = organizationId === undefined
+            ? this.themes.resolve(name)
+            : this.resolveOrganizationTheme(organizationId, name);
+        this.selectedVersions(organizationId).publish(name, version, theme);
+        return this;
+    }
+
+    public listThemeVersions(name: string, organizationId?: string): ThemeVersionInfo[] {
+        return this.selectedVersions(organizationId).list(name);
+    }
+
+    public resolvePublishedTheme(
+        name: string,
+        version: string,
+        includeDeprecated = false,
+        organizationId?: string,
+    ): ResolvedEmailTheme {
+        return this.selectedVersions(organizationId).resolve(name, version, includeDeprecated);
+    }
+
+    public deprecateThemeVersion(
+        name: string,
+        version: string,
+        reason?: string,
+        organizationId?: string,
+    ): this {
+        this.selectedVersions(organizationId).deprecate(name, version, reason);
+        return this;
+    }
+
+    public migrateThemeVersion(
+        name: string,
+        from: string,
+        to: string,
+        overrides: ThemeOverrides,
+        deprecateSource = false,
+        organizationId?: string,
+    ): this {
+        this.selectedVersions(organizationId).migrate(name, from, to, overrides, deprecateSource);
+        return this;
     }
 
     /** Register a reusable theme for this engine. */

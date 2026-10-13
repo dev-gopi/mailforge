@@ -7,20 +7,20 @@ import {
 import { createEmail } from "../src/index.js";
 
 const base = {
-    recipientName: "Priya",
+    recipientName: "Gopi",
     actionUrl: "https://example.com/dashboard",
 };
 
-describe("Task 7.8.5.2–7.8.5.3: account and authentication catalog", () => {
+describe("account and authentication catalog", () => {
     it("supports account details in existing theme-aware panels", () => {
         const data = {
             ...base,
-            account: { email: "priya@example.com", referenceId: "ACCT-2026-1" },
+            account: { email: "Gopi@example.com", referenceId: "ACCT-2026-1" },
         };
         expect(accountCatalogTemplateDataSchema.parse(data)).toEqual(data);
         const doc = buildCatalogTemplate("account-activated", data);
         const json = JSON.stringify(doc.body);
-        expect(json).toContain("Account email: priya@example.com");
+        expect(json).toContain("Account email: Gopi@example.com");
         expect(json).toContain("Reference: ACCT-2026-1");
         expect(json).toContain("account-activated-account-details");
         expect(doc.version).toBe("1.0.0");
@@ -57,15 +57,15 @@ describe("Task 7.8.5.2–7.8.5.3: account and authentication catalog", () => {
         const engine = createEmail();
         const data = {
             ...base,
-            account: { email: "priya@example.com" },
+            account: { email: "Gopi@example.com" },
         };
         const visible = await engine.render("email-verified", { data });
-        expect(visible.text).toContain("Account email: priya@example.com");
+        expect(visible.text).toContain("Account email: Gopi@example.com");
         const hidden = await engine.render("email-verified", {
             data,
             display: { heading: false, hideIds: ["email-verified-account-details"] },
         });
-        expect(hidden.text).not.toContain("Account email: priya@example.com");
+        expect(hidden.text).not.toContain("Account email: Gopi@example.com");
         expect(hidden.text).not.toContain("Email verified");
     });
 
@@ -86,13 +86,13 @@ describe("Task 7.8.5.2–7.8.5.3: account and authentication catalog", () => {
 
     it("rejects category-specific fields on unrelated templates", () => {
         expect(() => buildCatalogTemplate("payment-failed", {
-            ...base, account: { email: "priya@example.com" },
+            ...base, account: { email: "Gopi@example.com" },
         })).toThrow();
         expect(() => buildCatalogTemplate("account-activated", {
             ...base, security: { device: "Chrome" },
         })).toThrow();
         expect(() => buildCatalogTemplate("magic-link", {
-            ...base, account: { email: "priya@example.com" },
+            ...base, account: { email: "Gopi@example.com" },
         })).toThrow();
     });
 

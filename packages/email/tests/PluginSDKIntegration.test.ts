@@ -8,7 +8,7 @@ const document: EmailDocument = {
     subject: "Greeting", body: [{ id: "plugin-title", type: "heading", props: { text: "Hello" } }],
 };
 
-describe("Task 7.9: plugins integrated into MailForgeEmail", () => {
+describe("plugins integrated into MailForgeEmail", () => {
     it("registers a plugin template and runs both hooks", async () => {
         let observed = 0;
         const plugin: MailForgePlugin = {
@@ -81,6 +81,6 @@ describe("Task 7.9: plugins integrated into MailForgeEmail", () => {
         email.usePlugin({ name: "invalid-output", version: "1.0.0", setup() {},
             beforeRender(draft) { draft.subject = ""; },
         });
-        await expect(email.render("welcome", { data: { user: { firstName: "Priya" }, actionUrl: "https://example.com" } })).rejects.toThrow();
+        await expect(email.render("welcome", { data: { user: { firstName: "Gopi" }, actionUrl: "https://example.com" } })).rejects.toThrow();
     });
 });

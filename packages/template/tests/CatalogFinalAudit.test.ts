@@ -3,7 +3,7 @@ import { auditTemplateCatalog } from "../src/registry/TemplateCatalogAudit.js";
 import { listBuiltinTemplateCatalog } from "../src/BuiltinTemplates.js";
 import { buildCatalogTemplate, listCatalogTemplates } from "../src/catalog/CatalogTemplates.js";
 
-describe("Task 7.8.5.11–7.8.6: catalog verification", () => {
+describe("catalog verification", () => {
     it("has unique, complete catalog metadata and valid documents", () => {
         const audit = auditTemplateCatalog();
         expect(audit.issues).toEqual([]);
@@ -15,8 +15,8 @@ describe("Task 7.8.5.11–7.8.6: catalog verification", () => {
     });
     it("keeps marketing unsubscribe link visible in every marketing catalog template", () => {
         for (const info of listCatalogTemplates("marketing")) {
-            expect(() => buildCatalogTemplate(info.id, { recipientName: "Priya", actionUrl: "https://example.com", unsubscribeUrl: "https://example.com/unsubscribe" })).not.toThrow();
-            expect(() => buildCatalogTemplate(info.id, { recipientName: "Priya", actionUrl: "https://example.com" })).toThrow();
+            expect(() => buildCatalogTemplate(info.id, { recipientName: "Gopi", actionUrl: "https://example.com", unsubscribeUrl: "https://example.com/unsubscribe" })).not.toThrow();
+            expect(() => buildCatalogTemplate(info.id, { recipientName: "Gopi", actionUrl: "https://example.com" })).toThrow();
         }
     });
 });

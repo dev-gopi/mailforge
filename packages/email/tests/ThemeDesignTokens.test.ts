@@ -9,7 +9,7 @@ import {
     type EmailDocument,
 } from "../src/index.js";
 
-describe("Task 8.0.1–8.0.4: advanced email-safe design tokens", () => {
+describe("advanced email-safe design tokens", () => {
     it("provides complete status, card, and button tokens in all presets", () => {
         for (const preset of ["modern", "minimal", "corporate"] as const) {
             const theme = getThemePreset(preset);

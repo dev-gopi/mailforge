@@ -115,7 +115,7 @@ describe("Template contracts and customization", () => {
         const result = await email.renderCustomizedBuiltin(
             "welcome",
             {
-                user: { firstName: "Priya" },
+                user: { firstName: "Gopi" },
                 actionUrl: "https://example.com/dashboard",
             },
             draft => {
@@ -123,7 +123,7 @@ describe("Template contracts and customization", () => {
             },
         );
 
-        expect(result.subject).toBe("Hello Priya!");
+        expect(result.subject).toBe("Hello Gopi!");
     });
 
     it("does not permanently change the built-in", async () => {

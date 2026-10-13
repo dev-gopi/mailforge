@@ -15,7 +15,7 @@ function custom(version: string, text: string): EmailDocument {
     };
 }
 
-describe("Tasks 7.8.3.4–7.8.3.6 — Safe publication and migration", () => {
+describe("Safe publication and migration", () => {
     it("publishes a core built-in without changing its normal rendering", async () => {
         const email = createEmail();
         email.publishTemplateVersion("welcome");
@@ -23,7 +23,7 @@ describe("Tasks 7.8.3.4–7.8.3.6 — Safe publication and migration", () => {
             .toEqual(["1.0.0"]);
 
         const data = {
-            user: { firstName: "Priya" },
+            user: { firstName: "Gopi" },
             actionUrl: "https://example.com/dashboard",
         };
         const published = await email.render("welcome", {
@@ -32,8 +32,8 @@ describe("Tasks 7.8.3.4–7.8.3.6 — Safe publication and migration", () => {
         });
         const original = await email.render("welcome", { data });
         expect(published.subject).toBe(original.subject);
-        expect(published.text).toContain("Priya");
-        expect(original.text).toContain("Priya");
+        expect(published.text).toContain("Gopi");
+        expect(original.text).toContain("Gopi");
     });
 
     it("saves custom overrides as immutable snapshots", async () => {

@@ -5,11 +5,11 @@ import {
 } from "../src/index.js";
 
 const welcomeData = {
-    user: { firstName: "Priya" },
+    user: { firstName: "Gopi" },
     actionUrl: "https://example.com/dashboard",
 };
 
-describe("Task 7.8.4.1–7.8.4.5 — reusable template variants", () => {
+describe("reusable template variants", () => {
     it("provides four built-in variants without changing default renders", async () => {
         const email = createEmail();
         expect(email.listTemplateVariants("welcome").map(v => v.id))
@@ -20,7 +20,7 @@ describe("Task 7.8.4.1–7.8.4.5 — reusable template variants", () => {
         const compact = await email.render("welcome", {
             variant: "compact", data: welcomeData,
         });
-        expect(original.subject).toBe("Welcome, Priya!");
+        expect(original.subject).toBe("Welcome, Gopi!");
         expect(compact.subject).toBe(original.subject);
         expect(compact.html).not.toBe(original.html);
     });
@@ -98,7 +98,7 @@ describe("Task 7.8.4.1–7.8.4.5 — reusable template variants", () => {
         expect(second.resolveTemplateVariant("welcome", "partner").theme?.colors?.primary)
             .toBe("#1166aa");
         const rendered = await second.render("welcome", { variant: "partner", data: welcomeData });
-        expect(rendered.subject).toBe("Welcome, Priya!");
+        expect(rendered.subject).toBe("Welcome, Gopi!");
         expect(() => second.importTemplateVariants(json)).toThrow(TemplateVariantError);
     });
 

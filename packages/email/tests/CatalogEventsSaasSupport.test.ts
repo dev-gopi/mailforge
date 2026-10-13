@@ -8,9 +8,9 @@ import {
 } from "@mailforge/templates";
 import { createEmail } from "../src/index.js";
 
-const common = { recipientName: "Priya", actionUrl: "https://example.com/action" };
+const common = { recipientName: "Gopi", actionUrl: "https://example.com/action" };
 
-describe("Task 7.8.5.8–7.8.5.10: events, SaaS, support", () => {
+describe("events, SaaS, support", () => {
     it("validates event chronology and renders UTC details", () => {
         const data = { ...common, event: { name: "Launch", startsAt: "2026-11-05T10:00:00+05:30", endsAt: "2026-11-05T11:00:00+05:30", meetingUrl: "https://example.com/join" } };
         expect(eventCatalogTemplateDataSchema.parse(data).event?.name).toBe("Launch");

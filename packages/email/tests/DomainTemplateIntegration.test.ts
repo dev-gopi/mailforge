@@ -22,7 +22,7 @@ const receipt=()=>({
   },receiptUrl:"https://example.com/receipts/REC-1001",
 });
 const order=()=>({
-  customer:{firstName:"Priya"},
+  customer:{firstName:"Gopi"},
   order:{
     id:"ORD-1042",placedOn:"2026-10-12",currency:"USD",
     items:[
@@ -37,7 +37,7 @@ const alert=()=>({
   reviewUrl:"https://example.com/security",
 });
 
-describe("Task 7.8.1 end-to-end email integration", () => {
+describe("end-to-end email integration", () => {
   it("01 lists ten built-in templates", () => {
     const email=createEmail();
     expect(email.listBuiltinTemplates()).toHaveLength(10);

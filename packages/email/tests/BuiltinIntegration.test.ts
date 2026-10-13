@@ -147,7 +147,7 @@ describe("MailForge Built-in Template Integration", () => {
 
         const result = await email.render("invitation", {
             data: {
-                invitee: { firstName: "Priya" },
+                invitee: { firstName: "Gopi" },
                 inviterName: "Rahul",
                 organizationName: "Acme",
                 inviteUrl: "https://example.com/accept",
@@ -157,7 +157,7 @@ describe("MailForge Built-in Template Integration", () => {
         expect(result.subject)
             .toBe("Invitation to Acme");
 
-        expect(result.text).toContain("Priya");
+        expect(result.text).toContain("Gopi");
         expect(result.text).toContain("Rahul");
         expect(result.html).toContain("Accept Invitation");
     });

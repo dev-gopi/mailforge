@@ -318,3 +318,6 @@ export type { TemplatePreviewFixture } from "./preview/CatalogPreview.js";
 // Trusted application plugins (Task 7.9).
 export { PluginRegistry, MailForgePluginError } from "@mailforge/plugin-sdk";
 export type { MailForgePlugin, MailForgePluginHost } from "@mailforge/plugin-sdk";
+// Standalone registered theme definitions and immutable theme versions.
+export { ThemeRegistry, ThemeVersionRegistry } from "@mailforge/themes";
+export type { ThemeDefinition, ThemeImportOptions, ThemeVersionInfo } from "@mailforge/themes";

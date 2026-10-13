@@ -7,11 +7,11 @@ import {
 import { createEmail } from "../src/index.js";
 
 const base = {
-    recipientName: "Priya",
+    recipientName: "Gopi",
     actionUrl: "https://example.com/account",
 };
 
-describe("Task 7.8.5.4–7.8.5.5: billing and ecommerce catalog", () => {
+describe("billing and ecommerce catalog", () => {
     it("validates and builds theme-aware billing details", () => {
         const data = {
             ...base,

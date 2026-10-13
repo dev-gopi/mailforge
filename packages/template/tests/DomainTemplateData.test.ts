@@ -23,7 +23,7 @@ const receipt = () => ({
   receiptUrl: "https://example.com/receipt",
 });
 const order = () => ({
-  customer: { firstName: "Priya" },
+  customer: { firstName: "Gopi" },
   order: {
     id: "ORD-1", placedOn: "2026-10-12", currency: "USD",
     items: [{ name: "Pen", quantity: 1, unitPriceCents: 300 }],
@@ -36,7 +36,7 @@ const alert = () => ({
   reviewUrl: "https://example.com/security",
 });
 
-describe("Task 7.8.1 domain data contracts", () => {
+describe("domain data contracts", () => {
   it("01 applies monetary defaults", () => {
     const data = parseDomainTemplateData("invoice", invoice());
     expect(data.invoice.shippingCents).toBe(0);

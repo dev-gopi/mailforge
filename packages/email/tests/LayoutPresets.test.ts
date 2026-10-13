@@ -21,7 +21,7 @@ const source: EmailDocument = {
     ],
 };
 
-describe("Task 8.0.5–8.0.6: professional layout presets", () => {
+describe("professional layout presets", () => {
     it("lists four named visual profiles", () => {
         const email = createEmail();
         expect(listLayoutPresets()).toEqual([

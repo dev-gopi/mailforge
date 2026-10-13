@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { createEmail, TemplateVariantError } from "../src/index.js";
 
 const data = {
-    user: { firstName: "Priya" },
+    user: { firstName: "Gopi" },
     actionUrl: "https://example.com/dashboard",
 };
 
-describe("Task 7.8.4.6–7.8.4.7 — organization-specific variants", () => {
+describe("organization-specific variants", () => {
     it("renders independent colors for the same variant ID in two organizations", async () => {
         const email = createEmail();
         email.registerOrganizationTemplateVariant("org-a", {
@@ -84,7 +84,7 @@ describe("Task 7.8.4.6–7.8.4.7 — organization-specific variants", () => {
         const result = await restored.render("welcome", {
             organizationId: "org-a", variant: "child", data,
         });
-        expect(result.subject).toBe("Welcome, Priya!");
+        expect(result.subject).toBe("Welcome, Gopi!");
     });
 
     it("rejects a different tenant ID and leaves current data unchanged", () => {
