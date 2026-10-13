@@ -203,6 +203,11 @@ export class MailForgeEmail {
     private readonly templateVersions =
         new TemplateVersionRegistry();
 
+    // Safe domain versions store styling recipes, never customer data.
+    // Version identity and deprecation still use TemplateVersionRegistry.
+    private readonly domainVersionStyles =
+        new Map<string, readonly DocumentPatch[]>();
+
     // Only developer-registered templates live here.
     private readonly templates =
         new Map<string, EmailDocument>();
@@ -368,6 +373,11 @@ export class MailForgeEmail {
 
     /** Publish one immutable document version for this email engine. */
     public registerTemplateVersion(document: EmailDocument): this {
+        if (isDomainTemplateName(document.id)) {
+            throw new TemplateVersionError(
+                `Use publishDomainTemplateVersion for data-driven templates: ${document.id}`,
+            );
+        }
         this.templateVersions.register(document);
         return this;
     }
@@ -455,6 +465,11 @@ export class MailForgeEmail {
             readonly reason?: string;
         } = {},
     ): this {
+        if (isDomainTemplateName(templateId)) {
+            throw new TemplateVersionError(
+                `Data-driven versions cannot use document migration: ${templateId}`,
+            );
+        }
         this.templateVersions.migrate(
             templateId,
             fromVersion,
@@ -462,6 +477,52 @@ export class MailForgeEmail {
             customize,
             options,
         );
+        return this;
+    }
+
+    /**
+     * Publish a versioned, reusable *style recipe* for one data-driven
+     * core built-in (invoice, receipt, order or security alert).
+     *
+     * We store the canonical empty blueprint only. Customer data is
+     * validated and materialized fresh for each render. Permanent edits
+     * are deliberately limited to style-only update patches.
+     */
+    public publishDomainTemplateVersion(
+        name: DomainTemplateName,
+        version: string,
+        patches: readonly DocumentPatch[] = [],
+    ): this {
+        if (!isDomainTemplateName(name)) {
+            throw new TemplateVersionError(
+                `Not a data-driven core template: ${String(name)}`,
+            );
+        }
+        if (!Array.isArray(patches) || patches.length > 200) {
+            throw new TemplateVersionError(
+                "Domain version requires at most 200 styling patches",
+            );
+        }
+        for (const patch of patches) {
+            if (
+                patch === null ||
+                typeof patch !== "object" ||
+                patch.op !== "update" ||
+                patch.styles === undefined ||
+                patch.props !== undefined ||
+                patch.attrs !== undefined
+            ) {
+                throw new TemplateVersionError(
+                    "Domain versions accept only style-only update patches",
+                );
+            }
+        }
+
+        const styles = structuredClone(patches);
+        // Built with no user data: customer content never enters history.
+        const blueprint = getBuiltinTemplate(name);
+        this.templateVersions.register({ ...blueprint, version });
+        this.domainVersionStyles.set(`${name}@${version}`, styles);
         return this;
     }
 
@@ -592,6 +653,43 @@ export class MailForgeEmail {
                 templateId,
                 options.templateVersion,
             );
+
+            // Core built-ins must never skip their Zod data contract.
+            if (isBuiltinTemplateName(templateId)) {
+                const validated = this.validateTemplateData(
+                    templateId,
+                    options.data,
+                );
+                if (isDomainTemplateName(templateId)) {
+                    const styles = this.domainVersionStyles.get(
+                        `${templateId}@${document.version}`,
+                    );
+                    if (styles === undefined) {
+                        throw new TemplateVersionError(
+                            `No safe data-driven recipe for: ${templateId}@${document.version}`,
+                        );
+                    }
+                    // Use the existing domain builder and prepared pipeline.
+                    // Caller's one-off patches run after the saved styles.
+                    return this.renderValidatedBuiltin(
+                        templateId,
+                        validated,
+                        {
+                            ...options,
+                            patches: [
+                                ...structuredClone(styles),
+                                ...(options.patches ?? []),
+                            ],
+                        },
+                    );
+                }
+                return this.renderPipeline(
+                    document,
+                    { ...options, data: validated as TemplateData },
+                    false,
+                );
+            }
+
             return this.renderDocument(document, options);
         }
 
