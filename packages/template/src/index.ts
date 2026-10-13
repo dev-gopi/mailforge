@@ -79,7 +79,7 @@ export {
 export type {
   ValidatedBuiltinTemplateDataMap,
 } from "./registry/TemplateContractRegistry.js";
-// Task 7.8.3.1: Template version lifecycle
+// Template version lifecycle
 export {
   TemplateVersionRegistry,
   TemplateVersionError,
@@ -167,7 +167,7 @@ export type {
   SpecializedTemplateInfo as ExtendedTemplateInfo,
 } from "./specialized/SpecializedTemplates.js";
 
-// Task 7.8.5.2–7.8.5.3: category-specific catalog data contracts.
+// Category-specific catalog data contracts.
 export {
     accountCatalogTemplateDataSchema,
     authenticationCatalogTemplateDataSchema,
@@ -177,7 +177,7 @@ export type {
     AuthenticationCatalogTemplateData,
 } from "./catalog/CatalogTemplates.js";
 
-// Task 7.8.5.4–7.8.5.5: billing and ecommerce catalog contracts.
+// Billing and ecommerce catalog data contracts.
 export {
     billingCatalogTemplateDataSchema,
     ecommerceCatalogTemplateDataSchema,
@@ -187,7 +187,7 @@ export type {
     EcommerceCatalogTemplateData,
 } from "./catalog/CatalogTemplates.js";
 
-// Task 7.8.5.6–7.8.5.7: marketing and notification catalog contracts.
+// Marketing and notification catalog data contracts.
 export {
     marketingCatalogTemplateDataSchema,
     notificationCatalogTemplateDataSchema,
@@ -197,7 +197,7 @@ export type {
     NotificationCatalogTemplateData,
 } from "./catalog/CatalogTemplates.js";
 
-// Task 7.8.5.8–7.8.5.10: events, SaaS and support contracts.
+// Events, SaaS and support catalog data contracts.
 export {
     eventCatalogTemplateDataSchema,
     saasCatalogTemplateDataSchema,
@@ -212,7 +212,7 @@ export type {
 export { auditTemplateCatalog } from "./registry/TemplateCatalogAudit.js";
 export type { CatalogAudit, CatalogIssue } from "./registry/TemplateCatalogAudit.js";
 
-// Task 8.5.16–17: 51 additional typed catalog templates.
+// Additional typed catalog templates.
 export {
     EXPANDED_CATALOG_TEMPLATE_NAMES,
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,

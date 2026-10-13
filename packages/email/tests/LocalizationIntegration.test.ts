@@ -12,7 +12,7 @@ import {
 
 const welcomeData = { user: { firstName: "Gopi" }, actionUrl: "https://example.com/home" };
 
-describe("Task 8.1: email localization", () => {
+describe("email localization", () => {
     it("keeps legacy email rendering unchanged when localization is unused", async () => {
         const email = createEmail();
         const result = await email.render("welcome", { data: welcomeData });

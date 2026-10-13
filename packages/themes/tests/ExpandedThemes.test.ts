@@ -8,7 +8,7 @@ import {
 const NEW_PRESETS = ["dark", "premium", "ocean", "forest", "sunset", "elegant", "playful"] as const;
 const LEGACY = ["modern", "minimal", "corporate"] as const;
 
-describe("8.5.14: ten professional design presets", () => {
+describe("professional design presets", () => {
     it("preserves the original three in their existing order", () => {
         expect(listThemePresets().slice(0, 3)).toEqual(LEGACY);
     });

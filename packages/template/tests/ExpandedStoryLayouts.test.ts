@@ -15,7 +15,7 @@ const unboxed = new Set([
     "conversation", "minimal",
 ]);
 
-describe("Task 8.5.19 — expanded story composition", () => {
+describe("expanded story composition", () => {
     it("retains the same stable highlight IDs in all 51 expanded templates", () => {
         expect(EXPANDED_CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(51);
         for (const [id, category] of EXPANDED_CATALOG_TEMPLATE_DEFINITIONS) {

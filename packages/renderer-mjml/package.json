@@ -1,6 +1,7 @@
 {
     "name": "@mailforge/renderer-mjml",
     "version": "0.1.0",
+    "description": "Email-safe MJML rendering and plain-text output for MailForge",
     "private": true,
     "type": "module",
     "main": "./dist/index.js",
@@ -32,5 +33,6 @@
         "@types/mjml": "^5.0.0",
         "@types/node": "^26.6.5",
         "@types/sanitize-html": "^2.16.2"
-    }
+    },
+    "license": "MIT"
 }

@@ -3,7 +3,7 @@ import { describe, it, after } from "node:test";
 import assert from "node:assert/strict";
 import { normalizePreviewRequest, safeHost, verifySameOrigin } from "../lib.mjs";
 import { createPlaygroundServer } from "../server.mjs";
-import { getTemplatePreviewData } from "../../../scripts/template-preview-fixtures.mjs";
+import { getTemplatePreviewData } from "../template-preview-fixtures.mjs";
 
 const templates = new Set(["welcome", "invoice"]);
 const themes = ["modern", "minimal", "corporate"];

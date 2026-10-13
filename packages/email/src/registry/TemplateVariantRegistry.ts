@@ -1,6 +1,6 @@
 import type { DocumentPatch } from "@mailforge/core";
 import type { EmailLayoutOptions } from "../layout/Layout.types.js";
-import type { ThemeOverrides } from "../theme/Theme.types.js";
+import type { ThemeOverrides } from "@mailforge/themes";
 import { mergeLayoutOverrides, mergeThemeOverrides } from "../presets/PresetMerge.js";
 
 /** A named style/content variation; the template's input contract is unchanged. */

@@ -1,6 +1,7 @@
 {
     "name": "@mailforge/renderer-html",
     "version": "0.1.0",
+    "description": "Sanitized HTML rendering, CSS inlining, and plain-text output for MailForge",
     "private": true,
     "type": "module",
     "main": "./dist/index.js",
@@ -32,5 +33,6 @@
         "@types/node": "^26.6.5",
         "@types/sanitize-html": "^2.16.2"
     },
-    "sideEffects": false
+    "sideEffects": false,
+    "license": "MIT"
 }

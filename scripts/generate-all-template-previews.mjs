@@ -1,4 +1,4 @@
-import { getTemplatePreviewData } from "./template-preview-fixtures.mjs";
+import { getTemplatePreviewData } from "../apps/playground/template-preview-fixtures.mjs";
 /**
  * Generate real MJML-compiled HTML/text previews for ALL packaged MailForge templates.
  * Usage (after pnpm install && pnpm build):

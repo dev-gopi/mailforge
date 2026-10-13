@@ -192,6 +192,7 @@ MailForge sanitizes untrusted HTML and produces a plain-text fallback. Trusted r
 | `pnpm lint` | Run ESLint across the repository. |
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the development workflow and [CHANGELOG.md](./CHANGELOG.md) for release notes.
+Detailed guides are available in [docs/README.md](./docs/README.md), including the CLI, architecture, template, theme, compatibility, and release documentation.
 
 ## License
 

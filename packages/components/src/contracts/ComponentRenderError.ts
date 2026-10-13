@@ -25,7 +25,7 @@ export class ComponentCatalogError extends Error {
 
 /**
  * Reserved for errors raised while executing
- * a component handler in Task 7.7.2.
+ * a component handler.
  */
 export class ComponentRenderError extends Error {
     public readonly code = "COMPONENT_RENDER_FAILED";

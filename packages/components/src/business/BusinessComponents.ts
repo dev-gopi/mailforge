@@ -34,6 +34,7 @@ const promo = z.object({ title: short, detail: body, actionText: short.optional(
     .refine(v => Boolean(v.actionText) === Boolean(v.actionUrl), "Provide both actionText and actionUrl");
 const tableSchema = tablePropsSchema;
 
+/** Build the accessible image and text nodes shared by product-card and product-grid renderers. */
 function productNodes(id: string, value: z.output<typeof product>): EmailNode[] {
     return [
         ...(value.imageUrl ? [{ id: `${id}-image`, type: "image", props: { src: value.imageUrl, alt: value.imageAlt! } } satisfies EmailNode] : []),
@@ -42,6 +43,12 @@ function productNodes(id: string, value: z.output<typeof product>): EmailNode[] 
         ...(value.description ? [text(`${id}-description`, value.description)] : []),
     ];
 }
+/**
+ * Return fresh, validated definitions for the business-oriented component catalog.
+ *
+ * Definitions are recreated for each call so a caller cannot mutate the shared
+ * built-in component configuration.
+ */
 export function getBusinessComponentDefinitions(): ReusableComponentDefinition[] {
     const invoiceLine = z.object({ description: short, quantity: z.number().int().min(1).max(99999), unitPrice: money, amount: money }).strict();
     const plan = z.object({ name: short, price: money, features: z.array(short).min(1).max(12) }).strict();
@@ -119,12 +126,14 @@ export function getBusinessComponentDefinitions(): ReusableComponentDefinition[]
         }, "Readable verification code and expiration information"),
     ];
 }
+/** Stable names exposed by the built-in business component catalog. */
 export const BUSINESS_COMPONENT_NAMES = [
     "mf-data-table","mf-invoice-table","mf-pricing-comparison","mf-transaction-summary",
     "mf-product-card","mf-product-grid","mf-coupon-code","mf-discount-banner",
     "mf-event-card","mf-ticket-card","mf-avatar","mf-profile-card",
     "mf-feature-grid","mf-metric-grid","mf-alert-banner","mf-verification-panel",
 ] as const;
+/** Register every business component with a caller-owned component catalog. */
 export function registerBusinessComponents(catalog: ComponentCatalog): void {
     for (const definition of getBusinessComponentDefinitions()) catalog.register(definition);
 }

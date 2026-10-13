@@ -30,6 +30,7 @@ import {
     registerCompositeComponents,
 } from "./CompositeComponents.js";
 
+/** Stable names exposed by the built-in extended component catalog. */
 export const EXTENDED_COMPONENT_NAMES = [
     "mf-callout-box",
     "mf-key-value-list",
@@ -37,6 +38,7 @@ export const EXTENDED_COMPONENT_NAMES = [
     "mf-social-links",
 ] as const;
 
+/** Return fresh definitions for the built-in extended component collection. */
 export function getExtendedComponentDefinitions(): ReusableComponentDefinition[] {
     return [
         createCalloutBoxDefinition(),
@@ -46,6 +48,7 @@ export function getExtendedComponentDefinitions(): ReusableComponentDefinition[]
     ];
 }
 
+/** Register every extended component with a caller-owned component catalog. */
 export function registerExtendedComponents(
     catalog: ComponentCatalog,
 ): void {

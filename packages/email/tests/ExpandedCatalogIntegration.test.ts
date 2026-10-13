@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { createEmail } from "../src/index.js";
 import { EXPANDED_CATALOG_TEMPLATE_NAMES, listCatalogTemplates } from "@mailforge/templates";
 
-const data = { recipientName:"Priya", actionUrl:"https://example.com/action", unsubscribeUrl:"https://example.com/unsubscribe" };
+const data = { recipientName:"Gopi", actionUrl:"https://example.com/action", unsubscribeUrl:"https://example.com/unsubscribe" };
 
-describe("8.5.16–17: real MJML rendering and customization", () => {
+describe("real MJML rendering and customization", () => {
     it("renders all 51 new templates with real HTML/text and their own subjects", async () => {
         const email = createEmail({brand:{name:"Northstar"},theme:"modern"});
         const catalog = listCatalogTemplates();
@@ -14,7 +14,7 @@ describe("8.5.16–17: real MJML rendering and customization", () => {
             const result = await email.render(id, {data});
             expect(result.subject,id).toBe(info?.title);
             expect(result.html.toLowerCase(),id).toContain("<html");
-            expect(result.text,id).toContain("Priya");
+            expect(result.text,id).toContain("Gopi");
             expect(result.html,id).toContain("https://example.com/action");
             expect(result.text.trim().length,id).toBeGreaterThan(60);
             if (info?.category === "marketing") expect(result.html,id).toContain("unsubscribe");
@@ -44,7 +44,7 @@ describe("8.5.16–17: real MJML rendering and customization", () => {
     });
     it("rejects missing marketing opt-out and invalid context before rendering", async () => {
         const email = createEmail();
-        await expect(email.render("flash-sale", {data:{recipientName:"Priya",actionUrl:data.actionUrl}})).rejects.toThrow();
+        await expect(email.render("flash-sale", {data:{recipientName:"Gopi",actionUrl:data.actionUrl}})).rejects.toThrow();
         await expect(email.render("invoice-overdue", {data:{...data,billing:{amount:"20"}}})).rejects.toThrow();
     });
 });

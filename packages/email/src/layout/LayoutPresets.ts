@@ -1,5 +1,5 @@
 import type { EmailLayoutOptions } from "./Layout.types.js";
-import type { ThemeOverrides } from "../theme/Theme.types.js";
+import type { ThemeOverrides } from "@mailforge/themes";
 
 /** These are visual email-layout profiles, not separate template IDs. */
 export const LAYOUT_PRESET_NAMES = [

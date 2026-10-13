@@ -32,7 +32,7 @@ const FEATURED: Readonly<Record<string, CatalogDesignFamily>> = {
     "trial-started": "spotlight",
 };
 
-/** Task 8.5.19: curate the semantic exceptions rather than hashing their names. */
+/** Curate semantic exceptions rather than hashing their names. */
 const PURPOSE_FAMILIES: Readonly<Record<string, CatalogDesignFamily>> = {
     "magic-link": "security",
     "mfa-enabled": "security",

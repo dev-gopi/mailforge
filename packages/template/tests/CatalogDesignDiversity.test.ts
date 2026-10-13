@@ -7,7 +7,7 @@ import {
     CATALOG_DESIGN_FAMILIES, getCatalogDesignFamily,
 } from "../src/catalog/CatalogDesignFamilies.js";
 
-const data = { recipientName: "Priya", actionUrl: "https://example.com/open", unsubscribeUrl: "https://example.com/unsubscribe" };
+const data = { recipientName: "Gopi", actionUrl: "https://example.com/open", unsubscribeUrl: "https://example.com/unsubscribe" };
 const nodes = (tree: readonly EmailNode[]): EmailNode[] => tree.flatMap(node => [node, ...nodes(node.children ?? [])]);
 
 describe("distinct purpose-driven catalog compositions", () => {

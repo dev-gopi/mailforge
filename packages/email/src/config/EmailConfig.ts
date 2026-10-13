@@ -2,7 +2,7 @@
 import type {
   EmailThemeOptions,
   ResolvedEmailTheme,
-} from "../theme/Theme.types.js";
+} from "@mailforge/themes";
 
 /**
  * Brand options supplied by a developer.

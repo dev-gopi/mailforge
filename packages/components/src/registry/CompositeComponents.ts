@@ -31,6 +31,7 @@ import {
     createOrderSummaryDefinition,
 } from "../commerce/OrderSummary.js";
 
+/** Stable names exposed by the built-in composite component catalog. */
 export const COMPOSITE_COMPONENT_NAMES = [
     "mf-content-card",
     "mf-button-group",
@@ -40,6 +41,7 @@ export const COMPOSITE_COMPONENT_NAMES = [
     "mf-two-column",
 ] as const;
 
+/** Return fresh definitions for components that expand into multiple email nodes. */
 export function getCompositeComponentDefinitions():
     ReusableComponentDefinition[] {
     return [
@@ -52,6 +54,7 @@ export function getCompositeComponentDefinitions():
     ];
 }
 
+/** Register every composite component with a caller-owned component catalog. */
 export function registerCompositeComponents(
     catalog: ComponentCatalog,
 ): void {

@@ -13,9 +13,9 @@ const samples: Record<string, Record<string, EmailNodeValue>> = {
     "mf-coupon-code": { code:"WELCOME20",label:"Your discount" },
     "mf-discount-banner": { title:"Special offer",detail:"Save today" },
     "mf-event-card": {title:"Annual Meetup",date:"20 October 2026",location:"London"},
-    "mf-ticket-card": {event:"Annual Meetup",attendee:"Priya",ticketCode:"T-123"},
-    "mf-avatar": {src:"https://example.com/avatar.png",alt:"Portrait of Priya"},
-    "mf-profile-card": {name:"Priya",role:"Engineer",organization:"Northstar"},
+    "mf-ticket-card": {event:"Annual Meetup",attendee:"Gopi",ticketCode:"T-123"},
+    "mf-avatar": {src:"https://example.com/avatar.png",alt:"Portrait of Gopi"},
+    "mf-profile-card": {name:"Gopi",role:"Engineer",organization:"Northstar"},
     "mf-feature-grid": {features:[{title:"Fast",description:"Quick setup"},{title:"Safe",description:"Validated data"}]},
     "mf-metric-grid": {metrics:[{label:"Users",value:"250"}]},
     "mf-alert-banner": {severity:"warning",title:"Maintenance",message:"Scheduled downtime"},
@@ -25,7 +25,7 @@ function document(type: string, props: Record<string, EmailNodeValue>): EmailDoc
     return { schemaVersion:"1.0", id:"demo-business", version:"1.0.0", subject:"Business preview", body:[{id:"component",type,props}] };
 }
 
-describe("Task 8.5.13: business component rendering", () => {
+describe("business component rendering", () => {
     it("registers exactly the promised new components", () => {
         expect(new Set(BUSINESS_COMPONENT_NAMES).size).toBe(16);
         for (const name of BUSINESS_COMPONENT_NAMES) expect(samples[name]).toBeDefined();

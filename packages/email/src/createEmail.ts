@@ -105,13 +105,18 @@ import {
 
 import {
     mergeEmailTheme,
-} from "./theme/ThemeResolver.js";
-import { ThemeRegistry, ThemeVersionRegistry, EmailThemeError } from "@mailforge/themes";
-import type { ThemeDefinition, ThemeVersionInfo } from "@mailforge/themes";
-
-import {
     listThemePresets,
-} from "./theme/ThemePresets.js";
+    ThemeRegistry,
+    ThemeVersionRegistry,
+    EmailThemeError,
+} from "@mailforge/themes";
+import type {
+    ThemeDefinition,
+    ThemeVersionInfo,
+    ResolvedEmailTheme,
+    ThemeOverrides,
+    ThemePreset,
+} from "@mailforge/themes";
 
 import {
     applyDefaultLayout,
@@ -148,12 +153,6 @@ import type {
     ResolvedEmailBrand,
     ResolvedEmailConfig,
 } from "./config/EmailConfig.js";
-
-import type {
-    ResolvedEmailTheme,
-    ThemeOverrides,
-    ThemePreset,
-} from "./theme/Theme.types.js";
 
 import type {
     EmailLayoutOptions,
@@ -294,17 +293,17 @@ export class MailForgeEmail {
             this.componentCatalog,
         );
 
-        // Task 7.7.4: Six composite/layout components.
+        // Register composite and layout components.
         registerCompositeComponents(
             this.componentCatalog,
         );
 
-        // Stage 8.5.13: validated business and table components.
+        // Register validated business and table components.
         registerBusinessComponents(this.componentCatalog);
     }
 
     // ---------------------------------------
-    // TRUSTED PLUGIN SDK (TASK 7.9)
+    // TRUSTED PLUGIN SDK
     // ---------------------------------------
     /**
      * Plugins are trusted executable application code, not user-provided JSON.
@@ -354,7 +353,7 @@ export class MailForgeEmail {
     }
 
     // ---------------------------------------
-    // LOCALIZED EMAIL CONTENT (TASK 8.1)
+    // LOCALIZED EMAIL CONTENT
     // ---------------------------------------
     /** Application-owned, per-engine translations keyed by stable node ID. */
     public registerTranslations(locale: string, templateId: string, translation: EmailTranslation): this {
@@ -514,7 +513,7 @@ export class MailForgeEmail {
 
 
     // ---------------------------------------------------
-    // TASK 7.8.4: REUSABLE TEMPLATE VARIANTS
+    // REUSABLE TEMPLATE VARIANTS
     // ---------------------------------------------------
     /** Seed four built-in variants lazily for a known template. */
     private ensureTemplateVariants(templateId: string): void {
@@ -621,7 +620,7 @@ export class MailForgeEmail {
     }
 
     // ---------------------------------------------------
-    // TASK 7.8.4.6–7.8.4.7: ORGANIZATION VARIANTS
+    // ORGANIZATION VARIANTS
     // ---------------------------------------------------
     /** Each organization owns a separate registry; global custom variants are not inherited. */
     private organizationVariantRegistry(organizationId: string): TemplateVariantRegistry {
@@ -996,7 +995,7 @@ export class MailForgeEmail {
     }
 
     /**
-     * Preserve the existing Task 7.1 behavior:
+     * Preserve the existing behavior:
      * list only templates explicitly registered
      * by the developer.
      */
@@ -1162,7 +1161,7 @@ export class MailForgeEmail {
 
     /**
      * Existing structured-document pipeline
-     * from Task 7.5.
+     * from the baseline rendering flow.
      */
     public async renderDocument(
         document: EmailDocument,
@@ -1369,7 +1368,7 @@ export class MailForgeEmail {
         // 7. Validate once more after theme application.
         this.validator.validateOrThrow(themed);
 
-        // 8. Preserve the Task 7.7.5 resource budget.
+        // Preserve the resource budget.
         assertRenderBudget(themed);
 
         // 9. Produce responsive HTML and plain text.
@@ -1414,7 +1413,7 @@ export class MailForgeEmail {
     }
 
     // ---------------------------------------------------
-    // REUSABLE REGISTERED THEMES (8.0.6.5-8.0.6.7)
+    // REUSABLE REGISTERED THEMES
     // ---------------------------------------------------
     public registerTheme(definition: ThemeDefinition): this {
         this.themes.register(definition);

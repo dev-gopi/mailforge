@@ -18,7 +18,7 @@ export interface ComponentRenderContext {
  * A renderer returns structured EmailNode objects.
  *
  * Multiple nodes are reserved for composite
- * components in Task 7.7.4.
+ * components.
  */
 export type ComponentRenderOutput =
     | EmailNode

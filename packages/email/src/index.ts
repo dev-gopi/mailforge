@@ -26,18 +26,12 @@ export type {
 // Themes
 export {
     EmailThemeError,
-} from "./theme/Theme.types.js";
-
-export {
     getThemePreset,
     listThemePresets,
-} from "./theme/ThemePresets.js";
-
-export {
     resolveEmailTheme,
     mergeEmailTheme,
     defineThemeOverrides,
-} from "./theme/ThemeResolver.js";
+} from "@mailforge/themes";
 
 export type {
     ThemePreset,
@@ -49,7 +43,7 @@ export type {
     ThemeConfiguration,
     EmailThemeOptions,
     ResolvedEmailTheme,
-} from "./theme/Theme.types.js";
+} from "@mailforge/themes";
 
 // Layouts
 export {
@@ -65,7 +59,7 @@ export {
     applyDefaultLayout,
 } from "./layout/DefaultLayout.js";
 
-// Optional, email-safe visual layout presets (Tasks 8.0.5–8.0.6).
+// Optional, email-safe visual layout presets.
 export {
     getLayoutPreset,
     listLayoutPresets,
@@ -183,7 +177,7 @@ export {
     assertRenderBudget,
 } from "./security/RenderGuard.js";
 
-// Task 7.8.2.2: template presets and reusable theme profiles
+// Template presets and reusable theme profiles.
 export {
     TemplatePresetRegistry,
     ThemeProfileRegistry,
@@ -250,7 +244,7 @@ export type {
 export { applyTemplateDisplay, TemplateDisplayError } from "./layout/TemplateDisplay.js";
 export type { TemplateDisplayOptions } from "./layout/TemplateDisplay.js";
 
-// Task 7.8.3.2: Public version registry error and selection types.
+// Public version-registry error and selection types.
 export { TemplateVersionError } from "@mailforge/templates";
 export type {
     TemplateVersionInfo,
@@ -258,7 +252,7 @@ export type {
     TemplateVersionStatus,
 } from "@mailforge/templates";
 
-// Task 7.8.4: existing template variant registry, now connected to render().
+// Template variant registry, connected to render().
 export {
     TemplateVariantRegistry,
     TemplateVariantError,
@@ -298,7 +292,7 @@ export type {
     NotificationCatalogTemplateData,
 } from "@mailforge/templates";
 
-// Task 7.8.5.8–7.8.5.10: events, SaaS and support contracts.
+// Events, SaaS and support catalog data contracts.
 export {
     eventCatalogTemplateDataSchema,
     saasCatalogTemplateDataSchema,
@@ -315,14 +309,14 @@ export type { CatalogAudit, CatalogIssue } from "@mailforge/templates";
 export { generatePreviewFixtures } from "./preview/CatalogPreview.js";
 export type { TemplatePreviewFixture } from "./preview/CatalogPreview.js";
 
-// Trusted application plugins (Task 7.9).
+// Trusted application plugins.
 export { PluginRegistry, MailForgePluginError } from "@mailforge/plugin-sdk";
 export type { MailForgePlugin, MailForgePluginHost } from "@mailforge/plugin-sdk";
 // Standalone registered theme definitions and immutable theme versions.
 export { ThemeRegistry, ThemeVersionRegistry } from "@mailforge/themes";
 export type { ThemeDefinition, ThemeImportOptions, ThemeVersionInfo } from "@mailforge/themes";
 
-// Stage 8.1: localization, translations and Intl formatters.
+// Localization, translations and Intl formatters.
 export {
     EmailLocalizationError, EmailLocalizationRegistry,
     normalizeEmailLocale, resolveEmailDirection,

@@ -20,6 +20,7 @@ function wrap(id: string, nodes: EmailNode[]): EmailNode {
     };
 }
 
+/** Create the theme-aware hero section definition with an optional primary action. */
 export function createHeroSectionDefinition(): ReusableComponentDefinition {
     const schema = z.object({
         title: z.string().min(1).max(160),
@@ -41,6 +42,7 @@ export function createHeroSectionDefinition(): ReusableComponentDefinition {
     };
 }
 
+/** Create the compact metric block definition used for prominent values and supporting text. */
 export function createStatisticBlockDefinition(): ReusableComponentDefinition {
     const schema = z.object({ label: z.string().min(1).max(120), value: z.string().min(1).max(100), detail: z.string().max(240).optional() }).strict();
     return {
@@ -58,6 +60,7 @@ export function createStatisticBlockDefinition(): ReusableComponentDefinition {
     };
 }
 
+/** Create a readable, email-safe progress timeline without relying on grid or flexbox. */
 export function createProgressTimelineDefinition(): ReusableComponentDefinition {
     const schema = z.object({
         title: z.string().min(1).max(160).optional(),
@@ -79,6 +82,7 @@ export function createProgressTimelineDefinition(): ReusableComponentDefinition 
     };
 }
 
+/** Create a structured company-signature definition with optional support contact details. */
 export function createCompanySignatureDefinition(): ReusableComponentDefinition {
     const schema = z.object({ name: z.string().min(1).max(140), title: z.string().max(140).optional(), organization: z.string().min(1).max(140), supportEmail: z.string().email().optional() }).strict();
     return {
@@ -95,10 +99,12 @@ export function createCompanySignatureDefinition(): ReusableComponentDefinition 
     };
 }
 
+/** Stable names exposed by the built-in professional component catalog. */
 export const PROFESSIONAL_COMPONENT_NAMES = [
     "mf-hero-section", "mf-statistic-block", "mf-progress-timeline", "mf-company-signature",
 ] as const;
 
+/** Return fresh definitions for all optional professional components. */
 export function getProfessionalComponentDefinitions(): ReusableComponentDefinition[] {
     return [
         createHeroSectionDefinition(), createStatisticBlockDefinition(),

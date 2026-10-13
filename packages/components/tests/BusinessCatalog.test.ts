@@ -3,7 +3,7 @@ import { ComponentRegistry } from "@mailforge/core";
 import { ComponentCatalog } from "../src/registry/ComponentCatalog.js";
 import { BUSINESS_COMPONENT_NAMES, registerBusinessComponents, getBusinessComponentDefinitions } from "../src/business/BusinessComponents.js";
 
-describe("Task 8.5.13: business catalog", () => {
+describe("business catalog", () => {
     it("exports exactly 16 distinct definitions", () => {
         expect(getBusinessComponentDefinitions().map(d=>d.name)).toEqual([...BUSINESS_COMPONENT_NAMES]);
         expect(new Set(BUSINESS_COMPONENT_NAMES).size).toBe(16);

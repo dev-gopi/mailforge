@@ -6,9 +6,7 @@ import {
     type ResolvedEmailConfig,
 } from "./EmailConfig.js";
 
-import {
-    resolveEmailTheme,
-} from "../theme/ThemeResolver.js";
+import { resolveEmailTheme } from "@mailforge/themes";
 
 import {
     resolveEmailLayout,

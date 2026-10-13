@@ -3,7 +3,7 @@ import { renderTableMarkup } from "../src/TableRenderer.js";
 import { MjmlRenderer } from "../src/index.js";
 import type { EmailDocument } from "@mailforge/core";
 
-describe("Task 8.5.13: email-safe table renderer", () => {
+describe("email-safe table renderer", () => {
     it("escapes HTML and attributes in cells", () => {
         const markup = renderTableMarkup({headers:["<script>"],rows:[["<img src=x onerror=alert(1)> & \"quote\""]]});
         expect(markup).not.toContain("<script>");

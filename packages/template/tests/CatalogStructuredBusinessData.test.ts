@@ -11,7 +11,7 @@ function getNode(id: string, input: Record<string, unknown>, suffix: string): Em
 }
 const base = { recipientName: "Riley", actionUrl: "https://example.com/view" };
 
-describe("Task 8.5.19 — validated structured business details", () => {
+describe("validated structured business details", () => {
     it("renders caller-supplied invoice line items, without calculating money", () => {
         const input = { ...base, billing: {
             referenceId: "INV-001", amount: "26.00", currency: "USD",

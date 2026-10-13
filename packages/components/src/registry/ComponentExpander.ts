@@ -426,7 +426,7 @@ export class ComponentExpander {
                 );
             }
 
-            // Preserve Task 7.7.2's contract for
+            // Preserve the contract for
             // existing single-node components.
             if (!multi && isRecord(output)) {
                 if (output.id !== node.id) {

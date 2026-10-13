@@ -1,7 +1,7 @@
 
 import type {
     ThemeOverrides,
-} from "../theme/Theme.types.js";
+} from "@mailforge/themes";
 
 import type {
     EmailLayoutOptions,

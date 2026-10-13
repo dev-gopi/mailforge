@@ -1,5 +1,5 @@
 import type { EmailDocument, EmailNode } from "@mailforge/core";
-import type { ResolvedEmailTheme } from "../theme/Theme.types.js";
+import type { ResolvedEmailTheme } from "@mailforge/themes";
 
 type Styles = NonNullable<EmailNode["styles"]>;
 const STRUCTURAL = new Set(["section", "row", "container", "header", "footer"]);

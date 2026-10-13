@@ -21,12 +21,9 @@ For each of the representative email categories (welcome/OTP, invoice/order, mar
 From the repository root after `pnpm build`:
 
 ```bash
-node --test tests/quality/PreviewQuality.test.mjs
 node scripts/generate-all-template-previews.mjs
-node scripts/audit-release-previews.mjs
-node scripts/benchmark-release-rendering.mjs
 ```
 
-Outputs: `generated/template-audit/report.json`, `release-quality-report.json`, and `render-benchmark.json`.
+Output: `generated/template-audit/report.json`.
 
 Passes of these scripts **do not certify** Gmail, Outlook, Apple Mail, WCAG conformance or safe email deliverability.

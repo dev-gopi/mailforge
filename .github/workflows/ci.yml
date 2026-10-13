@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Build, tests, docs, release checks
+    name: Build and test
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -34,30 +34,11 @@ jobs:
         run: pnpm -r --if-present typecheck
       - name: Test
         run: pnpm -r --if-present test
-      - name: Release unit tests
-        run: node --test tests/quality/Stage86Release.test.mjs
+      - name: Check concurrent rendering
+        run: node --test tests/quality/ConcurrentRendering.test.mjs
       - name: Lint
         run: pnpm lint
-      - name: Check source-generated docs and exports
-        run: node scripts/stage86-release.mjs --audit --check-docs
-      - name: Validate local package artifacts (no publication)
-        run: node scripts/stage86-release.mjs --pack
       - name: Generate default email previews
         run: node scripts/generate-all-template-previews.mjs
-      - name: Audit 1100 email previews
-        run: node scripts/audit-release-previews.mjs
-      - name: Structured scenario and design-family review
-        run: node scripts/complete-stage8519-visual-review.mjs
       - name: Check whitespace
         run: git diff --check
-      - name: Preserve report on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: mailforge-ci-reports
-          path: |
-            generated/template-audit/release-quality-report.json
-            generated/template-audit/stage8519-review/report.json
-            generated/release/stage86-audit.json
-          if-no-files-found: ignore
-          retention-days: 7

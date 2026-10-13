@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { emailClientHead, resolveEmailClientStyles } from "../src/EmailClientStyles.js";
 
-describe("8.5.15: mobile and dark-mode style safety", () => {
+describe("mobile and dark-mode style safety", () => {
     it("includes mobile heading, panel, and full-width actions by default", () => {
         const css = emailClientHead({ responsive: true });
         expect(css).toContain("mf-role-hero-title");

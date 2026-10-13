@@ -5,7 +5,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { normalizePreviewRequest, safeHost, verifySameOrigin, LAYOUTS, VARIANTS } from "./lib.mjs";
-import { getTemplatePreviewData } from "../../scripts/template-preview-fixtures.mjs";
+import { getTemplatePreviewData } from "./template-preview-fixtures.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const staticFiles = new Map([

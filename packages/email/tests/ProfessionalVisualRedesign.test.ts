@@ -17,7 +17,7 @@ const find = (document: EmailDocument, id: string): EmailNode => {
     return node;
 };
 
-describe("8.5.15: professional visual system", () => {
+describe("professional visual system", () => {
     it("uses button padding from the selected theme, not hardcoded values", () => {
         const theme = resolveEmailTheme({ appearance: { buttonPaddingX: 37, buttonPaddingY: 17 } });
         const result = applyEmailTheme(sample(), theme);
@@ -93,9 +93,9 @@ describe("8.5.15: professional visual system", () => {
     });
     it("renders existing welcome template with branded actions", async () => {
         const email = createEmail({brand:{name:"Acme"}, theme:"forest"});
-        const result = await email.render("welcome", {data:{user:{firstName:"Priya"},actionUrl:"https://example.com/dashboard"}});
-        expect(result.html).toContain("Priya");
+        const result = await email.render("welcome", {data:{user:{firstName:"Gopi"},actionUrl:"https://example.com/dashboard"}});
+        expect(result.html).toContain("Gopi");
         expect(result.html).toContain("#166534");
-        expect(result.text).toContain("Priya");
+        expect(result.text).toContain("Gopi");
     });
 });

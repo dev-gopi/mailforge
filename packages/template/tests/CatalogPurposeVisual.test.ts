@@ -22,7 +22,7 @@ const curated = [
 
 const heroFamilies = new Set(["editorial", "spotlight", "showcase", "ticket", "invitation"]);
 
-describe("Task 8.5.19 — purposeful catalog design", () => {
+describe("purposeful catalog design", () => {
     it("selects semantic families instead of arbitrary hash results", () => {
         for (const [id, category, expected] of curated) {
             expect(getCatalogDesignFamily(id, category)).toBe(expected);

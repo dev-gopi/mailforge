@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createEmail } from "../src/index.js";
 import { listCatalogTemplates } from "@mailforge/templates";
 
-const sample = { recipientName: "Priya", actionUrl: "https://example.com/open", unsubscribeUrl: "https://example.com/unsubscribe" };
+const sample = { recipientName: "Gopi", actionUrl: "https://example.com/open", unsubscribeUrl: "https://example.com/unsubscribe" };
 const examples = ["feature-announcement", "flash-sale", "invoice-reminder", "invoice-overdue", "order-out-for-delivery", "product-launch", "event-ticket-issued", "event-invitation", "workspace-created", "ticket-escalated", "login-attempt-blocked", "account-restored"];
 
 describe("compiled MJML and theme diversity", () => {
@@ -21,7 +21,7 @@ describe("compiled MJML and theme diversity", () => {
             const result = await email.render(id, { data: sample });
             expect(result.html, id).toContain("<html");
             expect(result.html, id).toContain("https://example.com/open");
-            expect(result.text, id).toContain("Priya");
+            expect(result.text, id).toContain("Gopi");
             expect(result.html.length, id).toBeGreaterThan(500);
         }
     }, 120_000);

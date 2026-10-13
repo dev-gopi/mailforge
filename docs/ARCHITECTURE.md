@@ -15,7 +15,7 @@ MailForge is an existing TypeScript/pnpm monorepo. New systems should extend rat
 | `packages/transport` | Optional delivery adapters where present |
 | `packages/cli` | Local template discovery, validation and render commands |
 | `apps/playground` | Interactive template gallery and previews |
-| `scripts` | Build, preview, audit and release tooling |
+| `scripts` | Local preview-generation tooling |
 
 The `@mailforge/templates` package lives in **`packages/template/`**, never `packages/templates/`. The template catalog contains 100 IDs; the design system contains 12 composition families and ten theme presets. Do not assume every ID is a catalog-only template.
 

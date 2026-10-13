@@ -1,4 +1,4 @@
-# MailForge professional theme presets — Stage 8.5.14
+# MailForge professional theme presets
 
 `@mailforge/themes` now provides ten built-in presets. Existing theme IDs and their values are unchanged:
 `modern`, `minimal`, `corporate`. New: `dark`, `premium`, `ocean`, `forest`, `sunset`, `elegant`, `playful`.

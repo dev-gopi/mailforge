@@ -13,9 +13,9 @@ import {
 } from "../src/catalog/ExpandedCatalogTemplates.js";
 import { BUILTIN_CATALOG_TEMPLATE_NAMES, getBuiltinCatalogTemplate, listBuiltinTemplateCatalog } from "../src/BuiltinTemplates.js";
 
-const sample = {recipientName:"Priya",actionUrl:"https://example.com/next",unsubscribeUrl:"https://example.com/unsubscribe"};
+const sample = {recipientName:"Gopi",actionUrl:"https://example.com/next",unsubscribeUrl:"https://example.com/unsubscribe"};
 
-describe("8.5.16–17: complete 100-template catalog", () => {
+describe("complete 100-template catalog", () => {
     it("has exactly 100 unique public template IDs", () => {
         expect(EXPANDED_CATALOG_TEMPLATE_NAMES).toHaveLength(51);
         expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(87);
@@ -68,7 +68,7 @@ describe("8.5.16–17: complete 100-template catalog", () => {
     it("requires an unsubscribe URL for each new marketing template", () => {
         for (const item of listCatalogTemplates("marketing")) {
             if (!isExpandedCatalogTemplateName(item.id)) continue;
-            expect(() => buildCatalogTemplate(item.id, {recipientName:"Priya",actionUrl:sample.actionUrl})).toThrow();
+            expect(() => buildCatalogTemplate(item.id, {recipientName:"Gopi",actionUrl:sample.actionUrl})).toThrow();
             const doc = buildCatalogTemplate(item.id, sample);
             expect(doc.body.some(node => node.id === `${item.id}-unsubscribe`)).toBe(true);
         }

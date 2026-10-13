@@ -1,29 +1,24 @@
 # Release preparation and publication policy
 
-MailForge uses pnpm `10.34.7`. The package manager version is pinned in the root `package.json`.
+MailForge uses the pnpm version pinned in the root `package.json`.
 
 ## Local release candidate verification
 
 ```bash
-npx --yes pnpm@10.34.7 install --frozen-lockfile
-npx --yes pnpm@10.34.7 -r --if-present build
-npx --yes pnpm@10.34.7 -r --if-present typecheck
-npx --yes pnpm@10.34.7 -r --if-present test
-npx --yes pnpm@10.34.7 lint
-node --test tests/quality/Stage86Release.test.mjs
-node scripts/stage86-release.mjs --check-docs --audit
+pnpm install --frozen-lockfile
+pnpm build
+pnpm typecheck
+pnpm test
+pnpm lint
+node --test tests/quality/ConcurrentRendering.test.mjs
 node scripts/generate-all-template-previews.mjs
-node scripts/audit-release-previews.mjs
-node scripts/complete-stage8519-visual-review.mjs
 ```
 
-Reports: `generated/release/stage86-audit.json`, `generated/template-audit/release-quality-report.json`, and `generated/template-audit/stage8519-review/report.json`.
-
-Use `node scripts/stage86-release.mjs --pack` for **local tarballs only**. This does not publish or change package flags. Inspect tarballs manually before release. `workspace:*` dependencies need validation in packed manifests. Audit package exports and declaration files in the resulting tarballs, including any consumer packages that depend on them.
+Review `generated/template-audit/index.html` and `report.json`. The preview generator confirms that the rendering pipeline completes; it does not certify email-client compatibility.
 
 ## Publication blockers and release decisions
 
-The initial Stage 8.6 source has multiple private packages (including `@mailforge/email`, `@mailforge/templates`, and `@mailforge/themes`). **Do not remove `private: true` automatically.** Make an explicit package-by-package publication decision, validate dependency order and external names, add independent package licenses and appropriate npm provenance settings, and only then consider actual publication. No script in this stage calls `npm publish` or `pnpm publish`.
+Several packages are private (including `@mailforge/email`, `@mailforge/templates`, and `@mailforge/themes`). **Do not remove `private: true` automatically.** Make an explicit package-by-package publication decision, validate dependency order and external names, add independent package licenses and appropriate npm provenance settings, and only then consider actual publication. No repository script calls `npm publish` or `pnpm publish`.
 
 ## Versioning and CI
 

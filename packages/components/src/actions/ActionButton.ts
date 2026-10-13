@@ -13,7 +13,7 @@ import {
  * Theme-aware action button.
  *
  * The primary variant inherits the background
- * color from the Task 7.4 ThemeApplicator.
+ * color from the theme applicator.
  */
 export function createActionButtonDefinition():
     ReusableComponentDefinition {
