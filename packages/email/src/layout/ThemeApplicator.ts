@@ -36,7 +36,7 @@ function roleStyles(role: string | undefined, theme: ResolvedEmailTheme): Styles
       backgroundColor: colors.primary, color: buttonTextColor(colors.primary), fontFamily: typography.fontFamily,
       fontSize: Math.max(14, typography.baseSize), fontWeight: "bold",
       borderRadius: `${appearance.buttonRadius}px`, textAlign: "center",
-      innerPadding: "14px 24px", padding: `${spacing.sm}px ${inset}px ${spacing.lg}px`,
+      innerPadding: `${appearance.buttonPaddingY}px ${appearance.buttonPaddingX}px`, padding: `${spacing.sm}px ${inset}px ${spacing.lg}px`,
     };
     case "quiet-action": return {
       backgroundColor: colors.surface, color: colors.muted,
@@ -50,7 +50,7 @@ function roleStyles(role: string | undefined, theme: ResolvedEmailTheme): Styles
       backgroundColor: colors.background,
       border: `1px solid ${colors.border}`,
       borderRadius: `${appearance.cardRadius}px`,
-      padding: `${spacing.lg}px`,
+      padding: `${appearance.cardPadding}px`,
     };
     case "status-icon": return {
       backgroundColor: colors.accent, color: colors.primary,
@@ -113,7 +113,7 @@ function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
     case "button": return {
       backgroundColor: colors.primary, color: buttonTextColor(colors.primary), fontFamily: typography.fontFamily,
       fontSize: Math.max(13, typography.baseSize - 1), fontWeight: "bold",
-      borderRadius: `${appearance.buttonRadius}px`, innerPadding: "12px 22px",
+      borderRadius: `${appearance.buttonRadius}px`, innerPadding: `${appearance.buttonPaddingY}px ${appearance.buttonPaddingX}px`,
       textAlign: "center", padding: `${spacing.sm}px ${spacing.md}px`,
     };
     case "image": return { width: 140, padding: `${spacing.xs}px 0` };

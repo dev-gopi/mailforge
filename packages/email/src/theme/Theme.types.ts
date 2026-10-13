@@ -14,6 +14,10 @@ export interface ThemeColors {
     primary: string;
     secondary: string;
     accent: string;
+    /** Status colors for future alerts, badges, and notices. */
+    success: string;
+    warning: string;
+    danger: string;
     background: string;
     surface: string;
     section: string;
@@ -53,6 +57,11 @@ export interface ThemeAppearance {
     contentPadding: number;
     cardRadius: number;
     buttonRadius: number;
+    /** Inner padding for panels and cards (pixels). */
+    cardPadding: number;
+    /** Vertical and horizontal MJML button padding (pixels). */
+    buttonPaddingY: number;
+    buttonPaddingX: number;
 }
 
 /**

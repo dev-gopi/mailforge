@@ -30,12 +30,15 @@ const OVERRIDE_KEYS = new Set([
     "appearance",
 ]);
 
-const APPEARANCE_KEYS = new Set(["containerWidth", "contentPadding", "cardRadius", "buttonRadius"]);
+const APPEARANCE_KEYS = new Set(["containerWidth", "contentPadding", "cardRadius", "buttonRadius", "cardPadding", "buttonPaddingY", "buttonPaddingX"]);
 
 const COLOR_KEYS = [
     "primary",
     "secondary",
     "accent",
+    "success",
+    "warning",
+    "danger",
     "background",
     "surface",
     "section",
@@ -322,6 +325,9 @@ function parseAppearance(input: unknown): Partial<ThemeAppearance> {
             contentPadding: [16, 56],
             cardRadius: [0, 24],
             buttonRadius: [0, 24],
+            cardPadding: [8, 48],
+            buttonPaddingY: [8, 32],
+            buttonPaddingX: [8, 48],
         };
         const name = key as keyof ThemeAppearance;
         const [min, max] = limits[name];

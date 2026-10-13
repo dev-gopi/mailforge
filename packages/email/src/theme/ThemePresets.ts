@@ -25,6 +25,9 @@ const PRESETS: Record<
 
         colors: {
             primary: "#2563eb",
+            success: "#15803d",
+            warning: "#a16207",
+            danger: "#b91c1c",
             secondary: "#475569",
             accent: "#dbeafe",
             background: "#f5f6f8",
@@ -43,7 +46,7 @@ const PRESETS: Record<
             lineHeight: 1.5,
         },
 
-        appearance: { containerWidth: 600, contentPadding: 32, cardRadius: 12, buttonRadius: 8 },
+        appearance: { containerWidth: 600, contentPadding: 32, cardRadius: 12, buttonRadius: 8, cardPadding: 24, buttonPaddingY: 14, buttonPaddingX: 24 },
 
         spacing: {
             xs: 4,
@@ -56,10 +59,13 @@ const PRESETS: Record<
 
     minimal: {
         preset: "minimal",
-        appearance: { containerWidth: 600, contentPadding: 30, cardRadius: 4, buttonRadius: 4 },
+        appearance: { containerWidth: 600, contentPadding: 30, cardRadius: 4, buttonRadius: 4, cardPadding: 20, buttonPaddingY: 12, buttonPaddingX: 20 },
 
         colors: {
             primary: "#111827",
+            success: "#166534",
+            warning: "#92400e",
+            danger: "#991b1b",
             secondary: "#4b5563",
             accent: "#e5e7eb",
             background: "#ffffff",
@@ -89,10 +95,13 @@ const PRESETS: Record<
 
     corporate: {
         preset: "corporate",
-        appearance: { containerWidth: 600, contentPadding: 36, cardRadius: 10, buttonRadius: 6 },
+        appearance: { containerWidth: 600, contentPadding: 36, cardRadius: 10, buttonRadius: 6, cardPadding: 28, buttonPaddingY: 14, buttonPaddingX: 28 },
 
         colors: {
             primary: "#0f4c81",
+            success: "#166534",
+            warning: "#92400e",
+            danger: "#b91c1c",
             secondary: "#334155",
             accent: "#dbeafe",
             background: "#f8fafc",
