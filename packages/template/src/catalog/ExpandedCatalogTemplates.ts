@@ -1,6 +1,6 @@
 import type { EmailNode } from "@mailforge/core";
 import { z } from "zod";
-import { eyebrow, contentParagraph, mutedParagraph, panel, quietAction, paragraph, withRole } from "../shared/TemplateNodes.js";
+import { contentParagraph, mutedParagraph, panel, quietAction, paragraph, withRole } from "../shared/TemplateNodes.js";
 
 /** This is the 51-template expansion; category contracts remain in CatalogTemplates.ts. */
 export const EXPANDED_CATALOG_TEMPLATE_DEFINITIONS = [
@@ -128,7 +128,7 @@ export function isExpandedCatalogTemplateName(name: string): name is ExpandedCat
 }
 
 const safeText = z.string().trim().min(1).max(500).refine(value =>
-    !/[\u0000-\u001f\u007f]/.test(value), "Control characters are not allowed");
+    !/\p{Cc}/u.test(value), "Control characters are not allowed");
 const safeLink = z.url().refine(value => {
     const parsed = new URL(value);
     return (parsed.protocol === "https:" || parsed.protocol === "http:") && !parsed.username && !parsed.password;
@@ -175,21 +175,17 @@ export function buildExpandedTemplateContent(
     const body: EmailNode[] = [
         withRole(paragraph(`${id}-intro`, presentation?.summary ?? story.intro), introRole),
     ];
-    const highlightLabel = story.tone === "promotion" ? "WHY EXPLORE" : story.tone === "warning" ? "WHAT TO CHECK" : "KEY DETAILS";
     body.push(panel(`${id}-highlights`, [
-        eyebrow(`${id}-highlights-label`, highlightLabel),
         contentParagraph(`${id}-highlight-1`, story.highlights[0]),
         contentParagraph(`${id}-highlight-2`, story.highlights[1]),
     ]));
     if (presentation?.facts?.length) {
         body.push(panel(`${id}-facts`, [
-            eyebrow(`${id}-facts-label`, "ADDITIONAL INFORMATION"),
             ...presentation.facts.map((fact, i) => mutedParagraph(`${id}-fact-${i}`, `${fact.label}: ${fact.value}`)),
         ]));
     }
     if (presentation?.nextSteps?.length) {
         body.push(panel(`${id}-steps`, [
-            eyebrow(`${id}-steps-label`, "NEXT STEPS"),
             ...presentation.nextSteps.map((step, i) => contentParagraph(`${id}-step-${i}`, `${i + 1}. ${step}`)),
         ]));
     }

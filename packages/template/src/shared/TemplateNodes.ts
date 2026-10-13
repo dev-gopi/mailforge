@@ -12,7 +12,11 @@ export type TemplateRole =
   | "status-icon" | "promotional-code"
   | "hero-title" | "hero-subtitle" | "section-title"
   | "brand-title" | "brand-rule" | "footer-note"
-  | "success-note" | "warning-note" | "danger-note";
+  | "success-note" | "warning-note" | "danger-note"
+  | "design-kicker" | "design-badge" | "design-ornament" | "design-hero"
+  | "design-grid" | "design-grid-card" | "design-security-note"
+  | "design-record" | "design-ledger" | "design-route" | "design-conversation"
+  | "design-alert" | "design-dashboard";
 
 export function withRole(node: EmailNode, role: TemplateRole): EmailNode {
   return { ...node, attrs: { ...node.attrs, "data-mf-style": role } };

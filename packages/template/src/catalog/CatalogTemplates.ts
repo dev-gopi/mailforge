@@ -7,6 +7,7 @@ import {
     type ExpandedTemplatePresentation,
 } from "./ExpandedCatalogTemplates.js";
 import { DocumentValidator, type EmailDocument, type EmailNode } from "@mailforge/core";
+import { composeCatalogDesign } from "./CatalogDesignFamilies.js";
 
 import {
     actionButton,
@@ -464,10 +465,11 @@ export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): 
             data?.unsubscribeUrl ?? "{{unsubscribeUrl}}",
         ));
     }
+    const designed = composeCatalogDesign(id, category, body);
     const document: EmailDocument = {
         schemaVersion: "1.0", id, version: "1.0.0", subject: title,
-        preheader: description, body,
-        metadata: { category, catalog: "builtin" },
+        preheader: description, body: designed.body,
+        metadata: { category, catalog: "builtin", designFamily: designed.family },
     };
     new DocumentValidator().validateOrThrow(document);
     return document;

@@ -77,7 +77,7 @@ const TARGET_STYLES: Record<string, readonly string[]> = {
     "mj-text": ["color", "backgroundColor", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "letterSpacing", "padding", "height", "textDecoration"],
     "mj-button": ["color", "backgroundColor", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "padding", "innerPadding", "width", "height", "borderRadius", "border", "textDecoration"],
     "mj-image": ["width", "height", "padding", "borderRadius", "textAlign"],
-    "mj-section": ["backgroundColor", "padding", "textAlign"],
+    "mj-section": ["backgroundColor", "padding"],
     "mj-column": ["backgroundColor", "width", "padding", "border", "borderRadius"],
     "mj-table": ["color", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "padding", "width"],
     "mj-divider": ["color", "padding", "width"],

@@ -225,3 +225,7 @@ export type {
     ExpandedTemplatePresentation,
     ExpandedTemplateStory,
 } from "./catalog/ExpandedCatalogTemplates.js";
+
+// Discoverable visual composition families for built-in catalog emails.
+export { CATALOG_DESIGN_FAMILIES, getCatalogDesignFamily } from "./catalog/CatalogDesignFamilies.js";
+export type { CatalogDesignFamily } from "./catalog/CatalogDesignFamilies.js";

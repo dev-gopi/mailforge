@@ -79,6 +79,66 @@ function roleStyles(role: string | undefined, theme: ResolvedEmailTheme): Styles
       fontWeight: "bold", fontSize: Math.max(13, typography.baseSize - 1),
       lineHeight: "1.5", padding: `${spacing.sm}px ${inset}px`,
     };
+    case "design-kicker": return {
+      ...text, color: colors.primary, fontSize: 11, fontWeight: "bold",
+      letterSpacing: "1.4px", lineHeight: "18px",
+      padding: `${spacing.lg}px ${inset}px 0`,
+    };
+    case "design-badge": return {
+      ...text, color: colors.primary, backgroundColor: colors.section,
+      fontSize: 11, fontWeight: "bold", letterSpacing: "2px",
+      lineHeight: "18px", textAlign: "center",
+      padding: `${spacing.sm}px ${inset}px`,
+    };
+    case "design-ornament": return {
+      ...text, color: colors.primary, textAlign: "center", fontSize: 12,
+      letterSpacing: "2px", padding: `${spacing.sm}px ${inset}px`,
+    };
+    case "design-hero": return {
+      backgroundColor: colors.section,
+      // Hero copy supplies its own horizontal inset. Keeping this vertical-only
+      // prevents a second inset and aligns its edges with body copy.
+      padding: `${spacing.xl}px 0 ${spacing.lg}px`,
+    };
+    case "design-grid": return {
+      backgroundColor: colors.surface,
+      padding: `${spacing.md}px ${Math.max(spacing.sm, 12)}px ${spacing.lg}px`,
+    };
+    case "design-grid-card": return {
+      backgroundColor: colors.section, border: `1px solid ${colors.border}`,
+      borderRadius: `${appearance.cardRadius}px`,
+      padding: `${spacing.md}px ${spacing.sm}px`,
+    };
+    case "design-record": return {
+      backgroundColor: colors.section, border: `1px solid ${colors.border}`,
+      borderRadius: `${appearance.cardRadius}px`, padding: `${spacing.md}px 0`,
+    };
+    case "design-ledger": return {
+      backgroundColor: colors.surface, border: `2px solid ${colors.primary}`,
+      borderRadius: "0px", padding: `${spacing.md}px 0`,
+    };
+    case "design-route": return {
+      backgroundColor: colors.surface, border: `1px solid ${colors.border}`,
+      borderRadius: `${appearance.cardRadius}px`, padding: `${spacing.sm}px 0`,
+    };
+    case "design-conversation": return {
+      backgroundColor: colors.section, border: `1px solid ${colors.border}`,
+      borderRadius: `${appearance.cardRadius}px ${appearance.cardRadius}px ${appearance.cardRadius}px 0`,
+      padding: `${spacing.md}px 0`,
+    };
+    case "design-alert": return {
+      backgroundColor: colors.section, border: `1px solid ${colors.warning}`,
+      borderRadius: `${appearance.cardRadius}px`, padding: `${spacing.sm}px 0`,
+    };
+    case "design-dashboard": return {
+      backgroundColor: colors.surface, border: `1px solid ${colors.primary}`,
+      borderRadius: "0px", padding: `${spacing.md}px 0`,
+    };
+    case "design-security-note": return {
+      ...text, color: colors.warning, backgroundColor: colors.section,
+      fontWeight: "bold", fontSize: Math.max(14, typography.baseSize),
+      padding: `${spacing.md}px ${inset}px`,
+    };
     case "divider": return { color: colors.border, padding: `${spacing.sm}px ${inset}px` };
     case "panel-outer": return { padding: `${spacing.xs}px ${inset}px ${spacing.lg}px` };
     case "panel-inner": return {
@@ -166,7 +226,7 @@ function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
  */
 export function applyEmailTheme(source: EmailDocument, theme: ResolvedEmailTheme): EmailDocument {
   const document = structuredClone(source);
-  const walk = (node: EmailNode, inPanel = false): void => {
+  const walk = (node: EmailNode, inContentCard = false): void => {
     // Table-specific design tokens. Explicit cell colors always take precedence.
     if (node.type === "table") {
       node.props = {
@@ -181,14 +241,33 @@ export function applyEmailTheme(source: EmailDocument, theme: ResolvedEmailTheme
     const role = node.attrs?.["data-mf-style"];
     const semantic: Styles = typeof role === "string" ? roleStyles(role, theme) : {};
     const defaults = defaultStyles(node, theme);
-    if (inPanel && role !== "panel-inner" &&
-        ["title", "body", "muted", "eyebrow", "primary-action", "quiet-action", "hero-title", "hero-subtitle", "section-title", "success-note", "warning-note", "danger-note"].includes(String(role))) {
+    // Purpose-specific, email-safe fallback stacks; caller node styles still win.
+    // The active theme controls all other typography, colors and spacing tokens.
+    const fontIntent = node.attrs?.["data-mf-font"];
+    const designFontFamilies: Readonly<Record<string, string>> = {
+      editorial: "Georgia, Times New Roman, serif",
+      friendly: "Trebuchet MS, Arial, sans-serif",
+      corporate: "Tahoma, Arial, sans-serif",
+      technical: "Verdana, Geneva, sans-serif",
+      modern: "Arial, Helvetica, sans-serif",
+      mono: "Courier New, Courier, monospace",
+    };
+    const designFont: Styles =
+      ["heading", "text", "button", "copyright"].includes(node.type) &&
+      typeof fontIntent === "string" && Object.hasOwn(designFontFamilies, fontIntent)
+        ? { fontFamily: designFontFamilies[fontIntent]! }
+        : {};
+    if (inContentCard && role !== "panel-inner" &&
+        ["title", "body", "muted", "eyebrow", "primary-action", "quiet-action", "hero-title", "hero-subtitle", "section-title", "success-note", "warning-note", "danger-note", "design-kicker"].includes(String(role))) {
       semantic.padding = `0 0 ${theme.spacing.sm}px`;
     }
-    if (Object.keys(defaults).length || Object.keys(semantic).length) {
-      node.styles = { ...defaults, ...semantic, ...node.styles };
+    if (Object.keys(defaults).length || Object.keys(semantic).length || Object.keys(designFont).length) {
+      node.styles = { ...defaults, ...semantic, ...designFont, ...node.styles };
     }
-    node.children?.forEach(child => walk(child, inPanel || role === "panel-inner"));
+    node.children?.forEach(child => walk(
+      child,
+      inContentCard || role === "panel-inner" || role === "design-grid-card",
+    ));
   };
   if (document.header) walk(document.header);
   document.body.forEach(node => walk(node));

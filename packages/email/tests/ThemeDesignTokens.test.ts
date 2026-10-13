@@ -70,6 +70,23 @@ describe("advanced email-safe design tokens", () => {
         expect(result.body[0]?.styles?.innerPadding).toBe("7px 11px");
     });
 
+    it("uses one horizontal inset for copy inside a design grid card", () => {
+        const source: EmailDocument = {
+            schemaVersion: "1.0", id: "grid-card", version: "1.0.0", subject: "Test",
+            body: [{ id: "grid", type: "section", attrs: { "data-mf-style": "design-grid" }, children: [
+                { id: "card", type: "column", attrs: { "data-mf-style": "design-grid-card" }, children: [
+                    { id: "kicker", type: "text", props: { text: "UPDATE" }, attrs: { "data-mf-style": "design-kicker" } },
+                    { id: "copy", type: "text", props: { text: "Aligned copy" }, attrs: { "data-mf-style": "body" } },
+                ] },
+            ] }],
+        };
+        const result = applyEmailTheme(source, resolveEmailTheme({ spacing: { sm: 8 } }));
+        const card = result.body[0]?.children?.[0];
+        expect(card?.styles?.padding).toBe("16px 8px");
+        expect(card?.children?.[0]?.styles?.padding).toBe("0 0 8px");
+        expect(card?.children?.[1]?.styles?.padding).toBe("0 0 8px");
+    });
+
     it("rejects unknown or unsafe token values", () => {
         expect(() => resolveEmailTheme({ appearance: { cardPadding: -1 } })).toThrow(EmailThemeError);
         expect(() => resolveEmailTheme({ appearance: { buttonPaddingY: 100 } })).toThrow(EmailThemeError);
