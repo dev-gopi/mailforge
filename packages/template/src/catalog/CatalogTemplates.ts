@@ -70,7 +70,13 @@ const httpLink = z.url().refine((value: string) => {
     return (url.protocol === "http:" || url.protocol === "https:") && !url.username && !url.password;
 }, "Only HTTP(S) links without credentials are allowed");
 
-const textValue = z.string().trim().min(1).max(500).refine((value: string) => !/[\r\n\u0000-\u001f]/.test(value), "Control characters are not allowed");
+const textValue = z.string().trim().min(1).max(500).refine((value: string) => {
+    for (const character of value) {
+        const codePoint = character.codePointAt(0) ?? 0;
+        if (codePoint <= 0x1f) return false;
+    }
+    return true;
+}, "Control characters are not allowed");
 
 export const catalogTemplateDataSchema = z.object({
     recipientName: textValue,

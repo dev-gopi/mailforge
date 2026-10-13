@@ -91,7 +91,7 @@ describe("Professional per-render customization", () => {
           const role = node.attrs?.["data-mf-style"];
           expect(role, `${id}:${node.id}`).not.toBe("title");
           expect(role, `${id}:${node.id}`).not.toBe("eyebrow");
-          node.children && visit(node.children);
+          if (node.children) visit(node.children);
         }
       };
       visit(output.body);

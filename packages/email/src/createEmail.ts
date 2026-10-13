@@ -29,6 +29,9 @@ import {
 
 import {
     getBuiltinTemplate,
+    TemplateVersionRegistry,
+    type TemplateVersionInfo,
+    type TemplateVersionSelection,
     getBuiltinCatalogTemplate,
     listBuiltinTemplateCatalog,
     isCatalogTemplateName,
@@ -192,6 +195,10 @@ export class MailForgeEmail {
     private readonly templateContracts =
         new TemplateContractRegistry();
 
+    // Version history is independent for every MailForgeEmail instance.
+    private readonly templateVersions =
+        new TemplateVersionRegistry();
+
     // Only developer-registered templates live here.
     private readonly templates =
         new Map<string, EmailDocument>();
@@ -352,6 +359,43 @@ export class MailForgeEmail {
     // ---------------------------------------
     // CUSTOM TEMPLATE REGISTRATION
     // ---------------------------------------
+
+    /** Publish one immutable document version for this email engine. */
+    public registerTemplateVersion(document: EmailDocument): this {
+        this.templateVersions.register(document);
+        return this;
+    }
+
+    /** List available and deprecated versions, newest first. */
+    public listTemplateVersions(templateId: string): TemplateVersionInfo[] {
+        return this.templateVersions.list(templateId);
+    }
+
+    /** Return a detached copy of one published version. */
+    public getTemplateVersion(
+        templateId: string,
+        version: string,
+    ): EmailDocument {
+        return this.templateVersions.get(templateId, version);
+    }
+
+    /** Find the latest, exact, or compatible published version. */
+    public resolveTemplateVersion(
+        templateId: string,
+        selection: TemplateVersionSelection = {},
+    ): EmailDocument {
+        return this.templateVersions.resolve(templateId, selection);
+    }
+
+    /** Retain the version but exclude it from default resolution. */
+    public deprecateTemplateVersion(
+        templateId: string,
+        version: string,
+        reason?: string,
+    ): this {
+        this.templateVersions.deprecate(templateId, version, reason);
+        return this;
+    }
 
     public registerTemplate(
         document: EmailDocument,

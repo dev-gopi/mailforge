@@ -52,6 +52,14 @@ export function createActionButtonDefinition():
                 attrs: {
                     "data-mf-style": secondary ? "quiet-action" : "primary-action",
                 },
+
+                ...(secondary
+                    ? {
+                        styles: {
+                            backgroundColor: "#475569",
+                        },
+                    }
+                    : {}),
             };
         },
     };

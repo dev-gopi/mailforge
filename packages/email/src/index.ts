@@ -238,3 +238,11 @@ export type {
 // Per-render display customization (headers, headings, buttons, IDs and subject)
 export { applyTemplateDisplay, TemplateDisplayError } from "./layout/TemplateDisplay.js";
 export type { TemplateDisplayOptions } from "./layout/TemplateDisplay.js";
+
+// Task 7.8.3.2: Public version registry error and selection types.
+export { TemplateVersionError } from "@mailforge/templates";
+export type {
+    TemplateVersionInfo,
+    TemplateVersionSelection,
+    TemplateVersionStatus,
+} from "@mailforge/templates";
