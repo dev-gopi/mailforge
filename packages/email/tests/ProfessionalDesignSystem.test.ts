@@ -16,7 +16,7 @@ describe("Professional email design system", () => {
   it("audits all registered catalog documents individually", () => {
     const validator = new DocumentValidator();
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(108);
+    expect(catalog).toHaveLength(109);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       expect(validator.validate(original).valid, id).toBe(true);
@@ -63,7 +63,7 @@ describe("Professional email design system", () => {
       theme: { preset: "corporate", colors: { primary: "#9333ea" },
         appearance: { containerWidth: 640, contentPadding: 40 } },
     });
-    expect(email.listBuiltinCatalog()).toHaveLength(108);
+    expect(email.listBuiltinCatalog()).toHaveLength(109);
     const result = await email.render("payment-failed", {
       data: { recipientName: "Gopi", actionUrl: "https://example.com/pay", detail: "Invoice 123" },
     });
@@ -166,6 +166,17 @@ describe("Professional email design system", () => {
         expect(sub.subject).toBe("Pro subscription activated — orbit.");
         expect(sub.html).toContain("Gopi");
         expect(sub.html).toContain("https://example.com/action");
+        continue;
+      }
+      if (id === "support-ticket-created") {
+        const ticket = await email.render(id, { data: {
+          brandName: "Northline", customerName: "Gopi", ticketNumber: "HD-1",
+          ticketStatus: "OPEN", ticketSubject: "Workspace issue", createdAt: "14 Oct 2026",
+          ticketUrl: "https://example.com/action", supportEmail: "support@example.com", year: 2026,
+        } });
+        expect(ticket.subject).toBe("Support request received — Northline");
+        expect(ticket.html).toContain("Gopi");
+        expect(ticket.html).toContain("https://example.com/action");
         continue;
       }
       const result = await email.render(id, { data: {

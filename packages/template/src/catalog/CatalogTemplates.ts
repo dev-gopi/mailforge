@@ -7,6 +7,7 @@ import { buildAppointmentConfirmationTemplate, appointmentConfirmationPreviewDat
 import { buildNewDeviceLoginAlertTemplate, newDeviceLoginAlertPreviewData } from "../authentication/NewDeviceLoginAlertTemplate.js";
 import { buildPasswordResetSecureTemplate, passwordResetSecurePreviewData } from "../authentication/PasswordResetSecureTemplate.js";
 import { buildSubscriptionActivatedTemplate, subscriptionActivatedPreviewData } from "../billing/SubscriptionActivatedTemplate.js";
+import { buildSupportTicketCreatedTemplate, supportTicketCreatedPreviewData } from "../support/SupportTicketCreatedTemplate.js";
 import {
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
     isExpandedCatalogTemplateName,
@@ -74,6 +75,7 @@ export const CATALOG_TEMPLATE_DEFINITIONS = [
     ["plan-upgrade", "saas", "Plan upgraded", "Your subscription plan was updated", "View plan"],
     ["workspace-member-joined", "saas", "New teammate joined", "A teammate has joined your workspace", "View workspace"],
     ["support-ticket-opened", "support", "Support ticket received", "We've received your support request", "View ticket"],
+    ["support-ticket-created", "support", "Support ticket confirmation", "Confirmation of a new support ticket", "View ticket"],
     ["support-ticket-updated", "support", "Support ticket updated", "Your support request has an update", "View ticket"],
     ["support-ticket-resolved", "support", "Support ticket resolved", "Your support request has been resolved", "View resolution"],
     ["feedback-request", "support", "Share your feedback", "Tell us how we did", "Give feedback"],
@@ -264,6 +266,16 @@ export function listCatalogTemplates(category?: CatalogTemplateCategory): Catalo
 }
 
 export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
+    if (id === "support-ticket-created") {
+        if (input === undefined) return buildSupportTicketCreatedTemplate();
+        if (typeof input === "object" && input !== null && "ticketUrl" in input) return buildSupportTicketCreatedTemplate(input);
+        const common = supportCatalogTemplateDataSchema.parse(input);
+        return buildSupportTicketCreatedTemplate({
+            ...supportTicketCreatedPreviewData,
+            customerName: common.recipientName,
+            ticketUrl: common.actionUrl,
+        });
+    }
     if (id === "subscription-activated") {
         if (input === undefined) return buildSubscriptionActivatedTemplate();
         if (typeof input === "object" && input !== null && "manageSubscriptionUrl" in input) return buildSubscriptionActivatedTemplate(input);

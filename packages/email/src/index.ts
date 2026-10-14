@@ -131,6 +131,8 @@ export { buildNewDeviceLoginAlertTemplate, newDeviceLoginAlertSchema, newDeviceL
 export type { NewDeviceLoginAlertData } from "@mailforge/templates";
 export { buildSubscriptionActivatedTemplate, subscriptionActivatedSchema, subscriptionActivatedPreviewData } from "@mailforge/templates";
 export type { SubscriptionActivatedData } from "@mailforge/templates";
+export { buildSupportTicketCreatedTemplate, supportTicketCreatedSchema, supportTicketCreatedPreviewData } from "@mailforge/templates";
+export type { SupportTicketCreatedData } from "@mailforge/templates";
 export { buildAppointmentConfirmationTemplate, appointmentConfirmationSchema, appointmentConfirmationPreviewData } from "@mailforge/templates";
 export type { AppointmentConfirmationData } from "@mailforge/templates";
 // Built-in email templates

@@ -85,7 +85,7 @@ describe("validated structured business details", () => {
     });
 
     it("retains all 94 IDs and previously supplied security/reference node IDs", () => {
-        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(95);
+        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(96);
         const input = { ...base, security: {
             device: "Firefox", location: "Kolkata", occurredAt: "2026-10-13T18:30:00+05:30",
         } };

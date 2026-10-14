@@ -30,10 +30,10 @@ describe("purposeful catalog design", () => {
     });
 
     it("retains 94 unique catalog IDs, nodes, actions and unsubscribe controls", () => {
-        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(95);
-        expect(new Set(CATALOG_TEMPLATE_DEFINITIONS.map(([id]) => id)).size).toBe(95);
+        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(96);
+        expect(new Set(CATALOG_TEMPLATE_DEFINITIONS.map(([id]) => id)).size).toBe(96);
         for (const [id, category] of CATALOG_TEMPLATE_DEFINITIONS) {
-            if (id === "report-ready" || id === "activity-notification" || id === "password-reset-secure" || id === "order-shipped-notice" || id === "workspace-invitation-editorial" || id === "appointment-confirmation" || id === "new-device-login-alert" || id === "subscription-activated") continue;
+            if (id === "report-ready" || id === "activity-notification" || id === "password-reset-secure" || id === "order-shipped-notice" || id === "workspace-invitation-editorial" || id === "appointment-confirmation" || id === "new-device-login-alert" || id === "subscription-activated" || id === "support-ticket-created") continue;
             const doc = buildCatalogTemplate(id);
             const nodes = flatten(doc.body);
             const ids = nodes.map(node => node.id);

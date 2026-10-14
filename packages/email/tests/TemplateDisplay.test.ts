@@ -82,7 +82,7 @@ describe("Professional per-render customization", () => {
 
   it("supports optional heading removal in all 107 registered templates", () => {
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(108);
+    expect(catalog).toHaveLength(109);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       const output = applyTemplateDisplay(original, { heading: false, eyebrow: false });

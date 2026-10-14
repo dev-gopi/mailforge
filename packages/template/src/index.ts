@@ -153,6 +153,8 @@ export { buildNewDeviceLoginAlertTemplate, newDeviceLoginAlertSchema, newDeviceL
 export type { NewDeviceLoginAlertData } from "./authentication/NewDeviceLoginAlertTemplate.js";
 export { buildSubscriptionActivatedTemplate, subscriptionActivatedSchema, subscriptionActivatedPreviewData } from "./billing/SubscriptionActivatedTemplate.js";
 export type { SubscriptionActivatedData } from "./billing/SubscriptionActivatedTemplate.js";
+export { buildSupportTicketCreatedTemplate, supportTicketCreatedSchema, supportTicketCreatedPreviewData } from "./support/SupportTicketCreatedTemplate.js";
+export type { SupportTicketCreatedData } from "./support/SupportTicketCreatedTemplate.js";
 
 export { buildOrderShippedTemplate, orderShippedSchema, orderShippedPreviewData } from "./ecommerce/OrderShippedTemplate.js";
 export type { OrderShippedData } from "./ecommerce/OrderShippedTemplate.js";

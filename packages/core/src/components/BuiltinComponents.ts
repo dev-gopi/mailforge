@@ -31,6 +31,28 @@ const httpUrlSchema = z.url().refine(
     "Only HTTP and HTTPS URLs are supported",
 );
 
+const linkUrlSchema = z.string().refine(
+    (value) => {
+        try {
+            const url = new URL(value);
+
+            if (url.protocol === "https:" || url.protocol === "http:") {
+                return url.username.length === 0 && url.password.length === 0;
+            }
+            if (url.protocol === "mailto:") {
+                return url.pathname.length > 0 && !/[\s<>]/.test(url.pathname);
+            }
+            if (url.protocol === "tel:") {
+                return url.pathname.length > 0;
+            }
+            return false;
+        } catch {
+            return false;
+        }
+    },
+    "Only HTTP, HTTPS, mailto, and tel URLs are supported",
+);
+
 const base64ImageSchema = z
     .string()
     .refine((value) => {
@@ -146,7 +168,7 @@ export const BUILTIN_COMPONENTS: readonly ComponentDefinition[] = [
         version: "1.0.0",
         schema: z.object({
             text: z.string().min(1).max(300),
-            href: httpUrlSchema,
+            href: linkUrlSchema,
             prefix: z.string().max(300).optional(),
             suffix: z.string().max(300).optional(),
         }).strict(),

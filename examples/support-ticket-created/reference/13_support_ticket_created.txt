@@ -1,0 +1,15 @@
+Support request received — {{brand_name}}
+
+Hi {{customer_name}},
+
+We’ve received your support request. We’ll email you when there’s an update.
+
+Ticket: {{ticket_number}}
+Status: {{ticket_status}}
+Subject: {{ticket_subject}}
+Created: {{created_at}}
+
+View ticket: {{ticket_url}}
+Questions? {{support_email}}
+
+© {{year}} {{brand_name}}

@@ -33,6 +33,7 @@ const FEATURED: Readonly<Record<string, CatalogDesignFamily>> = {
     "password-reset-secure": "security", "order-shipped-notice": "delivery",
     "new-device-login-alert": "security",
     "subscription-activated": "receipt",
+    "support-ticket-created": "conversation",
     "workspace-invitation-editorial": "invitation",
     "appointment-confirmation": "ticket",
 };

@@ -20,6 +20,18 @@ export function safeUrl(value: unknown): string {
     } catch {
         throw new Error("Invalid absolute URL");
     }
+    if (url.protocol === "mailto:") {
+        if (!url.pathname || /[\s<>]/.test(url.pathname)) {
+            throw new Error("Invalid mailto URL");
+        }
+        return value;
+    }
+    if (url.protocol === "tel:") {
+        if (!url.pathname) {
+            throw new Error("Invalid tel URL");
+        }
+        return value;
+    }
     if (url.protocol !== "https:" && url.protocol !== "http:") {
         throw new Error("Unsafe URL protocol");
     }
