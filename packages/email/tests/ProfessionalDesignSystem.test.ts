@@ -159,6 +159,37 @@ describe("Professional email design system", () => {
     }
   });
 
+  it("lets callers extend appointment-confirmation with reusable structured content", async () => {
+    const email = createEmail();
+    const result = await email.render("appointment-confirmation", {
+      data: {
+        brandName: "Northstar", firstName: "Alex", appointmentName: "Design consultation",
+        fullDate: "October 21, 2026", monthShort: "OCT", dayNumber: "21", weekdayShort: "WED", year: 2026,
+        timeRange: "10:30–11:00 AM", timezone: "IST", appointmentLocation: "Video call",
+        appointmentUrl: "https://example.com/appointment", manageUrl: "https://example.com/manage",
+        supportUrl: "https://example.com/support", companyAddress: "Example Street",
+      },
+      overrides: {
+        byId: {
+          "appointment-heading": { styles: { fontSize: 40 }, props: { segments: [
+            { text: "You’re confirmed", strong: true, color: "#173C3F" },
+          ] } },
+        },
+      },
+      patches: [{
+        op: "slot", slot: "body.end", nodes: [{
+          id: "appointment-custom-note", type: "section", styles: { padding: "16px 43px", backgroundColor: "#FFFEFA" },
+          children: [{ id: "appointment-custom-note-column", type: "column", children: [{
+            id: "appointment-custom-note-text", type: "text", props: { text: "Bring your project brief." },
+            styles: { fontFamily: "Arial, Helvetica, sans-serif", fontSize: 14, lineHeight: "21px", color: "#173C3F", padding: "0" },
+          }] }],
+        }],
+      }],
+    });
+    expect(result.html).toContain("You’re confirmed");
+    expect(result.html).toContain("Bring your project brief.");
+  });
+
   it("renders every marketing catalog template with opt-out links", async () => {
     const email = createEmail({ theme: "minimal" });
     const all = listCatalogTemplates("marketing");
