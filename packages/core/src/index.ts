@@ -71,3 +71,12 @@ export type {
     RenderTrust,
     RenderWarning,
 } from "./rendering/EmailRenderer.js";
+
+export { MemoryCache } from "./caching/MemoryCache.js";
+export type { MemoryCacheOptions } from "./caching/MemoryCache.js";
+
+export { compileTemplate, escapeHtml } from "./compiler/compileTemplate.js";
+export type { TemplateRenderer } from "./compiler/compileTemplate.js";
+
+export { isSafeUrl, sanitizeUrl } from "./security/isSafeUrl.js";
+export type { SafeUrlOptions } from "./security/isSafeUrl.js";

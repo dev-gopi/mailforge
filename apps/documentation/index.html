@@ -1,5 +1,456 @@
 <!doctype html>
 <html lang="en">
-  <head><meta charset="utf-8"><title>MailForge Documentation</title></head>
-  <body><main><h1>MailForge Documentation</h1><p>Build email templates with reusable components.</p></main></body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MailForge Documentation — Enterprise-grade Email Engine</title>
+  <meta name="description" content="MailForge documentation: high-performance responsive email templates, theme engines, and frameworks integrations.">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-subtle: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --code-bg: #0f172a;
+      --code-text: #f8fafc;
+      --sidebar-width: 280px;
+    }
+    [data-theme="dark"] {
+      --bg: #0b1020;
+      --bg-subtle: #111827;
+      --surface: #151d32;
+      --border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #60a5fa;
+      --primary-hover: #3b82f6;
+      --code-bg: #030712;
+      --code-text: #f8fafc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      backdrop-filter: blur(8px);
+    }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .logo-badge {
+      background: #eff6ff;
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      border: 1px solid #bfdbfe;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .search-input {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      color: var(--text);
+      font-size: 13px;
+      width: 220px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+    .btn-toggle {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .layout-container {
+      display: flex;
+      min-height: calc(100vh - 61px);
+    }
+    aside {
+      width: var(--sidebar-width);
+      border-right: 1px solid var(--border);
+      background: var(--bg-subtle);
+      padding: 24px 16px;
+      overflow-y: auto;
+      position: sticky;
+      top: 61px;
+      height: calc(100vh - 61px);
+      flex-shrink: 0;
+    }
+    .nav-section { margin-bottom: 24px; }
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      padding-left: 8px;
+    }
+    .nav-link {
+      display: block;
+      padding: 6px 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      border-radius: 4px;
+      transition: background 0.1s;
+    }
+    .nav-link:hover { background: rgba(37, 99, 235, 0.08); color: var(--primary); }
+    .nav-link.active {
+      background: rgba(37, 99, 235, 0.12);
+      color: var(--primary);
+      font-weight: 600;
+    }
+    main {
+      flex: 1;
+      padding: 40px 48px;
+      max-width: 900px;
+      overflow-y: auto;
+    }
+    h1 { font-size: 32px; font-weight: 800; margin-bottom: 16px; line-height: 1.25; }
+    h2 { font-size: 22px; font-weight: 700; margin-top: 36px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    h3 { font-size: 17px; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+    p { margin-bottom: 16px; color: var(--text); }
+    .lead { font-size: 16px; color: var(--text-muted); margin-bottom: 24px; }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    pre code { background: none; border: none; padding: 0; }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .card:hover { transform: translateY(-2px); border-color: var(--primary); }
+    .card h4 { font-size: 15px; margin-bottom: 6px; color: var(--primary); }
+    .card p { font-size: 13px; color: var(--text-muted); margin: 0; }
+    .alert {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    [data-theme="dark"] .alert { background: #1e293b; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+    th { background: var(--bg-subtle); font-weight: 600; }
+    @media (max-width: 768px) {
+      aside { display: none; }
+      main { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-group">
+      <span>✉️ MailForge</span>
+      <span class="logo-badge">v0.1.0</span>
+    </div>
+    <div class="header-actions">
+      <input type="search" class="search-input" id="searchBox" placeholder="Search documentation…">
+      <button class="btn-toggle" onclick="toggleTheme()">🌓 Theme</button>
+      <a href="https://github.com" target="_blank" rel="noreferrer" class="btn-toggle" style="text-decoration:none;">GitHub</a>
+    </div>
+  </header>
+
+  <div class="layout-container">
+    <aside>
+      <div class="nav-section">
+        <div class="nav-section-title">Getting Started</div>
+        <a href="#overview" class="nav-link active">Overview</a>
+        <a href="#installation" class="nav-link">Installation</a>
+        <a href="#quickstart" class="nav-link">Quickstart</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Core Engine</div>
+        <a href="#create-email" class="nav-link">createEmail</a>
+        <a href="#compiler" class="nav-link">compileTemplate</a>
+        <a href="#caching" class="nav-link">MemoryCache</a>
+        <a href="#security" class="nav-link">isSafeUrl & Security</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Visual Styling</div>
+        <a href="#themes" class="nav-link">Themes & Presets</a>
+        <a href="#dark-mode" class="nav-link">Dark Mode (theme.ts)</a>
+        <a href="#components" class="nav-link">Components & Layouts</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Integrations</div>
+        <a href="#express" class="nav-link">Express</a>
+        <a href="#fastify" class="nav-link">Fastify</a>
+        <a href="#nestjs" class="nav-link">NestJS</a>
+        <a href="#nodemailer" class="nav-link">Nodemailer</a>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Testing & Tooling</div>
+        <a href="#testing" class="nav-link">@mailforge/testing</a>
+        <a href="#preview" class="nav-link">@mailforge/preview</a>
+        <a href="#agent" class="nav-link">Automated QA Agent</a>
+      </div>
+    </aside>
+
+    <main id="content">
+      <section id="overview">
+        <h1>MailForge Documentation</h1>
+        <p class="lead">Enterprise-grade, type-safe email template engine with built-in responsive designs, dark mode, component registry, and delivery integrations.</p>
+
+        <div class="card-grid">
+          <div class="card">
+            <h4>📦 Monorepo Packages</h4>
+            <p>Clean decoupled architecture: <code>@mailforge/email</code>, <code>@mailforge/core</code>, <code>@mailforge/themes</code>, <code>@mailforge/preview</code>, and <code>@mailforge/testing</code>.</p>
+          </div>
+          <div class="card">
+            <h4>🎨 Theme Presets & Dark Mode</h4>
+            <p>Built-in email-client compatible modern, corporate, minimal, and dark presets designed for high contrast and accessibility.</p>
+          </div>
+          <div class="card">
+            <h4>🛡️ Bulletproof Security</h4>
+            <p>XSS prevention, safe URL validation blocking <code>javascript:</code> vectors, and strict Gmail 102KB size budget checking.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="installation">
+        <h2>Installation</h2>
+        <pre><code># Install using pnpm, npm, or yarn
+pnpm add @mailforge/email @mailforge/core @mailforge/themes
+# Optional testing and preview tooling:
+pnpm add -D @mailforge/testing @mailforge/preview</code></pre>
+      </section>
+
+      <section id="quickstart">
+        <h2>Quickstart</h2>
+        <p>Render your first responsive HTML email in seconds:</p>
+        <pre><code>import { createEmail } from "@mailforge/email";
+
+// Initialize engine with your brand
+const email = createEmail({
+  brand: {
+    name: "Acme Corp",
+    primaryColor: "#2563eb",
+    logo: "https://example.com/logo.png",
+  },
+  theme: "modern", // or "dark", "corporate", "minimal"
+});
+
+// Render a template with dynamic variables
+const result = await email.render("welcome", {
+  data: {
+    user: { firstName: "Sarah" },
+    actionUrl: "https://example.com/onboarding",
+  },
+});
+
+console.log(result.subject); // "Welcome to Acme Corp, Sarah!"
+console.log(result.html);    // Full responsive HTML markup
+console.log(result.text);    // Plain text alternative</code></pre>
+      </section>
+
+      <section id="create-email">
+        <h2>Core Engine: <code>createEmail</code></h2>
+        <p>The primary entrypoint to MailForge. Supports branding, global layout, default theme, and plugin registration.</p>
+        <table>
+          <thead>
+            <tr><th>Option</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>brand.name</code></td><td>string</td><td>Company / product name displayed in header & copyright</td></tr>
+            <tr><td><code>brand.primaryColor</code></td><td>string</td><td>Hex color used for primary CTA buttons and highlights</td></tr>
+            <tr><td><code>brand.logo</code></td><td>string (URL)</td><td>HTTPS logo image URL</td></tr>
+            <tr><td><code>theme</code></td><td>ThemePreset | ThemeOverrides</td><td>Theme name ("modern", "dark", "corporate") or overrides</td></tr>
+            <tr><td><code>footer.message</code></td><td>string</td><td>Custom footer text or unsubscribe notice</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="compiler">
+        <h2>Template Compiler: <code>compileTemplate</code></h2>
+        <p>High-performance template compilation with HTML escaping, nested paths, fallbacks, conditionals, and loops.</p>
+        <pre><code>import { compileTemplate } from "@mailforge/core";
+
+// 1. Pre-compile reusable template
+const render = compileTemplate(`
+  &lt;h1&gt;Hello {{ user.name || 'Friend' }}!&lt;/h1&gt;
+  {{#if isVip}}
+    &lt;p&gt;Exclusive VIP perks apply!&lt;/p&gt;
+  {{/if}}
+  &lt;ul&gt;
+    {{#each items}}
+      &lt;li&gt;{{@index}}: {{this}}&lt;/li&gt;
+    {{/each}}
+  &lt;/ul&gt;
+`);
+
+const html = render({
+  user: { name: "Alex" },
+  isVip: true,
+  items: ["Express Delivery", "Gift Box"],
+});</code></pre>
+      </section>
+
+      <section id="caching">
+        <h2>In-Memory Caching: <code>MemoryCache</code></h2>
+        <p>Production-ready LRU eviction and TTL cache for compiling templates and theme tokens:</p>
+        <pre><code>import { MemoryCache } from "@mailforge/core";
+
+const cache = new MemoryCache({
+  maxSize: 1000,
+  defaultTtlMs: 60 * 1000, // 1 minute TTL
+});
+
+cache.set("template:welcome", compiledWelcome);
+const cached = cache.get("template:welcome");</code></pre>
+      </section>
+
+      <section id="security">
+        <h2>Security: <code>isSafeUrl</code></h2>
+        <p>Protects against malicious XSS schemes (such as <code>javascript:</code>, <code>vbscript:</code>, <code>data:</code>) in email CTAs:</p>
+        <pre><code>import { isSafeUrl, sanitizeUrl } from "@mailforge/core";
+
+isSafeUrl("https://example.com");              // true
+isSafeUrl("mailto:support@example.com");        // true
+isSafeUrl("javascript:alert(1)");             // false
+isSafeUrl("data:text/html,&lt;script&gt;");          // false
+
+const safeHref = sanitizeUrl(untrustedUrl, "#");</code></pre>
+      </section>
+
+      <section id="dark-mode">
+        <h2>Dark Theme: <code>darkTheme</code></h2>
+        <p>MailForge includes full dark-mode palette support conforming to <code>ResolvedEmailTheme</code>:</p>
+        <pre><code>import { createEmail } from "@mailforge/email";
+import { darkTheme } from "@mailforge/themes";
+
+const email = createEmail({
+  brand: { name: "DarkCo" },
+  theme: "dark", // activates dark theme tokens automatically
+});</code></pre>
+      </section>
+
+      <section id="testing">
+        <h2>Testing: <code>@mailforge/testing</code></h2>
+        <p>First-class test assertions and in-memory mock transports for testing email flows:</p>
+        <pre><code>import {
+  assertEmailContains,
+  assertEmailValidHtml,
+  assertEmailSizeWithinBudget,
+  assertEmailHasUnsubscribe,
+  createMockTransport,
+} from "@mailforge/testing";
+
+// Verify output
+assertEmailValidHtml(result.html);
+assertEmailSizeWithinBudget(result.html, 102400); // Gmail 102KB limit
+assertEmailHasUnsubscribe(result.html);
+
+// Dispatch through mock transport
+const mock = createMockTransport();
+await mock.sendMail({ to: "user@example.com", html: result.html });
+mock.assertSentCount(1);</code></pre>
+      </section>
+
+      <section id="preview">
+        <h2>Preview & Diagnostics: <code>@mailforge/preview</code></h2>
+        <p>Inspect email quality, calculate deliverability scores, and render interactive preview frames:</p>
+        <pre><code>import { renderPreviewFrame, inspectEmailQuality } from "@mailforge/preview";
+
+const quality = inspectEmailQuality(result.html);
+console.log(quality.score);            // 0-100 score
+console.log(quality.exceedsGmailLimit);// boolean
+
+const previewHtml = renderPreviewFrame({
+  subject: result.subject,
+  html: result.html,
+  text: result.text,
+});</code></pre>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+    }
+
+    document.getElementById('searchBox')?.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('main section').forEach(sec => {
+        if (!q || sec.textContent.toLowerCase().includes(q)) {
+          sec.style.display = 'block';
+        } else {
+          sec.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
 </html>

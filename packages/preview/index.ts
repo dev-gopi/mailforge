@@ -1,3 +1,1 @@
-export function createPreviewUrl(templateId: string): string {
-  return `/preview/${encodeURIComponent(templateId)}`;
-}
+export * from "./src/index.js";

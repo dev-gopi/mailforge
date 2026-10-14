@@ -18,3 +18,7 @@ export type { ThemeVersionInfo } from "./registry/ThemeVersionRegistry.js";
 // Theme catalog and accessibility diagnostics
 export { listThemeCatalog, getContrastRatio, auditThemeContrast } from "./catalog/ThemeCatalog.js";
 export type { ThemeCatalogEntry, ThemeContrastFinding } from "./catalog/ThemeCatalog.js";
+
+// Dedicated theme presets
+export { darkTheme, getDarkTheme } from "./dark/theme.js";
+
