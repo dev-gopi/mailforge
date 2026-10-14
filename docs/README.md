@@ -19,3 +19,5 @@ Use the local playground and HTML previews for development, but verify intended 
 
 
 - [Activity notification built-in](ACTIVITY_NOTIFICATION.md)
+
+- [Universal template customization](CUSTOMIZATION.md) — override content, visual styles, and components for every built-in email.

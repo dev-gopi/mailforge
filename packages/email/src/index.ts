@@ -7,6 +7,10 @@ export type {
     TemplateRenderOptions,
 } from "./createEmail.js";
 
+// Generic, validated per-render overrides for every built-in and custom document.
+export { applyDocumentOverrides, EmailDocumentOverrideError } from "@mailforge/core";
+export type { EmailDocumentOverrides, EmailNodeOverrides } from "@mailforge/core";
+
 // Branding and global configuration
 export {
     EmailConfigError,

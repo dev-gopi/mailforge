@@ -53,6 +53,15 @@ export {
     DocumentCustomizer,
 } from "./customization/DocumentCustomizer.js";
 
+export {
+    applyDocumentOverrides,
+    EmailDocumentOverrideError,
+} from "./customization/DocumentOverrides.js";
+export type {
+    EmailDocumentOverrides,
+    EmailNodeOverrides,
+} from "./customization/DocumentOverrides.js";
+
 export type {
     DocumentPatch,
     EmailSlot,

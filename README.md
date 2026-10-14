@@ -109,7 +109,8 @@ Render options can tailor a message without changing its source template:
 | `display` | Adjust the subject, preheader, heading, buttons, or visible sections for one render. |
 | `variant`, `organizationId` | Select a shared or tenant-scoped template variant. Tenant IDs must come from trusted authorization context. |
 | `templateVersion`, `themeVersion` | Select explicitly published immutable versions. |
-| `patches` | Make non-persistent document changes for a single render. |
+| `patches` | Insert, replace, remove or update components for one render. |
+| `overrides` | Override props, styles and attrs across all templates by type, semantic role or stable node ID. |
 
 Register components for reusable application-specific sections. Standard,
 composite, extended, professional, and business components are available from
@@ -142,7 +143,8 @@ const message = await email.render("welcome", {
 });
 ```
 
-For one-off changes, pass `patches` to `render()`. Use template presets, theme profiles, layout options, display options, and variants for reusable changes.
+For one-off changes, pass `overrides` or `patches` to `render()`.
+Read [Universal template customization](docs/CUSTOMIZATION.md) for full examples and precedence. Use template presets, theme profiles, layout options, display options, and variants for reusable changes.
 
 ## Plugins and delivery
 

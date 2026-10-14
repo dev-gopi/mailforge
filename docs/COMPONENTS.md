@@ -90,3 +90,11 @@ Business components only render values provided and validated by the application
 ### Before-shell sections
 
 Top-level sections/rows may opt into `attrs: { "data-mf-placement": "before-shell" }` to render secondary brand chrome above the main email card. `after-shell` continues to work for outside-card footers. Placement is rejected on leaf nodes; standard MJML validation and escaping apply.
+
+## Per-component overrides at render time
+
+Use the public `overrides` render option to set reusable styles and properties
+for components by `type`, `data-mf-style` role, or unique `id`. The generic
+mechanism works for new and existing component types after expansion; it
+does not require a custom renderer or duplicated template. Use `patches` for
+structural edits. See [CUSTOMIZATION.md](CUSTOMIZATION.md).

@@ -8,6 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Universal per-render `overrides` for all built-in and custom emails: target components by type, semantic role or ID without changing template source. Preserves `patches`, themes, layouts and data validation.
+- Shared, validated `applyDocumentOverrides` helper, public types, regression tests, and customization examples.
+
+
 - New `report-ready` (reference 03) template with validated data, theme-aware report summary and safe inline links.
 
 - Shared root TypeScript, ESLint, and Vitest configuration.

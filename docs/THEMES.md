@@ -30,3 +30,11 @@ See [the template guide](ACTIVITY_NOTIFICATION.md).
 ### Password reset security palette
 
 `password-reset-secure` supports `data.design` palette overrides (`accent`, `canvas`, `surface`, `panel`, `panelText`, `border`, `text`, `muted`) and an approved `fontFamily`. Standard public `theme`, `themeName`, `layoutPreset`, `display` and `patches` render options remain supported.
+
+## Override precedence for all templates
+
+`themeName`/`theme` control general palette, typography and spacing defaults.
+Built-ins may provide explicit node styles, which have historically taken
+priority over theme values. For exact appearance control across **every**
+template, use `overrides.byType`, `overrides.byRole`, and `overrides.byId`.
+See [CUSTOMIZATION.md](CUSTOMIZATION.md).

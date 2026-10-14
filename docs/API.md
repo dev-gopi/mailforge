@@ -15,6 +15,16 @@ const result = await engine.render("welcome", { data: {
 console.log(result.html, result.text);
 ```
 
+## Universal per-render customization
+
+Every built-in and custom template accepts optional `overrides` on
+`TemplateRenderOptions` in addition to `data`, `display`, `theme`, `layout`
+and `patches`. The public `EmailDocumentOverrides` type has `byType`,
+`byRole`, and `byId` selectors. `applyDocumentOverrides` is exported by
+`@mailforge/core` and `@mailforge/email` for structured-document use;
+`EmailDocumentOverrideError` reports invalid selectors. See
+[CUSTOMIZATION.md](CUSTOMIZATION.md) for detailed code examples.
+
 ## Package exports (runtime)
 
 ### `@mailforge/email`
@@ -51,6 +61,8 @@ console.log(result.html, result.text);
 - `ThemeRegistry`
 - `ThemeVersionRegistry`
 - `accountCatalogTemplateDataSchema`
+- `applyDocumentOverrides`
+- `EmailDocumentOverrideError`
 - `applyDefaultLayout`
 - `applyEmailTheme`
 - `applyTemplateDisplay`

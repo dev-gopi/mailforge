@@ -2,6 +2,8 @@ import {
     ComponentRegistry,
     ComponentValidator,
     DocumentCustomizer,
+    applyDocumentOverrides,
+    type EmailDocumentOverrides,
     type EmailDocument,
     type DocumentPatch,
     type RenderOptions,
@@ -168,6 +170,8 @@ export interface TemplateRenderOptions
     extends RenderOptions {
     data?: TemplateData;
     patches?: readonly DocumentPatch[];
+    /** Per-render node customization shared by all templates; byId overrides byRole and byType. */
+    overrides?: EmailDocumentOverrides;
     /** BCP-47 language tag; omitted means the engine's default locale. */
     locale?: string;
     /** Translation fallback when a regional language does not contain a phrase. */
@@ -1351,10 +1355,15 @@ export class MailForgeEmail {
             customized,
         );
 
+        // Apply reusable per-node overrides after component expansion so they
+        // also reach the standard and composite components. Explicit styles
+        // continue to win over theme defaults during applyEmailTheme().
+        const overridden = applyDocumentOverrides(expanded, options.overrides);
+
         // Apply visibility after component expansion so nested actions,
         // headings and composite components respect the same controls.
         const visible = applyTemplateDisplay(
-            expanded,
+            overridden,
             options.display,
         );
 

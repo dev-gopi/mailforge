@@ -230,3 +230,12 @@ All example values in documentation must be provided by the caller; MailForge do
 ## Standalone new-comment notification
 
 See [Activity notification](ACTIVITY_NOTIFICATION.md) for data contracts, theming and render examples.
+
+## Customization for every built-in template
+
+All existing template IDs support the new, optional `render(id, { overrides })`
+field without a schema change. `byType` adjusts shared components, `byRole`
+addresses semantic styling groups, and `byId` targets individual components
+including content, destinations, imagery, font and spacing. Existing `data`,
+`patches`, `theme`, `layout`, `display`, and variants continue to work.
+See [CUSTOMIZATION.md](CUSTOMIZATION.md).
