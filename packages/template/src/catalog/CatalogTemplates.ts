@@ -4,6 +4,7 @@ import { buildActivityNotificationTemplate } from "../notifications/ActivityNoti
 import { buildOrderShippedTemplate, orderShippedPreviewData } from "../ecommerce/OrderShippedTemplate.js";
 import { buildWorkspaceInvitationEditorialTemplate, workspaceInvitationEditorialPreviewData } from "../account/WorkspaceInvitationTemplate.js";
 import { buildAppointmentConfirmationTemplate, appointmentConfirmationPreviewData } from "../events/AppointmentConfirmationTemplate.js";
+import { buildNewDeviceLoginAlertTemplate, newDeviceLoginAlertPreviewData } from "../authentication/NewDeviceLoginAlertTemplate.js";
 import { buildPasswordResetSecureTemplate, passwordResetSecurePreviewData } from "../authentication/PasswordResetSecureTemplate.js";
 import {
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
@@ -54,6 +55,7 @@ export const CATALOG_TEMPLATE_DEFINITIONS = [
     ["report-ready", "notifications", "Report ready", "Your report is ready to download", "Download report"],
     ["activity-notification", "notifications", "New comment notification", "A teammate left a comment", "View comment"],
     ["password-reset-secure", "authentication", "Secure password reset", "Reset your password with a time-limited link", "Reset password"],
+    ["new-device-login-alert", "authentication", "New device sign-in", "A new device signed in to your account", "Secure account"],
     // Alerts, events, SaaS, support
     ["service-maintenance", "notifications", "Scheduled maintenance", "Planned maintenance is coming", "View status"],
     ["service-outage", "notifications", "Service status alert", "A service incident is in progress", "View status"],
@@ -260,6 +262,13 @@ export function listCatalogTemplates(category?: CatalogTemplateCategory): Catalo
 }
 
 export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
+    if (id === "new-device-login-alert") {
+        if (input === undefined) return buildNewDeviceLoginAlertTemplate();
+        if (typeof input === "object" && input !== null && "securityUrl" in input) return buildNewDeviceLoginAlertTemplate(input);
+        const common = authenticationCatalogTemplateDataSchema.parse(input);
+        return buildNewDeviceLoginAlertTemplate({ ...newDeviceLoginAlertPreviewData,
+            firstName: common.recipientName, securityUrl: common.actionUrl });
+    }
     if (id === "appointment-confirmation") {
         if (input === undefined) return buildAppointmentConfirmationTemplate();
         if (typeof input === "object" && input !== null && "appointmentUrl" in input) {

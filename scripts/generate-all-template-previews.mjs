@@ -24,7 +24,7 @@ const entries = [];
 const errors = [];
 const catalogEngine = createEmail({ brand: { name: "Acme", supportEmail: "support@example.com" } });
 const catalog = catalogEngine.listBuiltinCatalog();
-if (catalog.length < 106 || !catalog.some(item => item.id === "appointment-confirmation") || !catalog.some(item => item.id === "workspace-invitation-editorial") || !catalog.some(item => item.id === "order-shipped-notice") || !catalog.some(item => item.id === "password-reset-secure") || !catalog.some(item => item.id === "report-ready") ||
+if (catalog.length < 107 || !catalog.some(item => item.id === "new-device-login-alert") || !catalog.some(item => item.id === "appointment-confirmation") || !catalog.some(item => item.id === "workspace-invitation-editorial") || !catalog.some(item => item.id === "order-shipped-notice") || !catalog.some(item => item.id === "password-reset-secure") || !catalog.some(item => item.id === "report-ready") ||
     !catalog.some(item => item.id === "activity-notification")) {
   throw new Error(`Compiled catalog has ${catalog.length} templates, but appointment-confirmation and prior reference templates must all be present. Rebuild all packages first: npx --yes pnpm@10.34.7 -r --if-present build`);
 }

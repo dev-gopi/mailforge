@@ -8,7 +8,7 @@ describe("order-shipped-notice (#104)", () => {
     it("is standalone, discoverable and coexists with shipping-update", () => {
         expect(isCatalogTemplateName("order-shipped-notice")).toBe(true);
         expect(listCatalogTemplates().filter(item => item.id === "order-shipped-notice")).toHaveLength(1);
-        expect(listCatalogTemplates()).toHaveLength(93);
+        expect(listCatalogTemplates()).toHaveLength(94);
         const doc = buildCatalogTemplate("order-shipped-notice");
         expect(doc.id).toBe("order-shipped-notice");
         expect(doc.subject).toContain("NL-20481");

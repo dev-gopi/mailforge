@@ -127,6 +127,8 @@ export { buildActivityNotificationTemplate, activityNotificationSchema, activity
 export type { ActivityNotificationData } from "@mailforge/templates";
 export { buildPasswordResetSecureTemplate, passwordResetSecureSchema, passwordResetSecurePreviewData } from "@mailforge/templates";
 export type { PasswordResetSecureData } from "@mailforge/templates";
+export { buildNewDeviceLoginAlertTemplate, newDeviceLoginAlertSchema, newDeviceLoginAlertPreviewData } from "@mailforge/templates";
+export type { NewDeviceLoginAlertData } from "@mailforge/templates";
 export { buildAppointmentConfirmationTemplate, appointmentConfirmationSchema, appointmentConfirmationPreviewData } from "@mailforge/templates";
 export type { AppointmentConfirmationData } from "@mailforge/templates";
 // Built-in email templates

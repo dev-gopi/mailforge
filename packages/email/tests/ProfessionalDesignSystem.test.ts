@@ -16,7 +16,7 @@ describe("Professional email design system", () => {
   it("audits all registered catalog documents individually", () => {
     const validator = new DocumentValidator();
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(106);
+    expect(catalog).toHaveLength(107);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       expect(validator.validate(original).valid, id).toBe(true);
@@ -63,7 +63,7 @@ describe("Professional email design system", () => {
       theme: { preset: "corporate", colors: { primary: "#9333ea" },
         appearance: { containerWidth: 640, contentPadding: 40 } },
     });
-    expect(email.listBuiltinCatalog()).toHaveLength(106);
+    expect(email.listBuiltinCatalog()).toHaveLength(107);
     const result = await email.render("payment-failed", {
       data: { recipientName: "Gopi", actionUrl: "https://example.com/pay", detail: "Invoice 123" },
     });
@@ -144,6 +144,17 @@ describe("Professional email design system", () => {
         expect(appointment.subject).toBe("Appointment confirmed — Northstar");
         expect(appointment.html).toContain("Gopi");
         expect(appointment.html).toContain("https://example.com/action");
+        continue;
+      }
+      if (id === "new-device-login-alert") {
+        const alert = await email.render(id, { data: {
+          brandName: "Northline", firstName: "Gopi", eventId: "SL-1", deviceName: "Browser",
+          location: "Kolkata, India", signInTime: "14 Oct 2026, 10:32 IST", ipAddress: "203.0.113.42",
+          securityUrl: "https://example.com/action", supportUrl: "https://example.com/support", year: 2026,
+        } });
+        expect(alert.subject).toBe("New sign-in to your Northline account");
+        expect(alert.html).toContain("Gopi");
+        expect(alert.html).toContain("https://example.com/action");
         continue;
       }
       const result = await email.render(id, { data: {

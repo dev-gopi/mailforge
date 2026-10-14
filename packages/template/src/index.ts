@@ -149,6 +149,8 @@ export { buildActivityNotificationTemplate, activityNotificationSchema, activity
 export type { ActivityNotificationData } from "./notifications/ActivityNotificationTemplate.js";
 export { buildPasswordResetSecureTemplate, passwordResetSecureSchema, passwordResetSecurePreviewData } from "./authentication/PasswordResetSecureTemplate.js";
 export type { PasswordResetSecureData } from "./authentication/PasswordResetSecureTemplate.js";
+export { buildNewDeviceLoginAlertTemplate, newDeviceLoginAlertSchema, newDeviceLoginAlertPreviewData } from "./authentication/NewDeviceLoginAlertTemplate.js";
+export type { NewDeviceLoginAlertData } from "./authentication/NewDeviceLoginAlertTemplate.js";
 
 export { buildOrderShippedTemplate, orderShippedSchema, orderShippedPreviewData } from "./ecommerce/OrderShippedTemplate.js";
 export type { OrderShippedData } from "./ecommerce/OrderShippedTemplate.js";

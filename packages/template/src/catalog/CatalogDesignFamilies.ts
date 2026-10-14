@@ -31,6 +31,7 @@ const FEATURED: Readonly<Record<string, CatalogDesignFamily>> = {
     "account-activated": "editorial", "event-feedback-request": "editorial",
     "trial-started": "spotlight", "report-ready": "minimal", "activity-notification": "conversation",
     "password-reset-secure": "security", "order-shipped-notice": "delivery",
+    "new-device-login-alert": "security",
     "workspace-invitation-editorial": "invitation",
     "appointment-confirmation": "ticket",
 };

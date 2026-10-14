@@ -7,7 +7,7 @@ describe("activity-notification template", () => {
     it("is a distinct discoverable built-in notification", () => {
         expect(isCatalogTemplateName("activity-notification")).toBe(true);
         expect(listCatalogTemplates().filter(row => row.id === "activity-notification")).toHaveLength(1);
-        expect(listCatalogTemplates()).toHaveLength(93);
+        expect(listCatalogTemplates()).toHaveLength(94);
     });
     it("validates the standalone document and renders user-provided text", () => {
         const doc = buildCatalogTemplate("activity-notification", activityNotificationPreviewData);
