@@ -1,5 +1,8 @@
 import type { EmailDocument, EmailNode } from "@mailforge/core";
 
+/** Shared safe node shapes for authored templates; callers still control all styles. */
+export type TemplateNodeStyles = NonNullable<EmailNode["styles"]>;
+
 /**
  * Every packaged template uses semantic roles, rather than hardcoding a
  * particular brand's color, font, margins or border radius. The email layer
@@ -32,6 +35,54 @@ export function contentHeading(id: string, text: string): EmailNode {
 
 export function paragraph(id: string, text: string): EmailNode {
   return { id, type: "text", props: { text } };
+}
+
+/** Create a styled text leaf without duplicating the EmailNode boilerplate. */
+export function styledText(
+  id: string,
+  text: string,
+  styles: TemplateNodeStyles,
+  role?: string,
+): EmailNode {
+  return {
+    id,
+    type: "text",
+    props: { text },
+    styles,
+    ...(role ? { attrs: { "data-mf-style": role } } : {}),
+  };
+}
+
+/** Build the common section → one-column → leaf composition used by templates. */
+export function singleColumnSection(
+  id: string,
+  children: EmailNode[],
+  styles: TemplateNodeStyles,
+  attrs?: Record<string, string>,
+): EmailNode {
+  return {
+    id,
+    type: "section",
+    styles,
+    ...(attrs ? { attrs } : {}),
+    children: [{ id: `${id}-column`, type: "column", children }],
+  };
+}
+
+/** Backward-compatible shorthand for an authored section with padding and surface color. */
+export function contentSection(
+  id: string,
+  children: EmailNode[],
+  padding: string,
+  backgroundColor?: string,
+  attrs?: Record<string, string>,
+): EmailNode {
+  return singleColumnSection(
+    id,
+    children,
+    { padding, ...(backgroundColor ? { backgroundColor } : {}) },
+    attrs,
+  );
 }
 
 export function contentParagraph(id: string, text: string): EmailNode {

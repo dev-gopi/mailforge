@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DocumentValidator, type EmailDocument, type EmailNode } from "@mailforge/core";
+import { contentSection } from "../shared/TemplateNodes.js";
 
 /** An independently validated, reusable editorial workspace invitation design. */
 const clean = (max: number) => z.string().trim().min(1).max(max)
@@ -63,12 +64,6 @@ const node = (id: string, value: string, styles: Styles, role?: string): EmailNo
     id, type: "text", props: { text: value }, styles,
     ...(role ? { attrs: { "data-mf-style": role } } : {}),
 });
-const section = (id: string, children: EmailNode[], padding: string, backgroundColor: string,
-    attrs?: Record<string, string>): EmailNode => ({
-    id, type: "section", styles: { padding, backgroundColor }, ...(attrs ? { attrs } : {}),
-    children: [{ id: `${id}-column`, type: "column", children }],
-});
-
 /** Produces only typed MailForge nodes; no copied HTML or executable style strings. */
 export function buildWorkspaceInvitationEditorialTemplate(input?: unknown): EmailDocument {
     const d = workspaceInvitationEditorialSchema.parse(input ?? workspaceInvitationEditorialPreviewData);
@@ -106,7 +101,7 @@ export function buildWorkspaceInvitationEditorialTemplate(input?: unknown): Emai
                         ...label, fontSize: 11, lineHeight: "32px", textAlign: "right" }, "eyebrow"),
                 ] },
             ] },
-        section("invite-editorial-hero", [
+        contentSection("invite-editorial-hero", [
             { id: "invite-editorial-kicker", type: "rich-text", props: { segments: [
                 { text: d.kicker, strong: true, color: "#F5B39F" },
                 { text: "  ━━━━━", color: "#CB8A88" },
@@ -122,7 +117,7 @@ export function buildWorkspaceInvitationEditorialTemplate(input?: unknown): Emai
             node("invite-editorial-hero-subtitle", d.heroSubtitle, { ...textStyle,
                 color: c.heroMuted, fontSize: 15, lineHeight: "23px" }, "hero-subtitle"),
         ], "47px 49px 45px", c.plum),
-        section("invite-editorial-introduction", [
+        contentSection("invite-editorial-introduction", [
             node("invite-editorial-greeting", `${d.greetingPrefix} ${d.recipientFirstName},`, {
                 ...textStyle, padding: "0 0 2px" }, "body"),
             { id: "invite-editorial-intro-copy", type: "rich-text", props: { segments: [
@@ -153,7 +148,7 @@ export function buildWorkspaceInvitationEditorialTemplate(input?: unknown): Emai
                     ...textStyle, fontSize: 13, lineHeight: "20px", color: c.muted }),
             ] },
         ] },
-        section("invite-editorial-action-area", [
+        contentSection("invite-editorial-action-area", [
             { id: "invite-editorial-action", type: "button", props: {
                 text: d.buttonLabel, href: d.invitationUrl }, attrs: { "data-mf-style": "primary-action" },
                 styles: { fontFamily: sans, fontSize: 15, fontWeight: "bold", lineHeight: "20px",
@@ -162,13 +157,13 @@ export function buildWorkspaceInvitationEditorialTemplate(input?: unknown): Emai
             node("invite-editorial-expiry", `${d.expirationPrefix} ${d.expiryDays} ${d.expiryDays === 1 ? "day" : "days"}.`, {
                 ...textStyle, fontSize: 13, lineHeight: "21px", color: c.muted, padding: "18px 0 0" }),
         ], "0 49px 26px", c.surface),
-        section("invite-editorial-fine-print", [
+        contentSection("invite-editorial-fine-print", [
             { id: "invite-editorial-divider", type: "divider", styles: {
                 color: c.border, padding: "0 0 18px" } },
             node("invite-editorial-ignore", d.ignoreNotice, { ...textStyle,
                 fontSize: 12, lineHeight: "20px", color: c.muted }),
         ], "0 49px 37px", c.surface),
-        section("invite-editorial-footer", [
+        contentSection("invite-editorial-footer", [
             { id: "invite-editorial-support", type: "link", props: {
                 href: d.supportUrl, prefix: `${d.supportPrefix} `, text: d.supportLabel,
             }, styles: { ...textStyle, textAlign: "center", fontSize: 12, lineHeight: "19px",
@@ -181,7 +176,7 @@ export function buildWorkspaceInvitationEditorialTemplate(input?: unknown): Emai
         schemaVersion: "1.0", id: "workspace-invitation-editorial", version: "1.0.0",
         subject: `You're invited to ${d.workspaceName}`,
         preheader: `${d.inviterName} invited you to join ${d.workspaceName}. Accept your invitation.`,
-        head: { title: `You're invited to ${d.workspaceName}` },
+        head: { title: `You're invited to ${d.workspaceName}`, bodyBackgroundColor: c.canvas },
         metadata: { category: "saas", catalog: "builtin", designFamily: "invitation" },
         body,
         header: { id: "invite-editorial-empty-header", type: "container" },

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { DocumentValidator, type EmailDocument, type EmailNode } from "@mailforge/core";
 import { buildProgressSteps } from "../shared/ProgressSteps.js";
+import { contentSection } from "../shared/TemplateNodes.js";
 
 /** Standalone Sky Route shipment notice. Dates and shipment milestones come from the caller. */
 const copy = (max: number) => z.string().trim().min(1).max(max)
@@ -65,13 +66,6 @@ type Styles = NonNullable<EmailNode["styles"]>;
 function text(id: string, content: string, styles: Styles): EmailNode {
     return { id, type: "text", props: { text: content }, styles };
 }
-function section(id: string, nodes: EmailNode[], padding: string, backgroundColor: string,
-    attrs?: Record<string, string>): EmailNode {
-    return { id, type: "section", styles: { padding, backgroundColor },
-        ...(attrs ? { attrs } : {}),
-        children: [{ id: `${id}-column`, type: "column", children: nodes }],
-    };
-}
 function twoColumns(id: string, first: EmailNode[], second: EmailNode[], padding: string,
     backgroundColor: string, keepMobile = false): EmailNode {
     return { id, type: "section", styles: { padding, backgroundColor },
@@ -123,11 +117,11 @@ export function buildOrderShippedTemplate(input?: unknown): EmailDocument {
                         color: c.muted, textAlign: "right", lineHeight: "27px" }),
                 ] },
             ] },
-        section("order-shipped-accent-strip", [
+        contentSection("order-shipped-accent-strip", [
             { id: "order-shipped-accent-height", type: "spacer", props: { height: "6px" },
                 styles: { padding: "0" } },
         ], "0", c.accent),
-        section("order-shipped-intro", [
+        contentSection("order-shipped-intro", [
             { id: "order-shipped-status", type: "rich-text", props: { segments: [
                 { text: "●  ", color: c.success }, { text: d.statusLabel, strong: true, color: c.success },
             ] }, styles: { fontFamily: family, fontSize: 11, lineHeight: "19px",
@@ -165,7 +159,7 @@ export function buildOrderShippedTemplate(input?: unknown): EmailDocument {
             currentColor: c.accent, pendingColor: c.progressPending,
             labelColor: c.progressLabel, fontFamily: family }),
           styles: { padding: "0 48px 36px", backgroundColor: c.surface } },
-        section("order-shipped-details-rule", [
+        contentSection("order-shipped-details-rule", [
             { id: "order-shipped-details-divider", type: "divider", styles: { color: c.border, padding: "0" } },
         ], "0", c.surface),
         twoColumns("order-shipped-details", [
@@ -177,7 +171,7 @@ export function buildOrderShippedTemplate(input?: unknown): EmailDocument {
             text("order-shipped-carrier-value", `${d.carrierName} · ${d.trackingNumber}`, {
                 ...bodyFont, color: c.text, fontSize: 14, fontWeight: "bold", lineHeight: "23px" }),
         ], "26px 48px 32px", c.surface),
-        section("order-shipped-outside-footer", [
+        contentSection("order-shipped-outside-footer", [
             { id: "order-shipped-support-link", type: "link", props: {
                 href: d.supportUrl, prefix: `${d.supportPrompt} `, text: d.supportLabel, suffix: ".",
             }, styles: { ...bodyFont, textAlign: "center", fontSize: 12, lineHeight: "20px",
@@ -194,7 +188,7 @@ export function buildOrderShippedTemplate(input?: unknown): EmailDocument {
         schemaVersion: "1.0", id: "order-shipped-notice", version: "1.0.0",
         subject: `Your order ${d.orderNumber} has shipped`,
         preheader: `Your ${d.brandName} order ${d.orderNumber} is on its way. Track your package online.`,
-        head: { title: `Your order has shipped — ${d.brandName}` },
+        head: { title: `Your order has shipped — ${d.brandName}`, bodyBackgroundColor: c.canvas },
         metadata: { category: "ecommerce", catalog: "builtin", designFamily: "delivery" },
         body,
         header: { id: "order-shipped-empty-header", type: "container" },

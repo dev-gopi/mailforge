@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { DocumentValidator, type EmailDocument, type EmailNode } from "@mailforge/core";
-import { withRole } from "../shared/TemplateNodes.js";
+import { contentSection, withRole } from "../shared/TemplateNodes.js";
 
 /** A standalone, fully data-driven report-availability notification. */
 const text = (max: number) => z.string().trim().min(1).max(max)
@@ -15,6 +15,7 @@ const spacedText = (max: number) => z.string().min(1).max(max)
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/);
 const designSchema = z.object({
     accent: hex.optional(),
+    canvas: hex.optional(),
     surface: hex.optional(),
     text: hex.optional(),
     muted: hex.optional(),
@@ -61,18 +62,13 @@ function leaf(id: string, textValue: string, role: "body" | "muted" | "eyebrow" 
     return { ...withRole({ id, type: role === "title" ? "heading" : "text", props: { text: textValue } }, role),
         attrs: { "data-mf-style": role, "data-mf-font": "technical" }, styles };
 }
-function section(id: string, children: EmailNode[], padding: string, backgroundColor?: string): EmailNode {
-    return { id, type: "section", styles: { padding, ...(backgroundColor ? { backgroundColor } : {}) },
-        children: [{ id: `${id}-column`, type: "column", children }] };
-}
-
 /** Reuses MailForge's MJML-safe section/column/text/button primitives. */
 export function buildReportReadyTemplate(input?: unknown): EmailDocument {
     const data = reportReadySchema.parse(input ?? reportReadyPreviewData);
     const c = data.design ?? {};
     const font = c.fontFamily ?? typeFont;
     const body: EmailNode[] = [
-        withRole(section("report-ready-accent-strip", [{ id: "report-ready-strip-height", type: "spacer", props: { height: "5px" }, styles: { padding: "0" } }], "0", c.accent), "accent-strip"),
+        withRole(contentSection("report-ready-accent-strip", [{ id: "report-ready-strip-height", type: "spacer", props: { height: "5px" }, styles: { padding: "0" } }], "0", c.accent), "accent-strip"),
         { id: "report-ready-brand-row", type: "section", styles: { padding: "25px 40px 20px", ...(c.surface ? { backgroundColor: c.surface } : {}) }, children: [
             { id: "report-ready-brand-left", type: "column", styles: { width: "70%", padding: "0" }, children: [
                 leaf("report-ready-company", data.companyName, "title", { fontFamily: font, fontSize: 17, lineHeight: "24px", padding: "0", ...(c.text ? { color: c.text } : {}) }),
@@ -81,8 +77,8 @@ export function buildReportReadyTemplate(input?: unknown): EmailDocument {
                 leaf("report-ready-category", data.sectionLabel, "muted", { fontFamily: font, textAlign: "right", fontWeight: "bold", fontSize: 10, letterSpacing: "1.4px", lineHeight: "24px", padding: "0", ...(c.muted ? { color: c.muted } : {}) }),
             ] },
         ] },
-        section("report-ready-divider", [{ id: "report-ready-divider-line", type: "divider", styles: { padding: "0", ...(c.panelBorder ? { color: c.panelBorder } : {}) } }], "0"),
-        section("report-ready-opening", [
+        contentSection("report-ready-divider", [{ id: "report-ready-divider-line", type: "divider", styles: { padding: "0", ...(c.panelBorder ? { color: c.panelBorder } : {}) } }], "0"),
+        contentSection("report-ready-opening", [
             leaf("report-ready-status", data.statusLabel, "eyebrow", { fontFamily: font, fontSize: 11, lineHeight: "18px", letterSpacing: "1.2px", padding: "0 0 10px", ...(c.accent ? { color: c.accent } : {}) }),
             leaf("report-ready-title", data.heading, "title", { fontFamily: font, fontSize: 29, lineHeight: "38px", padding: "0 0 18px", ...(c.text ? { color: c.text } : {}) }),
             leaf("report-ready-greeting", `${data.greetingPrefix} ${data.recipientName},`, "body", { fontFamily: font, fontSize: 14, lineHeight: "24px", padding: "0 0 8px", ...(c.text ? { color: c.text } : {}) }),
@@ -98,9 +94,9 @@ export function buildReportReadyTemplate(input?: unknown): EmailDocument {
                 leaf("report-ready-period", data.reportPeriod, "body", { fontFamily: font, fontSize: 13, lineHeight: "21px", padding: "0", ...(c.text ? { color: c.text } : {}) }),
             ],
         }] },
-        section("report-ready-action-row", [{ id: "report-ready-action", type: "button", props: { href: data.reportUrl, text: data.buttonLabel }, attrs: { "data-mf-style": "primary-action", "data-mf-font": "technical" }, styles: { fontFamily: font, textAlign: "left", fontSize: 13, lineHeight: "20px", innerPadding: "14px 24px", padding: "26px 0 20px", ...(c.accent ? { backgroundColor: c.accent } : {}) } }], "0 40px"),
-        section("report-ready-fallback-row", [{ id: "report-ready-fallback", type: "link", props: { href: data.reportUrl, prefix: data.fallbackPrefix, text: data.fallbackLabel, suffix: data.fallbackSuffix }, styles: { fontFamily: font, fontSize: 11, lineHeight: "19px", padding: "0", ...(c.muted ? { color: c.muted } : {}) }, attrs: { "data-mf-style": "muted", "data-mf-font": "technical" } }], "0 40px 42px"),
-        section("report-ready-footer", [
+        contentSection("report-ready-action-row", [{ id: "report-ready-action", type: "button", props: { href: data.reportUrl, text: data.buttonLabel }, attrs: { "data-mf-style": "primary-action", "data-mf-font": "technical" }, styles: { fontFamily: font, textAlign: "left", fontSize: 13, lineHeight: "20px", innerPadding: "14px 24px", padding: "26px 0 20px", ...(c.accent ? { backgroundColor: c.accent } : {}) } }], "0 40px"),
+        contentSection("report-ready-fallback-row", [{ id: "report-ready-fallback", type: "link", props: { href: data.reportUrl, prefix: data.fallbackPrefix, text: data.fallbackLabel, suffix: data.fallbackSuffix }, styles: { fontFamily: font, fontSize: 11, lineHeight: "19px", padding: "0", ...(c.muted ? { color: c.muted } : {}) }, attrs: { "data-mf-style": "muted", "data-mf-font": "technical" } }], "0 40px 42px"),
+        contentSection("report-ready-footer", [
             leaf("report-ready-auto-note", `${data.automatedNote} ${data.companyName}.`, "footer-note", { fontFamily: font, fontSize: 11, lineHeight: "18px", textAlign: "center", padding: "0 0 5px", ...(c.muted ? { color: c.muted } : {}) }),
             leaf("report-ready-copyright", `© ${data.year} ${data.companyName}`, "footer-note", { fontFamily: font, fontSize: 11, lineHeight: "18px", textAlign: "center", padding: "0", ...(c.muted ? { color: c.muted } : {}) }),
         ], "22px 16px"),
@@ -109,7 +105,7 @@ export function buildReportReadyTemplate(input?: unknown): EmailDocument {
         schemaVersion: "1.0", id: "report-ready", version: "1.0.0",
         subject: `Your ${data.reportName} is ready`,
         preheader: `Your ${data.reportName} is ready to download.`,
-        head: { title: data.heading },
+        head: { title: data.heading, ...(c.canvas ? { bodyBackgroundColor: c.canvas } : {}) },
         metadata: { category: "notifications", catalog: "builtin", designFamily: "minimal" },
         body,
         // These empty structural sections prevent duplicate automatic chrome.

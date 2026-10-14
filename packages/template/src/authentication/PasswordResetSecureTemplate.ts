@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DocumentValidator, type EmailDocument, type EmailNode } from "@mailforge/core";
+import { contentSection } from "../shared/TemplateNodes.js";
 
 /** An independent indigo password-reset design. Never generates or retains reset tokens. */
 const words = (max: number) => z.string().trim().min(1).max(max)
@@ -53,11 +54,13 @@ const leaf = (id: string, value: string, styles: Styles,
     attrs?: Record<string, string>): EmailNode => ({
     id, type: "text", props: { text: value }, styles, ...(attrs ? { attrs } : {}),
 });
-const section = (id: string, children: EmailNode[], padding: string, bg: string,
-    attrs?: Record<string, string>): EmailNode => ({
-    id, type: "section", ...(attrs ? { attrs } : {}), styles: { padding, backgroundColor: bg },
-    children: [{ id: `${id}-col`, type: "column", children }],
-});
+const passwordResetSection = (id: string, children: EmailNode[], padding: string, backgroundColor: string,
+    attrs?: Record<string, string>): EmailNode => {
+    const node = contentSection(id, children, padding, backgroundColor, attrs);
+    // Preserve the published node IDs used by existing user overrides and patches.
+    node.children![0]!.id = `${id}-col`;
+    return node;
+};
 
 /** Standard safe EmailDocument; uses registered nodes and existing MJML renderer. */
 export function buildPasswordResetSecureTemplate(input?: unknown): EmailDocument {
@@ -96,10 +99,10 @@ export function buildPasswordResetSecureTemplate(input?: unknown): EmailDocument
                 }),
             ] },
         ] },
-        section("password-secure-top-rule", [
+        passwordResetSection("password-secure-top-rule", [
             leaf("password-secure-rule", "·", { padding: "0", backgroundColor: c.accent, color: c.accent, fontSize: 1, lineHeight: "5px" }),
         ], "0", c.accent),
-        section("password-secure-intro", [
+        passwordResetSection("password-secure-intro", [
             leaf("password-secure-kicker", d.kicker, {
                 ...base, color: c.accent, fontSize: 11, lineHeight: "16px", fontWeight: "bold",
                 letterSpacing: "1.7px", padding: "0 0 15px",
@@ -129,7 +132,7 @@ export function buildPasswordResetSecureTemplate(input?: unknown): EmailDocument
                     fontSize: 13, lineHeight: "20px", color: c.panelText }),
             ] },
         ] },
-        section("password-secure-outside-footer", [
+        passwordResetSection("password-secure-outside-footer", [
             { id: "password-secure-support", type: "link", props: {
                 href: d.supportUrl, prefix: `${d.supportPrefix} `, text: d.supportLabel,
             }, styles: { ...base, fontSize: 12, lineHeight: "19px", color: c.accent, textAlign: "center" } },
@@ -142,7 +145,7 @@ export function buildPasswordResetSecureTemplate(input?: unknown): EmailDocument
         schemaVersion: "1.0", id: "password-reset-secure", version: "1.0.0",
         subject: `Reset your ${d.brandName} password`,
         preheader: `Use this secure link to reset your password. The link expires in ${d.expiryMinutes} ${d.expiryMinutes === 1 ? "minute" : "minutes"}.`,
-        head: { title: d.heading },
+        head: { title: d.heading, bodyBackgroundColor: c.canvas },
         metadata: { category: "authentication", catalog: "builtin", designFamily: "security" },
         body,
         header: { id: "password-secure-empty-header", type: "container" },

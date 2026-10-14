@@ -20,6 +20,8 @@ export interface EmailDocument {
     head?: {
         title?: string | undefined;
         customCss?: string | undefined;
+        /** Optional validated canvas color for renderers that support an email body background. */
+        bodyBackgroundColor?: string | undefined;
     } | undefined;
 
     header?: EmailNode | undefined;

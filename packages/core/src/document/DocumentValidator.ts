@@ -83,6 +83,7 @@ const EmailDocumentSchema = z.object({
     head: z.object({
         title: z.string().optional(),
         customCss: z.string().optional(),
+        bodyBackgroundColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
     }).strict().optional(),
 
     header: EmailNodeSchema.optional(),

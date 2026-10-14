@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DocumentValidator, type EmailDocument, type EmailNode } from "@mailforge/core";
+import { contentSection } from "../shared/TemplateNodes.js";
 
 /** Secure, standalone new-comment notification with a configurable warm-minimal design. */
 const copy = (limit: number) => z.string().trim().min(1).max(limit)
@@ -66,12 +67,6 @@ function rich(id: string, fragments: Array<{ text: string; strong?: boolean; col
 function text(id: string, value: string, styles: Style): EmailNode {
     return { id, type: "text", props: { text: value }, styles, attrs: { "data-mf-font": "corporate" } };
 }
-function section(id: string, children: EmailNode[], padding: string, backgroundColor: string): EmailNode {
-    return { id, type: "section", styles: { padding, backgroundColor }, children: [
-        { id: `${id}-column`, type: "column", children },
-    ] };
-}
-
 /** Standard EmailDocument; no HTML snippets, third-party fonts, or unsafe interpolation. */
 export function buildActivityNotificationTemplate(input?: unknown): EmailDocument {
     const data = activityNotificationSchema.parse(input ?? activityNotificationPreviewData);
@@ -107,8 +102,8 @@ export function buildActivityNotificationTemplate(input?: unknown): EmailDocumen
                 ] },
             ],
         },
-        section("activity-divider", [{ id: "activity-divider-line", type: "divider", styles: { color: c.cardBorder, padding: "0" } }], "0", c.surface),
-        section("activity-intro", [
+        contentSection("activity-divider", [{ id: "activity-divider-line", type: "divider", styles: { color: c.cardBorder, padding: "0" } }], "0", c.surface),
+        contentSection("activity-intro", [
             text("activity-kicker", data.kicker, { ...base, fontWeight: "bold", fontSize: 11,
                 lineHeight: "18px", letterSpacing: "1.4px", color: c.accent, padding: "0 0 10px" }),
             { id: "activity-heading", type: "heading", props: { text: data.heading, level: 1 },
@@ -129,7 +124,7 @@ export function buildActivityNotificationTemplate(input?: unknown): EmailDocumen
                     text("activity-comment", data.commentExcerpt, { ...base, color: c.text, padding: "0" }),
                 ] }],
         },
-        section("activity-action-row", [{ id: "activity-action", type: "button", props: {
+        contentSection("activity-action-row", [{ id: "activity-action", type: "button", props: {
             href: data.actionUrl, text: data.buttonLabel }, attrs: { "data-mf-style": "primary-action" },
             styles: { fontFamily: font, fontSize: 13, fontWeight: "bold", lineHeight: "21px",
                 backgroundColor: c.button, color: "#ffffff", textAlign: "left", innerPadding: "13px 22px",
@@ -152,7 +147,7 @@ export function buildActivityNotificationTemplate(input?: unknown): EmailDocumen
         schemaVersion: "1.0", id: "activity-notification", version: "1.0.0",
         subject: `${data.actorName} commented on ${data.itemName}`,
         preheader: `${data.actorName} commented on ${data.itemName}.`,
-        head: { title: data.heading },
+        head: { title: data.heading, bodyBackgroundColor: c.canvas },
         metadata: { category: "notifications", catalog: "builtin", designFamily: "conversation" },
         body,
         header: { id: "activity-layout-header", type: "container" },

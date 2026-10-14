@@ -1387,7 +1387,7 @@ export class MailForgeEmail {
             themed,
             {
                 trust: options.trust ?? "safe",
-                bodyBackgroundColor: theme.colors.background,
+                bodyBackgroundColor: themed.head?.bodyBackgroundColor ?? theme.colors.background,
                 surfaceColor: theme.colors.surface,
                 sectionColor: theme.colors.section,
                 borderColor: theme.colors.border,

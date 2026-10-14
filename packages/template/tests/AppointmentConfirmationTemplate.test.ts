@@ -14,13 +14,15 @@ describe("appointment-confirmation (#106)", () => {
     });
     it("builds the responsive date ticket, safe actions and editable palette", () => {
         const document = buildAppointmentConfirmationTemplate({ ...appointmentConfirmationPreviewData,
-            appointmentName: "Strategy session", design: { accent: "#112233", detailsText: "#445566", headingFont: "Georgia, Times New Roman, serif" },
+            appointmentName: "Strategy session", design: { canvas: "#101112", accent: "#112233", detailsText: "#445566", supportText: "#556677", headingFont: "Georgia, Times New Roman, serif" },
         });
         const serialized = JSON.stringify(document);
         expect(serialized).toContain("appointment-date-day");
         expect(serialized).toContain("appointment-details-column");
         expect(serialized).toContain("Strategy session");
         expect(serialized).toContain("#112233");
+        expect(document.head?.bodyBackgroundColor).toBe("#101112");
+        expect(serialized).toContain("#556677");
         expect(serialized).toContain("Georgia");
         expect(JSON.stringify(buildAppointmentConfirmationTemplate())).not.toContain("#112233");
     });
