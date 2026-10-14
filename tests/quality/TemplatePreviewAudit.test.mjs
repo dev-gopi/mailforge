@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { auditPreviewManifest } from "../../scripts/lib/TemplatePreviewAudit.mjs";
 
-const catalog = Array.from({ length: 103 }, (_, i) => ({ id: i === 100 ? "report-ready" : i === 101 ? "activity-notification" : i === 102 ? "password-reset-secure" : `sample-${i}` }));
+const catalog = Array.from({ length: 104 }, (_, i) => ({ id: i === 100 ? "report-ready" : i === 101 ? "activity-notification" : i === 102 ? "password-reset-secure" : i === 103 ? "order-shipped-notice" : `sample-${i}` }));
 const themes = ["modern", "minimal"];
 function fixture() {
   const entries = [];
@@ -22,7 +22,7 @@ test("passes complete catalog and theme matrix", () => {
   const result = auditPreviewManifest(fixture(), catalog, themes);
   assert.deepEqual(result.errors, []);
   assert.deepEqual(result.warnings, []);
-  assert.equal(result.expected, 309);
+  assert.equal(result.expected, 312);
 });
 test("detects omitted preview", () => {
   const manifest = fixture(); manifest.entries.pop(); manifest.successful--;
@@ -44,9 +44,9 @@ test("detects rendering failure", () => {
   const manifest = fixture(); manifest.failed = 1;
   assert.match(auditPreviewManifest(manifest, catalog, themes).errors.join(" "), /failures/);
 });
-test("detects missing newly registered password-reset-secure template", () => {
+test("detects missing newly registered order-shipped-notice template", () => {
   const result = auditPreviewManifest(fixture(), catalog.slice(0, -1), themes);
-  assert.match(result.errors.join(" "), /password-reset-secure/);
+  assert.match(result.errors.join(" "), /order-shipped-notice/);
 });
 test("preserves renderer warnings as warnings", () => {
   const manifest = fixture(); manifest.entries[0].warnings = ["nonfatal warning"];

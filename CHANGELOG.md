@@ -29,3 +29,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Added `activity-notification` standalone built-in template (#102), reusable escaped rich text, a configurable quote panel, optional outside-card footer placement and mobile-preserved brand columns.
 
 - Added built-in `password-reset-secure` (#103) with configurable security content, indigo design and a safe reusable `before-shell` layout placement. Preserves the existing `password-reset` template and previous registrations.
+
+- Added `order-shipped-notice` (#104), a standalone Sky Route shipment email with
+  caller-controlled milestones and a reusable structured-node `buildProgressSteps` helper.
+  Kept `shipping-update`, `order-delivered`, and all previously registered templates unchanged.

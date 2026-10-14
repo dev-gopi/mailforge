@@ -16,7 +16,7 @@ describe("Professional email design system", () => {
   it("audits all registered catalog documents individually", () => {
     const validator = new DocumentValidator();
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(103);
+    expect(catalog).toHaveLength(104);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       expect(validator.validate(original).valid, id).toBe(true);
@@ -63,7 +63,7 @@ describe("Professional email design system", () => {
       theme: { preset: "corporate", colors: { primary: "#9333ea" },
         appearance: { containerWidth: 640, contentPadding: 40 } },
     });
-    expect(email.listBuiltinCatalog()).toHaveLength(103);
+    expect(email.listBuiltinCatalog()).toHaveLength(104);
     const result = await email.render("payment-failed", {
       data: { recipientName: "Gopi", actionUrl: "https://example.com/pay", detail: "Invoice 123" },
     });
@@ -78,6 +78,17 @@ describe("Professional email design system", () => {
   it("renders all catalog templates through the public API", async () => {
     const email = createEmail({ theme: "modern" });
     for (const { id, title } of listCatalogTemplates()) {
+      if (id === "order-shipped-notice") {
+        const output = await email.render(id, { data: {
+          brandName: "Northstar", firstName: "Gopi", orderNumber: "ORD-1",
+          deliveryDate: "October 18", carrierName: "ShipCo", trackingNumber: "TRK-1",
+          trackingUrl: "https://example.com/action", supportUrl: "https://example.com/support",
+          companyAddress: "Example St",
+        } });
+        expect(output.html).toContain("Gopi");
+        expect(output.html).toContain("https://example.com/action");
+        continue;
+      }
       if (id === "password-reset-secure") {
         const output = await email.render(id, { data: {
           brandName: "Acme", firstName: "Gopi", resetUrl: "https://example.com/action",

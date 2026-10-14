@@ -25,6 +25,11 @@ function dataForTemplate(id: string): Record<string, unknown> {
         case "shipping-update": return { customer: { firstName: "Alex" }, order: { id: "ORD-1" }, shipment: { carrier: "MailForge Express", trackingNumber: "TRACK-1", trackingUrl: url, estimatedDelivery: "2026-10-15" } };
         case "password-reset-secure": return reset;
         case "activity-notification": return { brandName: "huddle", recipientName: "Alex", actorName: "Mira", itemName: "Board", commentExcerpt: "Hi", actionUrl: url, preferencesUrl: "https://example.com/preferences", year: 2026 };
+        case "order-shipped-notice": return {
+            brandName: "Northstar", firstName: "Alex", orderNumber: "ORD-1",
+            deliveryDate: "October 18", carrierName: "ShipCo", trackingNumber: "TRK-1",
+            trackingUrl: url, supportUrl: "https://example.com/support", companyAddress: "Example St",
+        };
         case "report-ready": return { companyName: "Northstar", recipientName: "Alex", reportName: "Monthly Report", reportPeriod: "September 2026", reportUrl: "https://example.com/report", year: 2026 };
         default: return { recipientName: "Alex", actionUrl: url, unsubscribeUrl: "https://example.com/unsubscribe", detail: "Reference 1" };
     }
@@ -71,7 +76,7 @@ describe("universal per-render overrides", () => {
     it("supports generic type overrides throughout the complete built-in catalog", async () => {
         const email = createEmail();
         const catalog = listBuiltinTemplateCatalog();
-        expect(catalog).toHaveLength(103);
+        expect(catalog).toHaveLength(104);
         for (const { id } of catalog) {
             const data = dataForTemplate(id);
             const result = await email.render(id, {

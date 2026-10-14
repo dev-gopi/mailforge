@@ -30,7 +30,7 @@ const FEATURED: Readonly<Record<string, CatalogDesignFamily>> = {
     "login-attempt-blocked": "security", "account-restored": "minimal",
     "account-activated": "editorial", "event-feedback-request": "editorial",
     "trial-started": "spotlight", "report-ready": "minimal", "activity-notification": "conversation",
-    "password-reset-secure": "security",
+    "password-reset-secure": "security", "order-shipped-notice": "delivery",
 };
 
 /** Curate semantic exceptions rather than hashing their names. */

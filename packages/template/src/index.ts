@@ -136,6 +136,11 @@ export type { ActivityNotificationData } from "./notifications/ActivityNotificat
 export { buildPasswordResetSecureTemplate, passwordResetSecureSchema, passwordResetSecurePreviewData } from "./authentication/PasswordResetSecureTemplate.js";
 export type { PasswordResetSecureData } from "./authentication/PasswordResetSecureTemplate.js";
 
+export { buildOrderShippedTemplate, orderShippedSchema, orderShippedPreviewData } from "./ecommerce/OrderShippedTemplate.js";
+export type { OrderShippedData } from "./ecommerce/OrderShippedTemplate.js";
+export { buildProgressSteps } from "./shared/ProgressSteps.js";
+export type { ProgressStepsOptions } from "./shared/ProgressSteps.js";
+
 // Complete catalog exports (kept under the existing singular template package).
 export {
   CATALOG_TEMPLATE_DEFINITIONS,

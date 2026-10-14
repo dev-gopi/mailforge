@@ -98,3 +98,11 @@ for components by `type`, `data-mf-style` role, or unique `id`. The generic
 mechanism works for new and existing component types after expansion; it
 does not require a custom renderer or duplicated template. Use `patches` for
 structural edits. See [CUSTOMIZATION.md](CUSTOMIZATION.md).
+
+### Horizontal progress steps
+
+The `@mailforge/templates` export `buildProgressSteps({id, steps, currentStep, completedColor,
+currentColor, pendingColor, labelColor, fontFamily})` creates an email-safe horizontal milestone
+section from ordinary text, divider, column and section components. It is reusable by shipment,
+approval, onboarding or other progress emails without raw HTML and is compatible with per-node
+public overrides. `currentStep` is one-based and must be supplied from real application events.

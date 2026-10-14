@@ -4,7 +4,7 @@ The reference pages below describe the current public API and built-in catalog. 
 
 - [Report Ready notification](REPORT_READY.md) — built-in reference template 03 and its customizable data contract
 - [Public API reference](API.md) — runtime export inventory and usage
-- [All 103 templates and category contracts](TEMPLATES.md)
+- [All 104 templates and category contracts](TEMPLATES.md)
 - [Secure password reset reference](PASSWORD_RESET_SECURE.md)
 - [Theme presets and customization](THEMES.md)
 - [Reusable components](COMPONENTS.md)
@@ -21,3 +21,6 @@ Use the local playground and HTML previews for development, but verify intended 
 - [Activity notification built-in](ACTIVITY_NOTIFICATION.md)
 
 - [Universal template customization](CUSTOMIZATION.md) — override content, visual styles, and components for every built-in email.
+
+- [Order shipped reference email](ORDER_SHIPPED_NOTICE.md) — built-in template #104,
+  shipment-event milestones, customization and verified data requirements.

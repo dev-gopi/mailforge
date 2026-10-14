@@ -87,3 +87,11 @@ node examples/customization/render.mjs
 
 This writes `generated/customization/password-reset-secure.html` and a text
 preview. Real email-client verification remains separate.
+
+### Customize the order shipped notice
+
+The standard `overrides` render option applies to every node of `order-shipped-notice`; for example,
+`overrides.byId["order-shipped-heading"]` modifies its rich-text segments and styles, while
+`overrides.byType.text.styles.fontFamily` updates all text. Use `data` for shipment-specific content,
+`data.design` for the reusable Sky Route palette, and `theme` / `layout` for shared presentation.
+See [ORDER_SHIPPED_NOTICE.md](ORDER_SHIPPED_NOTICE.md).

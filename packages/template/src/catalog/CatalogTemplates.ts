@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { buildReportReadyTemplate, reportReadyPreviewData } from "../notifications/ReportReadyTemplate.js";
 import { buildActivityNotificationTemplate } from "../notifications/ActivityNotificationTemplate.js";
+import { buildOrderShippedTemplate, orderShippedPreviewData } from "../ecommerce/OrderShippedTemplate.js";
 import { buildPasswordResetSecureTemplate, passwordResetSecurePreviewData } from "../authentication/PasswordResetSecureTemplate.js";
 import {
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
@@ -38,6 +39,7 @@ export const CATALOG_TEMPLATE_DEFINITIONS = [
     ["subscription-renewed", "billing", "Subscription renewed", "Your subscription was renewed", "View subscription"],
     ["trial-expiring", "billing", "Trial ending soon", "Your free trial is ending", "Choose a plan"],
     ["refund-processed", "billing", "Refund processed", "Your refund has been processed", "View refund"],
+    ["order-shipped-notice", "ecommerce", "Order shipped notice", "Your order is on its way", "Track package"],
     ["order-delivered", "ecommerce", "Order delivered", "Your order has been delivered", "View order"],
     ["order-cancelled", "ecommerce", "Order cancelled", "Your order was cancelled", "View order"],
     ["return-approved", "ecommerce", "Return approved", "Your return request was approved", "View return"],
@@ -254,6 +256,20 @@ export function listCatalogTemplates(category?: CatalogTemplateCategory): Catalo
 }
 
 export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
+    if (id === "order-shipped-notice") {
+        if (input === undefined) return buildOrderShippedTemplate();
+        if (typeof input === "object" && input !== null && "trackingUrl" in input) {
+            return buildOrderShippedTemplate(input);
+        }
+        // Existing generic catalog clients can still request every ID using
+        // recipientName/actionUrl. Dedicated callers use the strict shipment schema.
+        const common = ecommerceCatalogTemplateDataSchema.parse(input);
+        return buildOrderShippedTemplate({
+            ...orderShippedPreviewData,
+            firstName: common.recipientName,
+            trackingUrl: common.actionUrl,
+        });
+    }
     if (id === "activity-notification") return buildActivityNotificationTemplate(input);
     if (id === "password-reset-secure") {
         if (input === undefined) return buildPasswordResetSecureTemplate();

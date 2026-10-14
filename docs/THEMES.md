@@ -38,3 +38,11 @@ Built-ins may provide explicit node styles, which have historically taken
 priority over theme values. For exact appearance control across **every**
 template, use `overrides.byType`, `overrides.byRole`, and `overrides.byId`.
 See [CUSTOMIZATION.md](CUSTOMIZATION.md).
+
+### Sky Route shipment design
+
+`order-shipped-notice` accepts optional `data.design` overrides for `accent`, `accentLight`,
+`canvas`, `surface`, `text`, `muted`, `brand`, `border`, `panel`, `panelText`, `success`,
+`progressPending`, `progressLabel`, `footer` and `fontFamily`. All palette defaults remain concrete
+with partially supplied overrides; public `themeName`, `theme`, `layout`, `display`,
+`overrides.byType/byRole/byId` and `patches` options are also supported.

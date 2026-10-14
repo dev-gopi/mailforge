@@ -278,3 +278,10 @@ For example data and theme options, see
 ### Secure password reset (`password-reset-secure`)
 
 The independent `password-reset-secure` template is available by ID alongside the original `password-reset`. For validated data, overrides and usage, see [PASSWORD_RESET_SECURE.md](PASSWORD_RESET_SECURE.md).
+
+### Order shipped notice (`order-shipped-notice`)
+
+`buildOrderShippedTemplate`, `orderShippedSchema`, `orderShippedPreviewData`, and type
+`OrderShippedData` are exported from `@mailforge/templates`. Render by ID through
+`createEmail().render("order-shipped-notice", {data})`. The generic `buildProgressSteps`
+helper is also exported for building milestone nodes; see [ORDER_SHIPPED_NOTICE.md](ORDER_SHIPPED_NOTICE.md).
