@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { buildReportReadyTemplate } from "../notifications/ReportReadyTemplate.js";
+import { buildReportReadyTemplate, reportReadyPreviewData } from "../notifications/ReportReadyTemplate.js";
 import {
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
     isExpandedCatalogTemplateName,
@@ -250,7 +250,21 @@ export function listCatalogTemplates(category?: CatalogTemplateCategory): Catalo
 }
 
 export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
-    if (id === "report-ready") return buildReportReadyTemplate(input);
+    if (id === "report-ready") {
+        // The dedicated report template has a richer contract than the common
+        // catalog fields. Preserve that contract for direct callers, while
+        // allowing catalog consumers to use the shared recipient/action shape.
+        if (input === undefined) return buildReportReadyTemplate();
+        if (typeof input === "object" && input !== null && "reportUrl" in input) {
+            return buildReportReadyTemplate(input);
+        }
+        const data = notificationCatalogTemplateDataSchema.parse(input);
+        return buildReportReadyTemplate({
+            ...reportReadyPreviewData,
+            recipientName: data.recipientName,
+            reportUrl: data.actionUrl,
+        });
+    }
     const entry = definitions.get(id);
     if (!entry) throw new Error(`Unknown catalog template: ${id}`);
     const [, category, title, description, actionLabel] = entry;

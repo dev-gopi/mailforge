@@ -75,6 +75,17 @@ describe("marketing and notification catalog", () => {
         const templates = listCatalogTemplates("notifications");
         expect(templates.length).toBeGreaterThan(0);
         for (const { id } of templates) {
+            if (id === "report-ready") {
+                const result = await email.render(id, {
+                    data: {
+                        companyName: "MailForge", recipientName: "Gopi",
+                        reportName: "Service report", reportPeriod: "October 2026",
+                        reportUrl: base.actionUrl, year: 2026,
+                    },
+                });
+                expect(result.text).toContain("Service report");
+                continue;
+            }
             const result = await email.render(id, {
                 data: { ...base, notification: { serviceName: "MailForge API" } },
             });

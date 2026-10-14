@@ -86,7 +86,7 @@ export function buildReportReadyTemplate(input?: unknown): EmailDocument {
             leaf("report-ready-status", data.statusLabel, "eyebrow", { fontFamily: font, fontSize: 11, lineHeight: "18px", letterSpacing: "1.2px", padding: "0 0 10px", ...(c.accent ? { color: c.accent } : {}) }),
             leaf("report-ready-title", data.heading, "title", { fontFamily: font, fontSize: 29, lineHeight: "38px", padding: "0 0 18px", ...(c.text ? { color: c.text } : {}) }),
             leaf("report-ready-greeting", `${data.greetingPrefix} ${data.recipientName},`, "body", { fontFamily: font, fontSize: 14, lineHeight: "24px", padding: "0 0 8px", ...(c.text ? { color: c.text } : {}) }),
-            leaf("report-ready-intro", data.message, "body", { fontFamily: font, fontSize: 14, lineHeight: "24px", padding: "0 0 25px", ...(c.text ? { color: c.text } : {}) }),
+            leaf("report-ready-message", data.message, "body", { fontFamily: font, fontSize: 14, lineHeight: "24px", padding: "0 0 25px", ...(c.text ? { color: c.text } : {}) }),
         ], "38px 40px 0"),
         { id: "report-ready-summary", type: "section", styles: { padding: "0 40px", ...(c.surface ? { backgroundColor: c.surface } : {}) }, children: [{
             id: "report-ready-summary-column", type: "column", attrs: { "data-mf-style": "panel-inner" },
@@ -98,7 +98,7 @@ export function buildReportReadyTemplate(input?: unknown): EmailDocument {
                 leaf("report-ready-period", data.reportPeriod, "body", { fontFamily: font, fontSize: 13, lineHeight: "21px", padding: "0", ...(c.text ? { color: c.text } : {}) }),
             ],
         }] },
-        section("report-ready-action-row", [{ id: "report-ready-download", type: "button", props: { href: data.reportUrl, text: data.buttonLabel }, attrs: { "data-mf-style": "primary-action", "data-mf-font": "technical" }, styles: { fontFamily: font, textAlign: "left", fontSize: 13, lineHeight: "20px", innerPadding: "14px 24px", padding: "26px 0 20px", ...(c.accent ? { backgroundColor: c.accent } : {}) } }], "0 40px"),
+        section("report-ready-action-row", [{ id: "report-ready-action", type: "button", props: { href: data.reportUrl, text: data.buttonLabel }, attrs: { "data-mf-style": "primary-action", "data-mf-font": "technical" }, styles: { fontFamily: font, textAlign: "left", fontSize: 13, lineHeight: "20px", innerPadding: "14px 24px", padding: "26px 0 20px", ...(c.accent ? { backgroundColor: c.accent } : {}) } }], "0 40px"),
         section("report-ready-fallback-row", [{ id: "report-ready-fallback", type: "link", props: { href: data.reportUrl, prefix: data.fallbackPrefix, text: data.fallbackLabel, suffix: data.fallbackSuffix }, styles: { fontFamily: font, fontSize: 11, lineHeight: "19px", padding: "0", ...(c.muted ? { color: c.muted } : {}) }, attrs: { "data-mf-style": "muted", "data-mf-font": "technical" } }], "0 40px 42px"),
         section("report-ready-footer", [
             leaf("report-ready-auto-note", `${data.automatedNote} ${data.companyName}.`, "footer-note", { fontFamily: font, fontSize: 11, lineHeight: "18px", textAlign: "center", padding: "0 0 5px", ...(c.muted ? { color: c.muted } : {}) }),
