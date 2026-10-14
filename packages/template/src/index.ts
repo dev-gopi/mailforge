@@ -151,6 +151,8 @@ export { buildPasswordResetSecureTemplate, passwordResetSecureSchema, passwordRe
 export type { PasswordResetSecureData } from "./authentication/PasswordResetSecureTemplate.js";
 export { buildNewDeviceLoginAlertTemplate, newDeviceLoginAlertSchema, newDeviceLoginAlertPreviewData } from "./authentication/NewDeviceLoginAlertTemplate.js";
 export type { NewDeviceLoginAlertData } from "./authentication/NewDeviceLoginAlertTemplate.js";
+export { buildSubscriptionActivatedTemplate, subscriptionActivatedSchema, subscriptionActivatedPreviewData } from "./billing/SubscriptionActivatedTemplate.js";
+export type { SubscriptionActivatedData } from "./billing/SubscriptionActivatedTemplate.js";
 
 export { buildOrderShippedTemplate, orderShippedSchema, orderShippedPreviewData } from "./ecommerce/OrderShippedTemplate.js";
 export type { OrderShippedData } from "./ecommerce/OrderShippedTemplate.js";

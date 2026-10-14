@@ -18,10 +18,10 @@ const sample = {recipientName:"Gopi",actionUrl:"https://example.com/next",unsubs
 describe("complete 107-template catalog", () => {
     it("has exactly 107 unique public template IDs", () => {
         expect(EXPANDED_CATALOG_TEMPLATE_NAMES).toHaveLength(51);
-        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(94);
-        expect(listBuiltinTemplateCatalog()).toHaveLength(107);
-        expect(BUILTIN_CATALOG_TEMPLATE_NAMES).toHaveLength(107);
-        expect(new Set(BUILTIN_CATALOG_TEMPLATE_NAMES).size).toBe(107);
+        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(95);
+        expect(listBuiltinTemplateCatalog()).toHaveLength(108);
+        expect(BUILTIN_CATALOG_TEMPLATE_NAMES).toHaveLength(108);
+        expect(new Set(BUILTIN_CATALOG_TEMPLATE_NAMES).size).toBe(108);
     });
     it("retains all previous 49 IDs without changing their relative order", () => {
         const names = BUILTIN_CATALOG_TEMPLATE_NAMES;

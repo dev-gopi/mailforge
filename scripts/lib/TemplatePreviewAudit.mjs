@@ -10,10 +10,10 @@ export function auditPreviewManifest(manifest, catalog, themes) {
   const uniqueThemes = new Set(themes);
   if (uniqueIds.size !== ids.length) errors.push("Duplicate built-in template IDs");
   if (uniqueThemes.size !== themes.length) errors.push("Duplicate theme names");
-  if (!uniqueIds.has("report-ready") || !uniqueIds.has("activity-notification") || !uniqueIds.has("password-reset-secure") || !uniqueIds.has("order-shipped-notice") || !uniqueIds.has("workspace-invitation-editorial") || !uniqueIds.has("appointment-confirmation") || !uniqueIds.has("new-device-login-alert")) {
+  if (!uniqueIds.has("report-ready") || !uniqueIds.has("activity-notification") || !uniqueIds.has("password-reset-secure") || !uniqueIds.has("order-shipped-notice") || !uniqueIds.has("workspace-invitation-editorial") || !uniqueIds.has("appointment-confirmation") || !uniqueIds.has("new-device-login-alert") || !uniqueIds.has("subscription-activated")) {
     errors.push("The compiled catalog must preserve appointment-confirmation and prior reference templates");
   }
-  if (uniqueIds.size < 107) errors.push(`Expected at least 107 built-in IDs; found ${uniqueIds.size}`);
+  if (uniqueIds.size < 108) errors.push(`Expected at least 108 built-in IDs; found ${uniqueIds.size}`);
 
   const expected = new Map();
   for (const id of uniqueIds) {

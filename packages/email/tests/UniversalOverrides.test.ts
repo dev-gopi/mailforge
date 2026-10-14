@@ -37,6 +37,11 @@ function dataForTemplate(id: string): Record<string, unknown> {
             trackingUrl: url, supportUrl: "https://example.com/support", companyAddress: "Example St",
         };
         case "report-ready": return { companyName: "Northstar", recipientName: "Alex", reportName: "Monthly Report", reportPeriod: "September 2026", reportUrl: "https://example.com/report", year: 2026 };
+        case "subscription-activated": return {
+            brandName: "orbit.", firstName: "Alex", planName: "Pro", planPrice: "$24.00",
+            billingPeriod: "per month", nextBillingDate: "Nov 14, 2026",
+            manageSubscriptionUrl: url, supportUrl: "https://example.com/support", year: 2026,
+        };
         default: return { recipientName: "Alex", actionUrl: url, unsubscribeUrl: "https://example.com/unsubscribe", detail: "Reference 1" };
     }
 }
@@ -82,7 +87,7 @@ describe("universal per-render overrides", () => {
     it("supports generic type overrides throughout the complete built-in catalog", async () => {
         const email = createEmail();
         const catalog = listBuiltinTemplateCatalog();
-        expect(catalog).toHaveLength(107);
+        expect(catalog).toHaveLength(108);
         for (const { id } of catalog) {
             const data = dataForTemplate(id);
             const result = await email.render(id, {

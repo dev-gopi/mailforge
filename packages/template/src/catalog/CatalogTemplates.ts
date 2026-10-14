@@ -6,6 +6,7 @@ import { buildWorkspaceInvitationEditorialTemplate, workspaceInvitationEditorial
 import { buildAppointmentConfirmationTemplate, appointmentConfirmationPreviewData } from "../events/AppointmentConfirmationTemplate.js";
 import { buildNewDeviceLoginAlertTemplate, newDeviceLoginAlertPreviewData } from "../authentication/NewDeviceLoginAlertTemplate.js";
 import { buildPasswordResetSecureTemplate, passwordResetSecurePreviewData } from "../authentication/PasswordResetSecureTemplate.js";
+import { buildSubscriptionActivatedTemplate, subscriptionActivatedPreviewData } from "../billing/SubscriptionActivatedTemplate.js";
 import {
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
     isExpandedCatalogTemplateName,
@@ -40,6 +41,7 @@ export const CATALOG_TEMPLATE_DEFINITIONS = [
     // Billing and commerce
     ["payment-failed", "billing", "Payment unsuccessful", "We could not process your payment", "Update payment"],
     ["subscription-renewed", "billing", "Subscription renewed", "Your subscription was renewed", "View subscription"],
+    ["subscription-activated", "billing", "Subscription activated", "Your subscription is now active", "Manage subscription"],
     ["trial-expiring", "billing", "Trial ending soon", "Your free trial is ending", "Choose a plan"],
     ["refund-processed", "billing", "Refund processed", "Your refund has been processed", "View refund"],
     ["order-shipped-notice", "ecommerce", "Order shipped notice", "Your order is on its way", "Track package"],
@@ -262,6 +264,13 @@ export function listCatalogTemplates(category?: CatalogTemplateCategory): Catalo
 }
 
 export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
+    if (id === "subscription-activated") {
+        if (input === undefined) return buildSubscriptionActivatedTemplate();
+        if (typeof input === "object" && input !== null && "manageSubscriptionUrl" in input) return buildSubscriptionActivatedTemplate(input);
+        const common = billingCatalogTemplateDataSchema.parse(input);
+        return buildSubscriptionActivatedTemplate({ ...subscriptionActivatedPreviewData,
+            firstName: common.recipientName, manageSubscriptionUrl: common.actionUrl });
+    }
     if (id === "new-device-login-alert") {
         if (input === undefined) return buildNewDeviceLoginAlertTemplate();
         if (typeof input === "object" && input !== null && "securityUrl" in input) return buildNewDeviceLoginAlertTemplate(input);

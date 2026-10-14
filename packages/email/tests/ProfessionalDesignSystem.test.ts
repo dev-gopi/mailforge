@@ -16,7 +16,7 @@ describe("Professional email design system", () => {
   it("audits all registered catalog documents individually", () => {
     const validator = new DocumentValidator();
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(107);
+    expect(catalog).toHaveLength(108);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       expect(validator.validate(original).valid, id).toBe(true);
@@ -63,7 +63,7 @@ describe("Professional email design system", () => {
       theme: { preset: "corporate", colors: { primary: "#9333ea" },
         appearance: { containerWidth: 640, contentPadding: 40 } },
     });
-    expect(email.listBuiltinCatalog()).toHaveLength(107);
+    expect(email.listBuiltinCatalog()).toHaveLength(108);
     const result = await email.render("payment-failed", {
       data: { recipientName: "Gopi", actionUrl: "https://example.com/pay", detail: "Invoice 123" },
     });
@@ -155,6 +155,17 @@ describe("Professional email design system", () => {
         expect(alert.subject).toBe("New sign-in to your Northline account");
         expect(alert.html).toContain("Gopi");
         expect(alert.html).toContain("https://example.com/action");
+        continue;
+      }
+      if (id === "subscription-activated") {
+        const sub = await email.render(id, { data: {
+          brandName: "orbit.", firstName: "Gopi", planName: "Pro",
+          planPrice: "$24.00", billingPeriod: "per month", nextBillingDate: "Nov 14, 2026",
+          manageSubscriptionUrl: "https://example.com/action", supportUrl: "https://example.com/support", year: 2026,
+        } });
+        expect(sub.subject).toBe("Pro subscription activated — orbit.");
+        expect(sub.html).toContain("Gopi");
+        expect(sub.html).toContain("https://example.com/action");
         continue;
       }
       const result = await email.render(id, { data: {
