@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { buildReportReadyTemplate, reportReadyPreviewData } from "../notifications/ReportReadyTemplate.js";
 import { buildActivityNotificationTemplate } from "../notifications/ActivityNotificationTemplate.js";
+import { buildPasswordResetSecureTemplate, passwordResetSecurePreviewData } from "../authentication/PasswordResetSecureTemplate.js";
 import {
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
     isExpandedCatalogTemplateName,
@@ -48,6 +49,7 @@ export const CATALOG_TEMPLATE_DEFINITIONS = [
     ["event-promotion", "marketing", "Upcoming event", "Join us for our next event", "Register now"],
     ["report-ready", "notifications", "Report ready", "Your report is ready to download", "Download report"],
     ["activity-notification", "notifications", "New comment notification", "A teammate left a comment", "View comment"],
+    ["password-reset-secure", "authentication", "Secure password reset", "Reset your password with a time-limited link", "Reset password"],
     // Alerts, events, SaaS, support
     ["service-maintenance", "notifications", "Scheduled maintenance", "Planned maintenance is coming", "View status"],
     ["service-outage", "notifications", "Service status alert", "A service incident is in progress", "View status"],
@@ -253,6 +255,18 @@ export function listCatalogTemplates(category?: CatalogTemplateCategory): Catalo
 
 export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
     if (id === "activity-notification") return buildActivityNotificationTemplate(input);
+    if (id === "password-reset-secure") {
+        if (input === undefined) return buildPasswordResetSecureTemplate();
+        if (typeof input === "object" && input !== null && "resetUrl" in input) {
+            return buildPasswordResetSecureTemplate(input);
+        }
+        // Preserve generic catalog caller compatibility without weakening the dedicated schema.
+        const common = authenticationCatalogTemplateDataSchema.parse(input);
+        return buildPasswordResetSecureTemplate({
+            ...passwordResetSecurePreviewData,
+            firstName: common.recipientName, resetUrl: common.actionUrl,
+        });
+    }
     if (id === "report-ready") {
         // The dedicated report template has a richer contract than the common
         // catalog fields. Preserve that contract for direct callers, while

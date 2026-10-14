@@ -80,9 +80,9 @@ describe("Professional per-render customization", () => {
     expect(filtered.body.some(n => n.id === "promo-code-box")).toBe(true);
   });
 
-  it("supports optional heading removal in all 102 registered templates", () => {
+  it("supports optional heading removal in all 103 registered templates", () => {
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(102);
+    expect(catalog).toHaveLength(103);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       const output = applyTemplateDisplay(original, { heading: false, eyebrow: false });

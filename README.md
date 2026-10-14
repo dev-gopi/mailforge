@@ -203,3 +203,8 @@ MIT. See [LICENSE](./LICENSE).
 ## New-comment activity notification
 
 Use `createEmail().render("activity-notification", { data })` with validated actor, comment, HTTPS action and preference links. See [the template guide](docs/ACTIVITY_NOTIFICATION.md).
+
+
+### Password reset security reference
+
+The independent `password-reset-secure` built-in preserves the original `password-reset` template. Render via `createEmail().render("password-reset-secure", { data })`; see [docs/PASSWORD_RESET_SECURE.md](docs/PASSWORD_RESET_SECURE.md).

@@ -65,5 +65,5 @@ node scripts/audit-release-previews.mjs
 ```
 
 The expected matrix is 102 templates times 11 variants across ten themes,
-including an extra `modern/no-heading` variant: 1,122 previews. The audit
+including an extra `modern/no-heading` variant: 1,133 previews. The audit
 validates the actual catalog, theme variants, manifest, and generated files.

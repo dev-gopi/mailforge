@@ -133,6 +133,8 @@ export { buildReportReadyTemplate, reportReadySchema, reportReadyPreviewData } f
 export type { ReportReadyData } from "./notifications/ReportReadyTemplate.js";
 export { buildActivityNotificationTemplate, activityNotificationSchema, activityNotificationPreviewData } from "./notifications/ActivityNotificationTemplate.js";
 export type { ActivityNotificationData } from "./notifications/ActivityNotificationTemplate.js";
+export { buildPasswordResetSecureTemplate, passwordResetSecureSchema, passwordResetSecurePreviewData } from "./authentication/PasswordResetSecureTemplate.js";
+export type { PasswordResetSecureData } from "./authentication/PasswordResetSecureTemplate.js";
 
 // Complete catalog exports (kept under the existing singular template package).
 export {

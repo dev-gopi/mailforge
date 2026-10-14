@@ -25,3 +25,8 @@ keys (`accent`, `button`, `surface`, `canvas`, `text`, `muted`,
 The general `theme`/`themeName` API still controls default branding, the outer
 card width/radius/background, and the email-wide visual system.
 See [the template guide](ACTIVITY_NOTIFICATION.md).
+
+
+### Password reset security palette
+
+`password-reset-secure` supports `data.design` palette overrides (`accent`, `canvas`, `surface`, `panel`, `panelText`, `border`, `text`, `muted`) and an approved `fontFamily`. Standard public `theme`, `themeName`, `layoutPreset`, `display` and `patches` render options remain supported.

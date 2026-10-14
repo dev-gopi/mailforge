@@ -1,6 +1,6 @@
 # Built-in templates
 
-> All 102 IDs are registered in `createEmail().listBuiltinCatalog()`.
+> All 103 IDs are registered in `createEmail().listBuiltinCatalog()`.
 
 | ID | Category | Title | Description |
 | --- | --- | --- | --- |
@@ -85,6 +85,7 @@
 | `incident-resolved` | notifications | Service incident resolved | Service availability has been restored |
 | `report-ready` | notifications | Report ready | Your report is ready to download |
 | `activity-notification` | notifications | New comment notification | A teammate left a comment |
+| `password-reset-secure` | authentication | Secure password reset | Reset your password with a time-limited link |
 | `scheduled-reminder` | notifications | Your reminder | You have an upcoming reminder |
 | `service-maintenance` | notifications | Scheduled maintenance | Planned maintenance is coming |
 | `service-outage` | notifications | Service status alert | A service incident is in progress |

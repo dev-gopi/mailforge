@@ -4,7 +4,8 @@ The reference pages below describe the current public API and built-in catalog. 
 
 - [Report Ready notification](REPORT_READY.md) — built-in reference template 03 and its customizable data contract
 - [Public API reference](API.md) — runtime export inventory and usage
-- [All 102 templates and category contracts](TEMPLATES.md)
+- [All 103 templates and category contracts](TEMPLATES.md)
+- [Secure password reset reference](PASSWORD_RESET_SECURE.md)
 - [Theme presets and customization](THEMES.md)
 - [Reusable components](COMPONENTS.md)
 - [Architecture](ARCHITECTURE.md)

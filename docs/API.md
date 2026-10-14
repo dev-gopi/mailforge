@@ -261,3 +261,8 @@ validated `ActivityNotificationData`. Exports `activityNotificationSchema`,
 from `@mailforge/templates` and `@mailforge/email`.
 For example data and theme options, see
 [Activity notification](ACTIVITY_NOTIFICATION.md).
+
+
+### Secure password reset (`password-reset-secure`)
+
+The independent `password-reset-secure` template is available by ID alongside the original `password-reset`. For validated data, overrides and usage, see [PASSWORD_RESET_SECURE.md](PASSWORD_RESET_SECURE.md).

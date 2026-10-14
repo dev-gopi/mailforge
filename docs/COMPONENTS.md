@@ -85,3 +85,8 @@ registered on a custom component catalog.
 
 Use `createEmail().registerComponent()` to add project-specific reusable components.
 Business components only render values provided and validated by the application.
+
+
+### Before-shell sections
+
+Top-level sections/rows may opt into `attrs: { "data-mf-placement": "before-shell" }` to render secondary brand chrome above the main email card. `after-shell` continues to work for outside-card footers. Placement is rejected on leaf nodes; standard MJML validation and escaping apply.

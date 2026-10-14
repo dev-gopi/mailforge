@@ -16,7 +16,7 @@ describe("Professional email design system", () => {
   it("audits all registered catalog documents individually", () => {
     const validator = new DocumentValidator();
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(102);
+    expect(catalog).toHaveLength(103);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       expect(validator.validate(original).valid, id).toBe(true);
@@ -63,7 +63,7 @@ describe("Professional email design system", () => {
       theme: { preset: "corporate", colors: { primary: "#9333ea" },
         appearance: { containerWidth: 640, contentPadding: 40 } },
     });
-    expect(email.listBuiltinCatalog()).toHaveLength(102);
+    expect(email.listBuiltinCatalog()).toHaveLength(103);
     const result = await email.render("payment-failed", {
       data: { recipientName: "Gopi", actionUrl: "https://example.com/pay", detail: "Invoice 123" },
     });
@@ -78,6 +78,15 @@ describe("Professional email design system", () => {
   it("renders all catalog templates through the public API", async () => {
     const email = createEmail({ theme: "modern" });
     for (const { id, title } of listCatalogTemplates()) {
+      if (id === "password-reset-secure") {
+        const output = await email.render(id, { data: {
+          brandName: "Acme", firstName: "Gopi", resetUrl: "https://example.com/action",
+          supportUrl: "https://example.com/support", expiryMinutes: 30, year: 2026,
+        } });
+        expect(output.html).toContain("Gopi");
+        expect(output.html).toContain("https://example.com/action");
+        continue;
+      }
       if (id === "activity-notification") {
         const activity = await email.render(id, { data: {
           brandName: "huddle", recipientName: "Gopi", actorName: "Mira",

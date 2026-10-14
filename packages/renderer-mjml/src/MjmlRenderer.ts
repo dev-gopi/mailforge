@@ -137,22 +137,24 @@ export class MjmlRenderer implements EmailRenderer {
         ];
         // Optional out-of-shell sections for secondary footer chrome.
         // Ordinary emails retain their original single-shell behavior.
+        const beforeShell: EmailNode[] = [];
         const inside: EmailNode[] = [];
         const afterShell: EmailNode[] = [];
         for (const node of nodes) {
             const placement = node.attrs?.["data-mf-placement"];
-            if (placement !== undefined && placement !== "after-shell") {
+            if (placement !== undefined && placement !== "after-shell" && placement !== "before-shell") {
                 throw new Error(`Unsupported shell placement on '${node.id}'`);
             }
-            if (placement === "after-shell") {
+            if (placement === "after-shell" || placement === "before-shell") {
                 if (node.type !== "section" && node.type !== "row") {
                     throw new Error(`Outside-shell placement requires a top-level section or row: '${node.id}'`);
                 }
-                afterShell.push(node);
+                (placement === "before-shell" ? beforeShell : afterShell).push(node);
             } else {
                 inside.push(node);
             }
         }
+        const beforeBody = beforeShell.map(node => this.topLevel(node, state, trust)).join("\n");
         const body = inside.map(node => this.topLevel(node, state, trust)).join("\n");
         const outsideBody = afterShell.map(node => this.topLevel(node, state, trust)).join("\n");
         const head = [
@@ -187,7 +189,7 @@ export class MjmlRenderer implements EmailRenderer {
         const source =
             `<mjml><mj-head>${head}</mj-head>` +
             `<mj-body width="${width}px"${bodyAttributes}>` +
-            `<mj-wrapper css-class="mf-email-shell" background-color="${surface}" ` +
+            `${beforeBody}<mj-wrapper css-class="mf-email-shell" background-color="${surface}" ` +
             `border="1px solid ${border}" border-radius="${radius}px" ` +
             `padding="0">${body}</mj-wrapper>${outsideBody}` +
             `</mj-body></mjml>`;        // MJML 5 supports an async compiler; strict mode throws on validation errors.
