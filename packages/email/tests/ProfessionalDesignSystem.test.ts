@@ -16,7 +16,7 @@ describe("Professional email design system", () => {
   it("audits all registered catalog documents individually", () => {
     const validator = new DocumentValidator();
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(105);
+    expect(catalog).toHaveLength(106);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       expect(validator.validate(original).valid, id).toBe(true);
@@ -63,7 +63,7 @@ describe("Professional email design system", () => {
       theme: { preset: "corporate", colors: { primary: "#9333ea" },
         appearance: { containerWidth: 640, contentPadding: 40 } },
     });
-    expect(email.listBuiltinCatalog()).toHaveLength(105);
+    expect(email.listBuiltinCatalog()).toHaveLength(106);
     const result = await email.render("payment-failed", {
       data: { recipientName: "Gopi", actionUrl: "https://example.com/pay", detail: "Invoice 123" },
     });
@@ -131,6 +131,19 @@ describe("Professional email design system", () => {
         expect(report.html).toContain("Gopi");
         expect(report.html).toContain("https://example.com/action");
         expect(report.text).toContain("Gopi");
+        continue;
+      }
+      if (id === "appointment-confirmation") {
+        const appointment = await email.render(id, { data: {
+          brandName: "Northstar", firstName: "Gopi", appointmentName: "Design consultation",
+          fullDate: "October 21, 2026", monthShort: "OCT", dayNumber: "21", weekdayShort: "WED", year: 2026,
+          timeRange: "10:30–11:00 AM", timezone: "IST", appointmentLocation: "Video call",
+          appointmentUrl: "https://example.com/action", manageUrl: "https://example.com/manage",
+          supportUrl: "https://example.com/support", companyAddress: "Example Street",
+        } });
+        expect(appointment.subject).toBe("Appointment confirmed — Northstar");
+        expect(appointment.html).toContain("Gopi");
+        expect(appointment.html).toContain("https://example.com/action");
         continue;
       }
       const result = await email.render(id, { data: {

@@ -8,7 +8,7 @@ describe("workspace-invitation-editorial (#105)", () => {
     it("registers a standalone template while preserving existing invitations", () => {
         expect(isCatalogTemplateName("workspace-invitation-editorial")).toBe(true);
         expect(listCatalogTemplates().filter(item => item.id === "workspace-invitation-editorial")).toHaveLength(1);
-        expect(listCatalogTemplates()).toHaveLength(92);
+        expect(listCatalogTemplates()).toHaveLength(93);
         const doc = buildCatalogTemplate("workspace-invitation-editorial");
         expect(doc.id).toBe("workspace-invitation-editorial");
         expect(doc.subject).toContain("Fieldnotes");

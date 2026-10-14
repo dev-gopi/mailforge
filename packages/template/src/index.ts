@@ -98,6 +98,13 @@ export {
 } from "./account/WorkspaceInvitationTemplate.js";
 export type { WorkspaceInvitationEditorialData } from "./account/WorkspaceInvitationTemplate.js";
 
+export {
+  buildAppointmentConfirmationTemplate,
+  appointmentConfirmationSchema,
+  appointmentConfirmationPreviewData,
+} from "./events/AppointmentConfirmationTemplate.js";
+export type { AppointmentConfirmationData } from "./events/AppointmentConfirmationTemplate.js";
+
 // Individually configurable built-in templates
 export {
   buildNewsletterTemplate,

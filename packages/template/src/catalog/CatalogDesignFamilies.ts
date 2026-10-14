@@ -32,6 +32,7 @@ const FEATURED: Readonly<Record<string, CatalogDesignFamily>> = {
     "trial-started": "spotlight", "report-ready": "minimal", "activity-notification": "conversation",
     "password-reset-secure": "security", "order-shipped-notice": "delivery",
     "workspace-invitation-editorial": "invitation",
+    "appointment-confirmation": "ticket",
 };
 
 /** Curate semantic exceptions rather than hashing their names. */

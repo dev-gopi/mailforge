@@ -4,7 +4,7 @@ The reference pages below describe the current public API and built-in catalog. 
 
 - [Report Ready notification](REPORT_READY.md) — built-in reference template 03 and its customizable data contract
 - [Public API reference](API.md) — runtime export inventory and usage
-- [All 105 templates and category contracts](TEMPLATES.md)
+- [All 106 templates and category contracts](TEMPLATES.md)
 - [Secure password reset reference](PASSWORD_RESET_SECURE.md)
 - [Theme presets and customization](THEMES.md)
 - [Reusable components](COMPONENTS.md)
@@ -26,3 +26,4 @@ Use the local playground and HTML previews for development, but verify intended 
   shipment-event milestones, customization and verified data requirements.
 
 - [Workspace invitation editorial (#105)](WORKSPACE_INVITATION_EDITORIAL.md) — standalone plum/coral invitation with fully editable data and styles.
+- [Appointment confirmation (#106)](APPOINTMENT_CONFIRMATION.md) — calendar-ticket appointment confirmation with validated appointment details.

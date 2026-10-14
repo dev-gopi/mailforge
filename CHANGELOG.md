@@ -35,3 +35,4 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
   Kept `shipping-update`, `order-delivered`, and all previously registered templates unchanged.
 
 - Added `workspace-invitation-editorial` (#105), a standalone configurable account invitation with strict validation, sample renderer, catalog exports, regression tests and documented public overrides. Existing 104 templates remain available.
+- Added `appointment-confirmation` (#106), a standalone configurable calendar-ticket appointment confirmation with strict validation, responsive preview fixture, catalog integration and documented public API. Existing templates remain available.

@@ -6,7 +6,7 @@ import { buildPasswordResetSecureTemplate, passwordResetSecureSchema, passwordRe
 describe("password-reset-secure standalone catalog template", () => {
     it("registers a distinct ID without replacing the existing password-reset", () => {
         expect(isCatalogTemplateName("password-reset-secure")).toBe(true);
-        expect(listCatalogTemplates()).toHaveLength(92);
+        expect(listCatalogTemplates()).toHaveLength(93);
         expect(listCatalogTemplates().filter(x => x.id === "password-reset-secure")).toHaveLength(1);
     });
     it("builds a valid default document with before- and after-shell sections", () => {

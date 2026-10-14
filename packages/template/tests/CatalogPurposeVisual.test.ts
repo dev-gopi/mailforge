@@ -29,11 +29,11 @@ describe("purposeful catalog design", () => {
         }
     });
 
-    it("retains 92 unique catalog IDs, nodes, actions and unsubscribe controls", () => {
-        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(92);
-        expect(new Set(CATALOG_TEMPLATE_DEFINITIONS.map(([id]) => id)).size).toBe(92);
+    it("retains 93 unique catalog IDs, nodes, actions and unsubscribe controls", () => {
+        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(93);
+        expect(new Set(CATALOG_TEMPLATE_DEFINITIONS.map(([id]) => id)).size).toBe(93);
         for (const [id, category] of CATALOG_TEMPLATE_DEFINITIONS) {
-            if (id === "report-ready" || id === "activity-notification" || id === "password-reset-secure" || id === "order-shipped-notice" || id === "workspace-invitation-editorial") continue;
+            if (id === "report-ready" || id === "activity-notification" || id === "password-reset-secure" || id === "order-shipped-notice" || id === "workspace-invitation-editorial" || id === "appointment-confirmation") continue;
             const doc = buildCatalogTemplate(id);
             const nodes = flatten(doc.body);
             const ids = nodes.map(node => node.id);

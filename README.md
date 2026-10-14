@@ -201,26 +201,3 @@ Detailed guides are available in [docs/README.md](./docs/README.md), including t
 ## License
 
 MIT. See [LICENSE](./LICENSE).
-
-## New-comment activity notification
-
-Use `createEmail().render("activity-notification", { data })` with validated actor, comment, HTTPS action and preference links. See [the template guide](docs/ACTIVITY_NOTIFICATION.md).
-
-
-### Password reset security reference
-
-The independent `password-reset-secure` built-in preserves the original `password-reset` template. Render via `createEmail().render("password-reset-secure", { data })`; see [docs/PASSWORD_RESET_SECURE.md](docs/PASSWORD_RESET_SECURE.md).
-
-### Order shipped — reference-based built-in (#104)
-
-`order-shipped-notice` is a standalone, configurable ecommerce shipment notification. It includes an
-email-safe horizontal milestone display, caller-supplied tracking details, delivery estimate,
-validated HTTPS links, an outside-card brand row and footer. Pass real shipment events: sample
-milestones, dates and tracking codes are demonstration data only.
-
-See [docs/ORDER_SHIPPED_NOTICE.md](docs/ORDER_SHIPPED_NOTICE.md) for the complete data contract,
-customization, local preview and verification commands.
-
-### Workspace invitation editorial — built-in (#105)
-
-Render `workspace-invitation-editorial` with `createEmail().render(id, { data })`. This editable plum/coral workspace invitation is distinct from the original invitation templates. See [template guide](docs/WORKSPACE_INVITATION_EDITORIAL.md) and [runnable example](examples/workspace-invitation-editorial/render.mjs).

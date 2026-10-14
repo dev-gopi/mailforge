@@ -82,7 +82,7 @@ describe("universal per-render overrides", () => {
     it("supports generic type overrides throughout the complete built-in catalog", async () => {
         const email = createEmail();
         const catalog = listBuiltinTemplateCatalog();
-        expect(catalog).toHaveLength(105);
+        expect(catalog).toHaveLength(106);
         for (const { id } of catalog) {
             const data = dataForTemplate(id);
             const result = await email.render(id, {

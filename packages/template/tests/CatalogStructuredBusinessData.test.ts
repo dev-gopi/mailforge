@@ -84,8 +84,8 @@ describe("validated structured business details", () => {
         expect(getNode("usage-limit-reached", base, "saas-metrics")).toBeUndefined();
     });
 
-    it("retains all 92 IDs and previously supplied security/reference node IDs", () => {
-        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(92);
+    it("retains all 93 IDs and previously supplied security/reference node IDs", () => {
+        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(93);
         const input = { ...base, security: {
             device: "Firefox", location: "Kolkata", occurredAt: "2026-10-13T18:30:00+05:30",
         } };

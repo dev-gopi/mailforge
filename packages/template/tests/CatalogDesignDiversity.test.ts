@@ -24,7 +24,7 @@ describe("distinct purpose-driven catalog compositions", () => {
         expect([...names].sort()).toEqual([...CATALOG_DESIGN_FAMILIES].sort());
     });
     it("keeps original content IDs and important links across all layouts", () => {
-        for (const info of listCatalogTemplates().filter(info => !["report-ready", "activity-notification", "password-reset-secure", "order-shipped-notice", "workspace-invitation-editorial"].includes(info.id))) {
+        for (const info of listCatalogTemplates().filter(info => !["report-ready", "activity-notification", "password-reset-secure", "order-shipped-notice", "workspace-invitation-editorial", "appointment-confirmation"].includes(info.id))) {
             const document = buildCatalogTemplate(info.id, data);
             const all = nodes(document.body);
             for (const part of ["title", "greeting", "message", "action"]) {
@@ -38,7 +38,7 @@ describe("distinct purpose-driven catalog compositions", () => {
         }
     });
     it("uses one full-width content card rather than side-by-side story cards", () => {
-        for (const info of listCatalogTemplates().filter(info => info.id !== "report-ready" && info.id !== "activity-notification" && info.id !== "password-reset-secure" && info.id !== "order-shipped-notice" && info.id !== "workspace-invitation-editorial")) {
+        for (const info of listCatalogTemplates().filter(info => info.id !== "report-ready" && info.id !== "activity-notification" && info.id !== "password-reset-secure" && info.id !== "order-shipped-notice" && info.id !== "workspace-invitation-editorial" && info.id !== "appointment-confirmation")) {
             const document = buildCatalogTemplate(info.id, data);
             for (const section of nodes(document.body).filter(node => node.type === "section")) {
                 const columns = section.children?.filter(child => child.type === "column") ?? [];
@@ -63,7 +63,7 @@ describe("distinct purpose-driven catalog compositions", () => {
     });
     it("offers multiple fallback font families without embedding unsafe inline styles", () => {
         const families = new Set<string>();
-        for (const info of listCatalogTemplates().filter(info => info.id !== "report-ready" && info.id !== "activity-notification" && info.id !== "password-reset-secure" && info.id !== "order-shipped-notice" && info.id !== "workspace-invitation-editorial")) {
+        for (const info of listCatalogTemplates().filter(info => info.id !== "report-ready" && info.id !== "activity-notification" && info.id !== "password-reset-secure" && info.id !== "order-shipped-notice" && info.id !== "workspace-invitation-editorial" && info.id !== "appointment-confirmation")) {
             const doc = buildCatalogTemplate(info.id, data);
             const title = nodes(doc.body).find(node => node.id === `${info.id}-title`);
             expect(title?.attrs?.["data-mf-font"]).toBeTruthy();

@@ -1,6 +1,6 @@
 # Built-in templates
 
-> All 105 IDs are registered in `createEmail().listBuiltinCatalog()`.
+> All 106 IDs are registered in `createEmail().listBuiltinCatalog()`.
 
 | ID | Category | Title | Description |
 | --- | --- | --- | --- |
@@ -244,3 +244,7 @@ See [CUSTOMIZATION.md](CUSTOMIZATION.md).
 ## Workspace invitation editorial (#105)
 
 Built-in ID: `workspace-invitation-editorial`. Dedicated validated schema, reusable nodes and customization documented in [WORKSPACE_INVITATION_EDITORIAL.md](WORKSPACE_INVITATION_EDITORIAL.md). Existing `invitation` and `workspace-invitation` remain unchanged.
+
+## Appointment confirmation (#106)
+
+Built-in ID: `appointment-confirmation`. Dedicated validated calendar-ticket data, responsive date/details layout and customization are documented in [APPOINTMENT_CONFIRMATION.md](APPOINTMENT_CONFIRMATION.md). Existing event registration templates remain unchanged.

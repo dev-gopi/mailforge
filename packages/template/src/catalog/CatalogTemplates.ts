@@ -3,6 +3,7 @@ import { buildReportReadyTemplate, reportReadyPreviewData } from "../notificatio
 import { buildActivityNotificationTemplate } from "../notifications/ActivityNotificationTemplate.js";
 import { buildOrderShippedTemplate, orderShippedPreviewData } from "../ecommerce/OrderShippedTemplate.js";
 import { buildWorkspaceInvitationEditorialTemplate, workspaceInvitationEditorialPreviewData } from "../account/WorkspaceInvitationTemplate.js";
+import { buildAppointmentConfirmationTemplate, appointmentConfirmationPreviewData } from "../events/AppointmentConfirmationTemplate.js";
 import { buildPasswordResetSecureTemplate, passwordResetSecurePreviewData } from "../authentication/PasswordResetSecureTemplate.js";
 import {
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
@@ -60,6 +61,7 @@ export const CATALOG_TEMPLATE_DEFINITIONS = [
     ["weekly-digest", "notifications", "Weekly digest", "See this week's highlights", "View digest"],
     ["event-invitation", "events", "Event invitation", "You're invited to an event", "RSVP"],
     ["event-registration", "events", "Registration confirmed", "Your event registration is confirmed", "View ticket"],
+    ["appointment-confirmation", "events", "Appointment confirmed", "Your appointment is confirmed", "View appointment"],
     ["event-reminder", "events", "Event reminder", "Your event is almost here", "Event details"],
     ["event-cancelled", "events", "Event cancelled", "An event you registered for was cancelled", "View event"],
     ["workspace-invitation", "saas", "Workspace invitation", "You've been invited to a workspace", "Join workspace"],
@@ -258,6 +260,17 @@ export function listCatalogTemplates(category?: CatalogTemplateCategory): Catalo
 }
 
 export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
+    if (id === "appointment-confirmation") {
+        if (input === undefined) return buildAppointmentConfirmationTemplate();
+        if (typeof input === "object" && input !== null && "appointmentUrl" in input) {
+            return buildAppointmentConfirmationTemplate(input);
+        }
+        const common = eventCatalogTemplateDataSchema.parse(input);
+        return buildAppointmentConfirmationTemplate({
+            ...appointmentConfirmationPreviewData,
+            firstName: common.recipientName, appointmentUrl: common.actionUrl,
+        });
+    }
     if (id === "workspace-invitation-editorial") {
         if (input === undefined) return buildWorkspaceInvitationEditorialTemplate();
         if (typeof input === "object" && input !== null && "invitationUrl" in input) {
