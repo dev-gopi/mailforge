@@ -8,8 +8,8 @@ import {
 
 describe("unified built-in template catalog", () => {
   it("includes every ready-to-use template in one catalog", () => {
-    expect(BUILTIN_CATALOG_TEMPLATE_NAMES).toHaveLength(101);
-    expect(listBuiltinTemplateCatalog()).toHaveLength(101);
+    expect(BUILTIN_CATALOG_TEMPLATE_NAMES).toHaveLength(102);
+    expect(listBuiltinTemplateCatalog()).toHaveLength(102);
   });
 
   it("builds valid documents from the catalog", () => {

@@ -8,6 +8,19 @@ The `link` node safely renders `props: { text, href, prefix?, suffix? }` as an
 escaped text line with one validated HTTP(S) anchor. No raw HTML is needed.
 The `styles` map accepts the same `mj-text` styling options as a regular text node.
 
+## Core document primitive: rich text and layout chrome
+
+The `rich-text` node accepts `{ segments: [{text, strong?, color?}] }`.
+Each segment is HTML-escaped, with optional bold emphasis or a validated
+six-digit hexadecimal color. There is no arbitrary HTML passthrough.
+Use a `column` with `data-mf-style="quote-panel"` to obtain a theme-based
+comment/quote panel with a left accent border, background, and padding.
+Use `data-mf-columns="keep-mobile"` on a section with two or more columns
+to preserve their horizontal layout on narrow screens.
+Use `data-mf-placement="after-shell"` on a top-level section/row to render a
+footer or secondary message outside the central card, but within the email body.
+Existing templates are unchanged unless they explicitly opt in.
+
 ## Standard
 
 - `mf-action-button`

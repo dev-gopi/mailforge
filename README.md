@@ -199,3 +199,7 @@ Detailed guides are available in [docs/README.md](./docs/README.md), including t
 ## License
 
 MIT. See [LICENSE](./LICENSE).
+
+## New-comment activity notification
+
+Use `createEmail().render("activity-notification", { data })` with validated actor, comment, HTTPS action and preference links. See [the template guide](docs/ACTIVITY_NOTIFICATION.md).

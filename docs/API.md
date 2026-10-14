@@ -252,3 +252,12 @@ console.log(result.html, result.text);
 - Untrusted HTML and URLs must pass the existing sanitizers and validators.
 - Keep `createEmail()` engines isolated per tenant when registering extensions.
 - Built-in IDs, customizations, theme overrides, variants and versions are public compatibility commitments.
+
+## New-comment activity notification
+
+Render using `createEmail().render("activity-notification", {data})` with
+validated `ActivityNotificationData`. Exports `activityNotificationSchema`,
+`activityNotificationPreviewData`, and `buildActivityNotificationTemplate`
+from `@mailforge/templates` and `@mailforge/email`.
+For example data and theme options, see
+[Activity notification](ACTIVITY_NOTIFICATION.md).

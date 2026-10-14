@@ -75,6 +75,16 @@ describe("marketing and notification catalog", () => {
         const templates = listCatalogTemplates("notifications");
         expect(templates.length).toBeGreaterThan(0);
         for (const { id } of templates) {
+            if (id === "activity-notification") {
+                const result = await email.render(id, { data: {
+                    brandName: "huddle", recipientName: "Gopi", actorName: "Mira",
+                    itemName: "Design handoff", commentExcerpt: "Please review",
+                    actionUrl: base.actionUrl,
+                    preferencesUrl: "https://example.com/preferences", year: 2026,
+                } });
+                expect(result.text).toContain("Please review");
+                continue;
+            }
             if (id === "report-ready") {
                 const result = await email.render(id, {
                     data: {

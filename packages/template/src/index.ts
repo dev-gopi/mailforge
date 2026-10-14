@@ -131,6 +131,8 @@ export type {
 
 export { buildReportReadyTemplate, reportReadySchema, reportReadyPreviewData } from "./notifications/ReportReadyTemplate.js";
 export type { ReportReadyData } from "./notifications/ReportReadyTemplate.js";
+export { buildActivityNotificationTemplate, activityNotificationSchema, activityNotificationPreviewData } from "./notifications/ActivityNotificationTemplate.js";
+export type { ActivityNotificationData } from "./notifications/ActivityNotificationTemplate.js";
 
 // Complete catalog exports (kept under the existing singular template package).
 export {

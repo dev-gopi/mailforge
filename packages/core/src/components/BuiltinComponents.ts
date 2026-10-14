@@ -130,6 +130,18 @@ export const BUILTIN_COMPONENTS: readonly ComponentDefinition[] = [
         allowChildren: false,
     },
     {
+        name: "rich-text",
+        version: "1.0.0",
+        schema: z.object({
+            segments: z.array(z.object({
+                text: z.string().max(4096),
+                strong: z.boolean().optional(),
+                color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+            }).strict()).min(1).max(40),
+        }).strict(),
+        allowChildren: false,
+    },
+    {
         name: "link",
         version: "1.0.0",
         schema: z.object({

@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import {
     ComponentRegistry,
+    BUILTIN_COMPONENTS,
 } from "../src/index.js";
 
 describe("ComponentRegistry", () => {
@@ -92,7 +93,8 @@ describe("ComponentRegistry", () => {
 
         const components = registry.list();
 
-        expect(components.length).toBe(16);
+        expect(components.length).toBe(BUILTIN_COMPONENTS.length);
+        expect(components.some((component) => component.name === "rich-text")).toBe(true);
         expect(
             components.some(
                 (component) => component.name === "header",

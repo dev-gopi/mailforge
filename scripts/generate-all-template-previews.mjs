@@ -24,8 +24,9 @@ const entries = [];
 const errors = [];
 const catalogEngine = createEmail({ brand: { name: "Acme", supportEmail: "support@example.com" } });
 const catalog = catalogEngine.listBuiltinCatalog();
-if (catalog.length < 101) {
-  throw new Error(`Unexpected catalog size ${catalog.length} (minimum 101); inspect template registration before regenerating.`);
+if (catalog.length < 102 || !catalog.some(item => item.id === "report-ready") ||
+    !catalog.some(item => item.id === "activity-notification")) {
+  throw new Error(`Compiled catalog has ${catalog.length} templates, but report-ready and activity-notification must both be present. Rebuild all packages first: npx --yes pnpm@10.34.7 -r --if-present build`);
 }
 
 for (const template of catalog) {

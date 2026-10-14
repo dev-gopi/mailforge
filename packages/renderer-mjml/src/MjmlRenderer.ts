@@ -55,7 +55,7 @@ function nodeAttributes(node: EmailNode, state: State): string {
     if (selectors.length) {
         state.selectors.push(`<mj-selector path=".${className}">${selectors.join("")}</mj-selector>`);
     }
-    const responsive = ["heading", "text", "copyright"].includes(node.type)
+    const responsive = ["heading", "text", "rich-text", "copyright"].includes(node.type)
         ? "mf-responsive-copy" : node.type === "button" ? "mf-responsive-action" : "";
     const role = node.attrs?.["data-mf-style"];
     const roleClass = typeof role === "string" && /^[a-z][a-z0-9-]{0,60}$/.test(role)
@@ -135,7 +135,26 @@ export class MjmlRenderer implements EmailRenderer {
             ...(document.footer ? [document.footer] : []),
             ...(document.copyright ? [document.copyright] : []),
         ];
-        const body = nodes.map(node => this.topLevel(node, state, trust)).join("\n");
+        // Optional out-of-shell sections for secondary footer chrome.
+        // Ordinary emails retain their original single-shell behavior.
+        const inside: EmailNode[] = [];
+        const afterShell: EmailNode[] = [];
+        for (const node of nodes) {
+            const placement = node.attrs?.["data-mf-placement"];
+            if (placement !== undefined && placement !== "after-shell") {
+                throw new Error(`Unsupported shell placement on '${node.id}'`);
+            }
+            if (placement === "after-shell") {
+                if (node.type !== "section" && node.type !== "row") {
+                    throw new Error(`Outside-shell placement requires a top-level section or row: '${node.id}'`);
+                }
+                afterShell.push(node);
+            } else {
+                inside.push(node);
+            }
+        }
+        const body = inside.map(node => this.topLevel(node, state, trust)).join("\n");
+        const outsideBody = afterShell.map(node => this.topLevel(node, state, trust)).join("\n");
         const head = [
             document.head?.title ? `<mj-title>${escapeHtml(document.head.title)}</mj-title>` : "",
             document.preheader ? `<mj-preview>${escapeHtml(document.preheader)}</mj-preview>` : "",
@@ -170,7 +189,7 @@ export class MjmlRenderer implements EmailRenderer {
             `<mj-body width="${width}px"${bodyAttributes}>` +
             `<mj-wrapper css-class="mf-email-shell" background-color="${surface}" ` +
             `border="1px solid ${border}" border-radius="${radius}px" ` +
-            `padding="0">${body}</mj-wrapper>` +
+            `padding="0">${body}</mj-wrapper>${outsideBody}` +
             `</mj-body></mjml>`;        // MJML 5 supports an async compiler; strict mode throws on validation errors.
         const compiled = await mjml2html(source, {
             validationLevel: "strict",
@@ -274,7 +293,14 @@ export class MjmlRenderer implements EmailRenderer {
                     return this.column(child, state, trust);
                 }).join("\n")
                 : `<mj-column>${children.map(child => this.leaf(child, state, trust)).join("\n")}</mj-column>`;
-            return `<mj-section ${sectionAttributes}>${columns}</mj-section>`;
+            const keepMobile = node.attrs?.["data-mf-columns"] === "keep-mobile";
+            if (node.attrs?.["data-mf-columns"] !== undefined && !keepMobile) {
+                throw new Error(`Unsupported mobile column setting on '${node.id}'`);
+            }
+            if (keepMobile && (!withColumns || children.length < 2)) {
+                throw new Error(`Mobile column grouping needs multiple columns on '${node.id}'`);
+            }
+            return `<mj-section ${sectionAttributes}>${keepMobile ? `<mj-group>${columns}</mj-group>` : columns}</mj-section>`;
         }
         return `<mj-section background-color="${state.sectionColor}" padding="0"><mj-column>${this.leaf(node, state, trust)}</mj-column></mj-section>`;
     }
@@ -296,6 +322,31 @@ export class MjmlRenderer implements EmailRenderer {
                 const number = Number(props.level ?? 2);
                 const level = Number.isInteger(number) && number >= 1 && number <= 6 ? number : 2;
                 return `<mj-text ${attrs}><h${level} style="margin:0;font-size:inherit;line-height:inherit;font-family:inherit;color:inherit;font-weight:inherit">${escapeHtml(props.text)}</h${level}></mj-text>`;
+            }
+            case "rich-text": {
+                const attrs = targetAttributes(node, "mj-text", state);
+                const source = props.segments;
+                if (!Array.isArray(source) || source.length === 0 || source.length > 40) {
+                    throw new Error(`Invalid inline segments on '${node.id}'`);
+                }
+                const rendered = source.map(segment => {
+                    if (!segment || typeof segment !== "object" || Array.isArray(segment)) {
+                        throw new Error(`Invalid inline segment on '${node.id}'`);
+                    }
+                    const fields = Object.keys(segment);
+                    if (fields.some(key => !["text", "strong", "color"].includes(key)) ||
+                        typeof segment.text !== "string" || segment.text.length > 4096 ||
+                        (segment.strong !== undefined && typeof segment.strong !== "boolean") ||
+                        (segment.color !== undefined &&
+                            (typeof segment.color !== "string" || !/^#[0-9a-fA-F]{6}$/.test(segment.color)))) {
+                        throw new Error(`Invalid inline segment on '${node.id}'`);
+                    }
+                    let value = escapeHtml(segment.text);
+                    if (segment.strong) value = `<strong>${value}</strong>`;
+                    if (segment.color) value = `<span style="color:${segment.color}">${value}</span>`;
+                    return value;
+                }).join("");
+                return `<mj-text ${attrs}>${rendered}</mj-text>`;
             }
             case "text":
             case "copyright": {

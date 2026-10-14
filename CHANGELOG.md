@@ -21,3 +21,5 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Built-in email components, including safe HTTP, CID, and base64 image sources.
 - Document patching and customization support.
 - HTML and MJML renderers with HTML sanitization, CSS inlining, and plain-text output.
+
+- Added `activity-notification` standalone built-in template (#102), reusable escaped rich text, a configurable quote panel, optional outside-card footer placement and mobile-preserved brand columns.

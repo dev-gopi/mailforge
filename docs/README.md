@@ -4,7 +4,7 @@ The reference pages below describe the current public API and built-in catalog. 
 
 - [Report Ready notification](REPORT_READY.md) — built-in reference template 03 and its customizable data contract
 - [Public API reference](API.md) — runtime export inventory and usage
-- [All 101 templates and category contracts](TEMPLATES.md)
+- [All 102 templates and category contracts](TEMPLATES.md)
 - [Theme presets and customization](THEMES.md)
 - [Reusable components](COMPONENTS.md)
 - [Architecture](ARCHITECTURE.md)
@@ -16,3 +16,5 @@ The reference pages below describe the current public API and built-in catalog. 
 
 Use the local playground and HTML previews for development, but verify intended email-client support separately.
 
+
+- [Activity notification built-in](ACTIVITY_NOTIFICATION.md)

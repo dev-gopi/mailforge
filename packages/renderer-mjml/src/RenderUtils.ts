@@ -68,6 +68,7 @@ const STYLE_ATTRIBUTES: Record<string, string> = {
     height: "height",
     borderRadius: "border-radius",
     border: "border",
+    borderLeft: "border-left",
     innerPadding: "inner-padding",
     textDecoration: "text-decoration",
 };
@@ -78,7 +79,7 @@ const TARGET_STYLES: Record<string, readonly string[]> = {
     "mj-button": ["color", "backgroundColor", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "padding", "innerPadding", "width", "height", "borderRadius", "border", "textDecoration"],
     "mj-image": ["width", "height", "padding", "borderRadius", "textAlign"],
     "mj-section": ["backgroundColor", "padding"],
-    "mj-column": ["backgroundColor", "width", "padding", "border", "borderRadius"],
+    "mj-column": ["backgroundColor", "width", "padding", "border", "borderLeft", "borderRadius"],
     "mj-table": ["color", "fontSize", "fontWeight", "fontFamily", "textAlign", "lineHeight", "padding", "width"],
     "mj-divider": ["color", "padding", "width"],
     "mj-spacer": ["height", "padding"],

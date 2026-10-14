@@ -9,7 +9,12 @@ describe("compiled MJML and theme diversity", () => {
     it("renders every catalog template without alignment-invalid MJML", async () => {
         const email = createEmail({ theme: "modern", brand: { name: "Northstar" } });
         for (const template of listCatalogTemplates()) {
-            const result = await email.render(template.id, { data: sample });
+            const data = template.id === "activity-notification"
+                ? { brandName: "huddle", recipientName: "Gopi", actorName: "Mira",
+                    itemName: "Design handoff", commentExcerpt: "Please review",
+                    actionUrl: sample.actionUrl, preferencesUrl: "https://example.com/preferences", year: 2026 }
+                : sample;
+            const result = await email.render(template.id, { data });
             expect(result.html, template.id).toContain("<html");
             expect(result.html, template.id).toContain("https://example.com/open");
         }

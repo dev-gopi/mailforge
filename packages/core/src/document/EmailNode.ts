@@ -10,6 +10,7 @@ export type EmailNodeType =
     | "column"
     | "heading"
     | "text"
+    | "rich-text"
     | "button"
     | "image"
     | "divider"

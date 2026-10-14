@@ -119,6 +119,8 @@ export type {
 
 export { buildReportReadyTemplate, reportReadySchema, reportReadyPreviewData } from "@mailforge/templates";
 export type { ReportReadyData } from "@mailforge/templates";
+export { buildActivityNotificationTemplate, activityNotificationSchema, activityNotificationPreviewData } from "@mailforge/templates";
+export type { ActivityNotificationData } from "@mailforge/templates";
 // Built-in email templates
 export {
     getBuiltinTemplate,

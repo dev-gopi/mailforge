@@ -121,6 +121,12 @@ function roleStyles(role: string | undefined, theme: ResolvedEmailTheme): Styles
       backgroundColor: colors.surface, border: `1px solid ${colors.border}`,
       borderRadius: `${appearance.cardRadius}px`, padding: `${spacing.sm}px 0`,
     };
+    case "quote-panel": return {
+      backgroundColor: colors.section,
+      borderLeft: `3px solid ${colors.primary}`,
+      borderRadius: `${appearance.cardRadius}px`,
+      padding: `${spacing.md}px ${spacing.lg}px`,
+    };
     case "design-conversation": return {
       backgroundColor: colors.section, border: `1px solid ${colors.border}`,
       borderRadius: `${appearance.cardRadius}px ${appearance.cardRadius}px ${appearance.cardRadius}px 0`,
@@ -198,6 +204,7 @@ function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
       lineHeight: "1.25", padding: `0 0 ${spacing.sm}px`,
     };
     case "link":
+    case "rich-text":
     case "text": return {
       color: colors.text, fontFamily: typography.fontFamily,
       fontSize: Math.max(14, typography.baseSize), lineHeight, padding: `0 0 ${spacing.md}px`,
@@ -255,7 +262,7 @@ export function applyEmailTheme(source: EmailDocument, theme: ResolvedEmailTheme
       mono: "Courier New, Courier, monospace",
     };
     const designFont: Styles =
-      ["heading", "text", "link", "button", "copyright"].includes(node.type) &&
+      ["heading", "text", "rich-text", "link", "button", "copyright"].includes(node.type) &&
       typeof fontIntent === "string" && Object.hasOwn(designFontFamilies, fontIntent)
         ? { fontFamily: designFontFamilies[fontIntent]! }
         : {};
