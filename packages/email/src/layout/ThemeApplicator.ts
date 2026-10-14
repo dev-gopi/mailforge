@@ -139,6 +139,7 @@ function roleStyles(role: string | undefined, theme: ResolvedEmailTheme): Styles
       fontWeight: "bold", fontSize: Math.max(14, typography.baseSize),
       padding: `${spacing.md}px ${inset}px`,
     };
+    case "accent-strip": return { backgroundColor: colors.primary, padding: "0" };
     case "divider": return { color: colors.border, padding: `${spacing.sm}px ${inset}px` };
     case "panel-outer": return { padding: `${spacing.xs}px ${inset}px ${spacing.lg}px` };
     case "panel-inner": return {
@@ -196,6 +197,7 @@ function defaultStyles(node: EmailNode, theme: ResolvedEmailTheme): Styles {
       fontSize: Math.min(typography.headingSize, 32), fontWeight: "bold",
       lineHeight: "1.25", padding: `0 0 ${spacing.sm}px`,
     };
+    case "link":
     case "text": return {
       color: colors.text, fontFamily: typography.fontFamily,
       fontSize: Math.max(14, typography.baseSize), lineHeight, padding: `0 0 ${spacing.md}px`,
@@ -253,7 +255,7 @@ export function applyEmailTheme(source: EmailDocument, theme: ResolvedEmailTheme
       mono: "Courier New, Courier, monospace",
     };
     const designFont: Styles =
-      ["heading", "text", "button", "copyright"].includes(node.type) &&
+      ["heading", "text", "link", "button", "copyright"].includes(node.type) &&
       typeof fontIntent === "string" && Object.hasOwn(designFontFamilies, fontIntent)
         ? { fontFamily: designFontFamilies[fontIntent]! }
         : {};

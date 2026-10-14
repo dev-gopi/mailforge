@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { reportReadySchema, type ReportReadyData } from "./notifications/ReportReadyTemplate.js";
 import { newsletterSchema, type NewsletterData } from "./marketing/NewsletterTemplate.js";
 import { promotionSchema, type PromotionData } from "./marketing/PromotionTemplate.js";
 import { shippingUpdateSchema, type ShippingUpdateData } from "./ecommerce/ShippingUpdateTemplate.js";
@@ -235,6 +236,7 @@ export const BUILTIN_ADDITIONAL_TEMPLATE_SCHEMAS = {
   promotion: promotionSchema,
   "shipping-update": shippingUpdateSchema,
   catalog: catalogTemplateDataSchema,
+   "report-ready": reportReadySchema,
 } as const;
 
 export interface BuiltinAdditionalTemplateDataMap {
@@ -242,6 +244,7 @@ export interface BuiltinAdditionalTemplateDataMap {
   promotion: PromotionData;
   "shipping-update": ShippingUpdateData;
   catalog: CatalogTemplateData;
+   "report-ready": ReportReadyData;
 }
 
 /**

@@ -15,13 +15,13 @@ import { BUILTIN_CATALOG_TEMPLATE_NAMES, getBuiltinCatalogTemplate, listBuiltinT
 
 const sample = {recipientName:"Gopi",actionUrl:"https://example.com/next",unsubscribeUrl:"https://example.com/unsubscribe"};
 
-describe("complete 100-template catalog", () => {
-    it("has exactly 100 unique public template IDs", () => {
+describe("complete 101-template catalog", () => {
+    it("has exactly 101 unique public template IDs", () => {
         expect(EXPANDED_CATALOG_TEMPLATE_NAMES).toHaveLength(51);
-        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(87);
-        expect(listBuiltinTemplateCatalog()).toHaveLength(100);
-        expect(BUILTIN_CATALOG_TEMPLATE_NAMES).toHaveLength(100);
-        expect(new Set(BUILTIN_CATALOG_TEMPLATE_NAMES).size).toBe(100);
+        expect(CATALOG_TEMPLATE_DEFINITIONS).toHaveLength(88);
+        expect(listBuiltinTemplateCatalog()).toHaveLength(101);
+        expect(BUILTIN_CATALOG_TEMPLATE_NAMES).toHaveLength(101);
+        expect(new Set(BUILTIN_CATALOG_TEMPLATE_NAMES).size).toBe(101);
     });
     it("retains all previous 49 IDs without changing their relative order", () => {
         const names = BUILTIN_CATALOG_TEMPLATE_NAMES;

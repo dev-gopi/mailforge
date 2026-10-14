@@ -302,6 +302,15 @@ export class MjmlRenderer implements EmailRenderer {
                 const attrs = targetAttributes(node, "mj-text", state);
                 return `<mj-text ${attrs}>${escapeHtml(props.text)}</mj-text>`;
             }
+            case "link": {
+                // Reusable inline text link with escaped surrounding copy.
+                const attrs = targetAttributes(node, "mj-text", state);
+                const url = safeUrl(props.href);
+                const prefix = escapeHtml(props.prefix ?? "");
+                const label = escapeHtml(props.text);
+                const suffix = escapeHtml(props.suffix ?? "");
+                return `<mj-text ${attrs}>${prefix}<a href="${escapeHtml(url)}" target="_blank">${label}</a>${suffix}</mj-text>`;
+            }
             case "button": {
                 const attrs = targetAttributes(node, "mj-button", state);
                 return `<mj-button ${attrs}${xmlAttribute("href", safeUrl(props.href))}>${escapeHtml(props.text)}</mj-button>`;

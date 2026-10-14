@@ -110,6 +110,10 @@ console.log(result.html, result.text);
 - `saasCatalogTemplateDataSchema`
 - `supportCatalogTemplateDataSchema`
 
+- `buildReportReadyTemplate`
+- `reportReadySchema`
+- `reportReadyPreviewData`
+
 ### `@mailforge/templates`
 
 - `BUILTIN_ADDITIONAL_TEMPLATE_SCHEMAS`
@@ -174,6 +178,10 @@ console.log(result.html, result.text);
 - `saasCatalogTemplateDataSchema`
 - `shippingUpdateSchema`
 - `supportCatalogTemplateDataSchema`
+
+- `buildReportReadyTemplate`
+- `reportReadySchema`
+- `reportReadyPreviewData`
 
 ### `@mailforge/themes`
 

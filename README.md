@@ -60,6 +60,8 @@ The returned result is `{ subject, html, text }`. Rendering is separate from
 delivery, so an application can preview, store, queue, or send the result using
 its own provider and policies.
 
+See [Report Ready](docs/REPORT_READY.md) for the new `report-ready` standalone, fully data-driven notification.
+
 ## Render a built-in template
 
 ```ts

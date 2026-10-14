@@ -2,6 +2,12 @@
 
 > Generated from the registered component-name constants in `@mailforge/components`.
 
+## Core document primitive: inline link
+
+The `link` node safely renders `props: { text, href, prefix?, suffix? }` as an
+escaped text line with one validated HTTP(S) anchor. No raw HTML is needed.
+The `styles` map accepts the same `mj-text` styling options as a regular text node.
+
 ## Standard
 
 - `mf-action-button`

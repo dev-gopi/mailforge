@@ -117,6 +117,8 @@ export type {
     HtmlRenderInput,
 } from "@mailforge/renderer-html";
 
+export { buildReportReadyTemplate, reportReadySchema, reportReadyPreviewData } from "@mailforge/templates";
+export type { ReportReadyData } from "@mailforge/templates";
 // Built-in email templates
 export {
     getBuiltinTemplate,

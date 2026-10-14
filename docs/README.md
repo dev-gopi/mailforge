@@ -2,8 +2,9 @@
 
 The reference pages below describe the current public API and built-in catalog. Verify template IDs and exports against a successful build before publishing changes.
 
+- [Report Ready notification](REPORT_READY.md) — built-in reference template 03 and its customizable data contract
 - [Public API reference](API.md) — runtime export inventory and usage
-- [All 100 templates and category contracts](TEMPLATES.md)
+- [All 101 templates and category contracts](TEMPLATES.md)
 - [Theme presets and customization](THEMES.md)
 - [Reusable components](COMPONENTS.md)
 - [Architecture](ARCHITECTURE.md)

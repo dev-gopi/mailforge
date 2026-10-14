@@ -129,6 +129,9 @@ export type {
 } from "./specialized/FeatureShowcaseTemplate.js";
 
 
+export { buildReportReadyTemplate, reportReadySchema, reportReadyPreviewData } from "./notifications/ReportReadyTemplate.js";
+export type { ReportReadyData } from "./notifications/ReportReadyTemplate.js";
+
 // Complete catalog exports (kept under the existing singular template package).
 export {
   CATALOG_TEMPLATE_DEFINITIONS,

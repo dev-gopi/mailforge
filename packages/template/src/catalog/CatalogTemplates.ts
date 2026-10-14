@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { buildReportReadyTemplate } from "../notifications/ReportReadyTemplate.js";
 import {
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
     isExpandedCatalogTemplateName,
@@ -44,6 +45,7 @@ export const CATALOG_TEMPLATE_DEFINITIONS = [
     ["feature-announcement", "marketing", "New feature", "Discover what's new", "Learn more"],
     ["seasonal-sale", "marketing", "Seasonal sale", "Discover limited-time offers", "See offers"],
     ["event-promotion", "marketing", "Upcoming event", "Join us for our next event", "Register now"],
+    ["report-ready", "notifications", "Report ready", "Your report is ready to download", "Download report"],
     // Alerts, events, SaaS, support
     ["service-maintenance", "notifications", "Scheduled maintenance", "Planned maintenance is coming", "View status"],
     ["service-outage", "notifications", "Service status alert", "A service incident is in progress", "View status"],
@@ -248,6 +250,7 @@ export function listCatalogTemplates(category?: CatalogTemplateCategory): Catalo
 }
 
 export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
+    if (id === "report-ready") return buildReportReadyTemplate(input);
     const entry = definitions.get(id);
     if (!entry) throw new Error(`Unknown catalog template: ${id}`);
     const [, category, title, description, actionLabel] = entry;

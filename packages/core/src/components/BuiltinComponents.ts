@@ -130,6 +130,17 @@ export const BUILTIN_COMPONENTS: readonly ComponentDefinition[] = [
         allowChildren: false,
     },
     {
+        name: "link",
+        version: "1.0.0",
+        schema: z.object({
+            text: z.string().min(1).max(300),
+            href: httpUrlSchema,
+            prefix: z.string().max(300).optional(),
+            suffix: z.string().max(300).optional(),
+        }).strict(),
+        allowChildren: false,
+    },
+    {
         name: "button",
         version: "1.0.0",
         schema: z.object({

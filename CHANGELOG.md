@@ -8,6 +8,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- New `report-ready` (reference 03) template with validated data, theme-aware report summary and safe inline links.
+
 - Shared root TypeScript, ESLint, and Vitest configuration.
 - Workspace package metadata and development scripts.
 

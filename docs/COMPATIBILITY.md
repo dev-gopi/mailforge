@@ -4,7 +4,7 @@ MailForge renders HTML and plain text. Its static quality checks and preview gal
 
 ## Automated
 
-The default generator targets 100 templates across ten themes, plus the `modern/no-heading` variants (1,100 previews). Run the documented build, test, and preview commands in `docs/RELEASING.md`.
+The default generator targets 101 templates across ten themes, plus the `modern/no-heading` variants (1,111 previews). Run the documented build, test, and preview commands in `docs/RELEASING.md`.
 
 ## Manual release acceptance
 

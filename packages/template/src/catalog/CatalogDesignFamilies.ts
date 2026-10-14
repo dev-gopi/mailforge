@@ -29,7 +29,7 @@ const FEATURED: Readonly<Record<string, CatalogDesignFamily>> = {
     "workspace-created": "dashboard", "ticket-escalated": "conversation",
     "login-attempt-blocked": "security", "account-restored": "minimal",
     "account-activated": "editorial", "event-feedback-request": "editorial",
-    "trial-started": "spotlight",
+    "trial-started": "spotlight", "report-ready": "minimal",
 };
 
 /** Curate semantic exceptions rather than hashing their names. */

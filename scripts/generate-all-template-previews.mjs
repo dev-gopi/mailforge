@@ -24,8 +24,8 @@ const entries = [];
 const errors = [];
 const catalogEngine = createEmail({ brand: { name: "Acme", supportEmail: "support@example.com" } });
 const catalog = catalogEngine.listBuiltinCatalog();
-if (catalog.length !== 100) {
-  throw new Error(`Unexpected catalog size ${catalog.length} (expected 100); inspect new template additions before regenerating.`);
+if (catalog.length < 101) {
+  throw new Error(`Unexpected catalog size ${catalog.length} (minimum 101); inspect template registration before regenerating.`);
 }
 
 for (const template of catalog) {

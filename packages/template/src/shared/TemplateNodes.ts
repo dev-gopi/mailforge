@@ -7,7 +7,7 @@ import type { EmailDocument, EmailNode } from "@mailforge/core";
  * Node IDs and the document schema remain backward compatible.
  */
 export type TemplateRole =
-  | "title" | "body" | "muted" | "eyebrow" | "primary-action"
+  | "title" | "body" | "muted" | "eyebrow" | "accent-strip" | "primary-action"
   | "quiet-action" | "divider" | "panel-outer" | "panel-inner"
   | "status-icon" | "promotional-code"
   | "hero-title" | "hero-subtitle" | "section-title"
