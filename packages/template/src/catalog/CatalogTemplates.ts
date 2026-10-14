@@ -2,6 +2,7 @@ import { z } from "zod";
 import { buildReportReadyTemplate, reportReadyPreviewData } from "../notifications/ReportReadyTemplate.js";
 import { buildActivityNotificationTemplate } from "../notifications/ActivityNotificationTemplate.js";
 import { buildOrderShippedTemplate, orderShippedPreviewData } from "../ecommerce/OrderShippedTemplate.js";
+import { buildWorkspaceInvitationEditorialTemplate, workspaceInvitationEditorialPreviewData } from "../account/WorkspaceInvitationTemplate.js";
 import { buildPasswordResetSecureTemplate, passwordResetSecurePreviewData } from "../authentication/PasswordResetSecureTemplate.js";
 import {
     EXPANDED_CATALOG_TEMPLATE_DEFINITIONS,
@@ -62,6 +63,7 @@ export const CATALOG_TEMPLATE_DEFINITIONS = [
     ["event-reminder", "events", "Event reminder", "Your event is almost here", "Event details"],
     ["event-cancelled", "events", "Event cancelled", "An event you registered for was cancelled", "View event"],
     ["workspace-invitation", "saas", "Workspace invitation", "You've been invited to a workspace", "Join workspace"],
+    ["workspace-invitation-editorial", "saas", "Editorial workspace invitation", "An editorial invitation to join a workspace", "Accept invitation"],
     ["usage-warning", "saas", "Usage approaching limit", "Your usage is approaching its limit", "Review usage"],
     ["plan-upgrade", "saas", "Plan upgraded", "Your subscription plan was updated", "View plan"],
     ["workspace-member-joined", "saas", "New teammate joined", "A teammate has joined your workspace", "View workspace"],
@@ -256,6 +258,18 @@ export function listCatalogTemplates(category?: CatalogTemplateCategory): Catalo
 }
 
 export function buildCatalogTemplate(id: CatalogTemplateName, input?: unknown): EmailDocument {
+    if (id === "workspace-invitation-editorial") {
+        if (input === undefined) return buildWorkspaceInvitationEditorialTemplate();
+        if (typeof input === "object" && input !== null && "invitationUrl" in input) {
+            return buildWorkspaceInvitationEditorialTemplate(input);
+        }
+        // Compatibility: shared catalog recipients still work; dedicated callers remain strictly validated.
+        const common = saasCatalogTemplateDataSchema.parse(input);
+        return buildWorkspaceInvitationEditorialTemplate({
+            ...workspaceInvitationEditorialPreviewData,
+            recipientFirstName: common.recipientName, invitationUrl: common.actionUrl,
+        });
+    }
     if (id === "order-shipped-notice") {
         if (input === undefined) return buildOrderShippedTemplate();
         if (typeof input === "object" && input !== null && "trackingUrl" in input) {

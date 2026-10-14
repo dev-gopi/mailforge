@@ -6,6 +6,12 @@ const invoiceData = { customer: { name: "Gopi" }, invoice: { number: "INV-2026-0
 const receiptData = { customer: { name: "Gopi" }, receipt: { number: "RCPT-2026-001", transactionId: "TXN-829102", paidOn: "2026-10-13", currency: "USD", items: [{ name: "Pro subscription", quantity: 1, unitPriceCents: 4900 }] }, receiptUrl: url("billing/receipts/RCPT-2026-001") };
 const orderData = { customer: { firstName: "Gopi" }, order: { id: "ORDER-2301", placedOn: "2026-10-13", currency: "USD", items: [{ name: "Notebook", quantity: 2, unitPriceCents: 2000 }, { name: "Pen", quantity: 1, unitPriceCents: 500 }], shippingCents: 500, discountCents: 0 }, orderUrl: url("orders/ORDER-2301") };
 const byId = {
+  "workspace-invitation-editorial": {
+    brandName: "kindred", workspaceName: "Fieldnotes", workspaceInitial: "F",
+    recipientFirstName: "Jordan", inviterName: "Tessa Carter", roleName: "Member",
+    expiryDays: 7, invitationUrl: url("invitations/sample"), supportUrl: url("support"),
+    year: 2026, companyAddress: "88 Grove Street, Portland, OR 97205",
+  },
   "report-ready": { companyName: "Acme", recipientName: "Alex", reportName: "Monthly Performance Report", reportPeriod: "September 2026", reportUrl: url("reports/sample"), year: 2026 },
   "activity-notification": { brandName: "huddle", recipientName: "Jordan", actorName: "Mira Patel", itemName: "Design handoff", commentExcerpt: "The updated screens are ready for your review.", actionUrl: url("discussions/123"), preferencesUrl: url("settings/notifications"), year: 2026 },
   "order-shipped-notice": { brandName: "northline", firstName: "Maya", orderNumber: "NL-20481", deliveryDate: "Oct 17 – 19", carrierName: "ParcelPost", trackingNumber: "PK9048193", trackingUrl: url("track/PK9048193"), supportUrl: url("support"), companyAddress: "123 Market St, San Francisco, CA 94103" },

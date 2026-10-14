@@ -25,6 +25,12 @@ function dataForTemplate(id: string): Record<string, unknown> {
         case "shipping-update": return { customer: { firstName: "Alex" }, order: { id: "ORD-1" }, shipment: { carrier: "MailForge Express", trackingNumber: "TRACK-1", trackingUrl: url, estimatedDelivery: "2026-10-15" } };
         case "password-reset-secure": return reset;
         case "activity-notification": return { brandName: "huddle", recipientName: "Alex", actorName: "Mira", itemName: "Board", commentExcerpt: "Hi", actionUrl: url, preferencesUrl: "https://example.com/preferences", year: 2026 };
+        case "workspace-invitation-editorial": return {
+            brandName: "kindred", workspaceName: "Fieldnotes", workspaceInitial: "F",
+            recipientFirstName: "Alex", inviterName: "Mira", roleName: "Member", expiryDays: 7,
+            invitationUrl: url, supportUrl: "https://example.com/support",
+            year: 2026, companyAddress: "Example Street",
+        };
         case "order-shipped-notice": return {
             brandName: "Northstar", firstName: "Alex", orderNumber: "ORD-1",
             deliveryDate: "October 18", carrierName: "ShipCo", trackingNumber: "TRK-1",
@@ -76,7 +82,7 @@ describe("universal per-render overrides", () => {
     it("supports generic type overrides throughout the complete built-in catalog", async () => {
         const email = createEmail();
         const catalog = listBuiltinTemplateCatalog();
-        expect(catalog).toHaveLength(104);
+        expect(catalog).toHaveLength(105);
         for (const { id } of catalog) {
             const data = dataForTemplate(id);
             const result = await email.render(id, {

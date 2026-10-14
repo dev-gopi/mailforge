@@ -10,10 +10,10 @@ export function auditPreviewManifest(manifest, catalog, themes) {
   const uniqueThemes = new Set(themes);
   if (uniqueIds.size !== ids.length) errors.push("Duplicate built-in template IDs");
   if (uniqueThemes.size !== themes.length) errors.push("Duplicate theme names");
-  if (!uniqueIds.has("report-ready") || !uniqueIds.has("activity-notification") || !uniqueIds.has("password-reset-secure") || !uniqueIds.has("order-shipped-notice")) {
-    errors.push("The compiled catalog must preserve report-ready, activity-notification, password-reset-secure and order-shipped-notice");
+  if (!uniqueIds.has("report-ready") || !uniqueIds.has("activity-notification") || !uniqueIds.has("password-reset-secure") || !uniqueIds.has("order-shipped-notice") || !uniqueIds.has("workspace-invitation-editorial")) {
+    errors.push("The compiled catalog must preserve report-ready, activity-notification, password-reset-secure, order-shipped-notice and workspace-invitation-editorial");
   }
-  if (uniqueIds.size < 104) errors.push(`Expected at least 104 built-in IDs; found ${uniqueIds.size}`);
+  if (uniqueIds.size < 105) errors.push(`Expected at least 105 built-in IDs; found ${uniqueIds.size}`);
 
   const expected = new Map();
   for (const id of uniqueIds) {

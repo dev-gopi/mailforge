@@ -1,6 +1,6 @@
 # Built-in templates
 
-> All 104 IDs are registered in `createEmail().listBuiltinCatalog()`.
+> All 105 IDs are registered in `createEmail().listBuiltinCatalog()`.
 
 | ID | Category | Title | Description |
 | --- | --- | --- | --- |
@@ -240,3 +240,7 @@ addresses semantic styling groups, and `byId` targets individual components
 including content, destinations, imagery, font and spacing. Existing `data`,
 `patches`, `theme`, `layout`, `display`, and variants continue to work.
 See [CUSTOMIZATION.md](CUSTOMIZATION.md).
+
+## Workspace invitation editorial (#105)
+
+Built-in ID: `workspace-invitation-editorial`. Dedicated validated schema, reusable nodes and customization documented in [WORKSPACE_INVITATION_EDITORIAL.md](WORKSPACE_INVITATION_EDITORIAL.md). Existing `invitation` and `workspace-invitation` remain unchanged.

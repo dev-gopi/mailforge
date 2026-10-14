@@ -110,7 +110,34 @@ export function applyTemplateDisplay(
                 // Don't leave empty layout structures after removing their final child.
                 if (!children.length && node.children.length &&
                     ["header", "footer", "section", "row", "column", "container"].includes(node.type)) continue;
-                output.push({ ...node, children });
+                // Visibility controls can remove one side of a mobile-preserved row.
+                // A single surviving column is no longer a group: normalize the
+                // derived document, never the caller's original nodes.
+                let visibleNode: EmailNode = { ...node, children };
+                if (
+                    (node.type === "section" || node.type === "row") &&
+                    node.attrs?.["data-mf-columns"] === "keep-mobile" &&
+                    node.children.length >= 2 &&
+                    children.length === 1 &&
+                    children[0]?.type === "column"
+                ) {
+                    const attrs = { ...node.attrs };
+                    delete attrs["data-mf-columns"];
+                    const singleColumn: EmailNode = { ...children[0] };
+                    // Any width from the former pair would leave the lone column
+                    // needlessly narrow. Allow MJML to use the full row width.
+                    if (singleColumn.styles?.width !== undefined) {
+                        const styles = { ...singleColumn.styles };
+                        delete styles.width;
+                        singleColumn.styles = Object.keys(styles).length ? styles : undefined;
+                    }
+                    visibleNode = {
+                        ...visibleNode,
+                        attrs: Object.keys(attrs).length ? attrs : undefined,
+                        children: [singleColumn],
+                    };
+                }
+                output.push(visibleNode);
             } else {
                 output.push(node);
             }

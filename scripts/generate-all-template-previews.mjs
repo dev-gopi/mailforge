@@ -24,9 +24,9 @@ const entries = [];
 const errors = [];
 const catalogEngine = createEmail({ brand: { name: "Acme", supportEmail: "support@example.com" } });
 const catalog = catalogEngine.listBuiltinCatalog();
-if (catalog.length < 104 || !catalog.some(item => item.id === "order-shipped-notice") || !catalog.some(item => item.id === "password-reset-secure") || !catalog.some(item => item.id === "report-ready") ||
+if (catalog.length < 105 || !catalog.some(item => item.id === "workspace-invitation-editorial") || !catalog.some(item => item.id === "order-shipped-notice") || !catalog.some(item => item.id === "password-reset-secure") || !catalog.some(item => item.id === "report-ready") ||
     !catalog.some(item => item.id === "activity-notification")) {
-  throw new Error(`Compiled catalog has ${catalog.length} templates, but report-ready, activity-notification, password-reset-secure and order-shipped-notice must all be present. Rebuild all packages first: npx --yes pnpm@10.34.7 -r --if-present build`);
+  throw new Error(`Compiled catalog has ${catalog.length} templates, but report-ready, activity-notification, password-reset-secure, order-shipped-notice and workspace-invitation-editorial must all be present. Rebuild all packages first: npx --yes pnpm@10.34.7 -r --if-present build`);
 }
 
 for (const template of catalog) {

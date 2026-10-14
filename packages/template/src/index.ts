@@ -91,6 +91,13 @@ export type {
   TemplateVersionStatus,
 } from "./registry/TemplateVersionRegistry.js";
 
+export {
+  buildWorkspaceInvitationEditorialTemplate,
+  workspaceInvitationEditorialSchema,
+  workspaceInvitationEditorialPreviewData,
+} from "./account/WorkspaceInvitationTemplate.js";
+export type { WorkspaceInvitationEditorialData } from "./account/WorkspaceInvitationTemplate.js";
+
 // Individually configurable built-in templates
 export {
   buildNewsletterTemplate,

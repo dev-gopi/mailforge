@@ -80,9 +80,9 @@ describe("Professional per-render customization", () => {
     expect(filtered.body.some(n => n.id === "promo-code-box")).toBe(true);
   });
 
-  it("supports optional heading removal in all 104 registered templates", () => {
+  it("supports optional heading removal in all 105 registered templates", () => {
     const catalog = listBuiltinTemplateCatalog();
-    expect(catalog).toHaveLength(104);
+    expect(catalog).toHaveLength(105);
     for (const { id } of catalog) {
       const original = getBuiltinCatalogTemplate(id);
       const output = applyTemplateDisplay(original, { heading: false, eyebrow: false });
@@ -98,6 +98,35 @@ describe("Professional per-render customization", () => {
       expect(output.subject, id).toBe(original.subject);
       expect(original.body.length, id).toBeGreaterThan(0);
     }
+  });
+
+  it("reflows a keep-mobile brand row when an eyebrow is hidden", () => {
+    const original = getBuiltinCatalogTemplate("workspace-invitation-editorial");
+    const originalBrand = original.body.find(n => n.id === "invite-editorial-brand");
+    expect(originalBrand?.attrs?.["data-mf-columns"]).toBe("keep-mobile");
+    expect(originalBrand?.children).toHaveLength(2);
+
+    const filtered = applyTemplateDisplay(original, { heading: false, eyebrow: false });
+    const brand = filtered.body.find(n => n.id === "invite-editorial-brand");
+    expect(brand?.attrs?.["data-mf-placement"]).toBe("before-shell");
+    expect(brand?.attrs?.["data-mf-columns"]).toBeUndefined();
+    expect(brand?.children).toHaveLength(1);
+    expect(brand?.children?.[0]?.id).toBe("invite-editorial-brand-left");
+    expect(brand?.children?.[0]?.styles?.width).toBeUndefined();
+    // The original template must remain unchanged for subsequent renders.
+    expect(originalBrand?.children).toHaveLength(2);
+    expect(originalBrand?.attrs?.["data-mf-columns"]).toBe("keep-mobile");
+  });
+
+  it("preserves strict validation of an originally invalid one-column group", () => {
+    const original = getBuiltinCatalogTemplate("workspace-invitation-editorial");
+    const source = structuredClone(original);
+    const brand = source.body.find(n => n.id === "invite-editorial-brand");
+    expect(brand).toBeDefined();
+    brand!.children = [brand!.children![0]!];
+    const filtered = applyTemplateDisplay(source, { eyebrow: false });
+    expect(filtered.body.find(n => n.id === "invite-editorial-brand")?.attrs?.["data-mf-columns"])
+      .toBe("keep-mobile");
   });
 
   it("rejects unknown component IDs and unsafe header overrides", () => {

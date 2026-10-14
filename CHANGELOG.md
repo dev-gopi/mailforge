@@ -33,3 +33,5 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Added `order-shipped-notice` (#104), a standalone Sky Route shipment email with
   caller-controlled milestones and a reusable structured-node `buildProgressSteps` helper.
   Kept `shipping-update`, `order-delivered`, and all previously registered templates unchanged.
+
+- Added `workspace-invitation-editorial` (#105), a standalone configurable account invitation with strict validation, sample renderer, catalog exports, regression tests and documented public overrides. Existing 104 templates remain available.
