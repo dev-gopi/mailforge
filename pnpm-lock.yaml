@@ -33,6 +33,8 @@ importers:
         specifier: ^4.6.6
         version: 4.6.6
 
+  apps/documentation: {}
+
   apps/playground: {}
 
   packages/cli:
@@ -100,6 +102,8 @@ importers:
         specifier: workspace:*
         version: link:../core
 
+  packages/preview: {}
+
   packages/renderer-html:
     dependencies:
       '@mailforge/core':
@@ -164,6 +168,8 @@ importers:
       zod:
         specifier: ^4.6.6
         version: 4.6.6
+
+  packages/testing: {}
 
   packages/themes:
     devDependencies:
